@@ -1,0 +1,382 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import '../../../app/theme/app_colors.dart';
+import '../../../app/theme/app_text_styles.dart';
+import '../../../core/services/providers.dart';
+import '../../../core/utils/localizations.dart';
+import '../../../core/widgets/status_badge.dart';
+
+class ManagerHomeScreen extends ConsumerWidget {
+  const ManagerHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = AppLocalizations.of(context);
+    final user = ref.watch(authStateProvider).value;
+    final requestsState = ref.watch(managerMaintenanceProvider);
+    final paymentsState = ref.watch(managerPaymentsProvider);
+
+    final tenantsState = ref.watch(managerTenantsProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(localizations.translate('app_name')),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.logOut, color: AppColors.primaryNavy),
+            onPressed: () async {
+              await ref.read(authServiceProvider).signOut();
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(managerMaintenanceProvider);
+            ref.invalidate(managerPaymentsProvider);
+            ref.invalidate(managerTenantsProvider);
+          },
+          child: ListView(
+            padding: const EdgeInsets.all(24.0),
+            children: [
+              // 1. Welcome Banner
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryNavy,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome Back, Owner',
+                      style: AppTextStyles.label.copyWith(color: AppColors.lightBlue),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user?.fullName ?? 'Property Owner',
+                      style: AppTextStyles.heading2.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'SMS Services Property Management Portal',
+                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withOpacity(0.8)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // 2. Metrics row
+              _buildMetricsGrid(context, requestsState, paymentsState),
+              const SizedBox(height: 24),
+
+              // 3. Quick Actions Grid
+              Text(
+                'QUICK ACTIONS',
+                style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+              ),
+              const SizedBox(height: 12),
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.4,
+                children: [
+                  _buildActionCard(
+                    context,
+                    icon: LucideIcons.wrench,
+                    title: 'Maintenance',
+                    subtitle: 'Review requests',
+                    color: AppColors.lightBlue,
+                    iconColor: AppColors.primaryNavy,
+                    onTap: () => context.push('/manager/maintenance'),
+                  ),
+                  _buildActionCard(
+                    context,
+                    icon: LucideIcons.creditCard,
+                    title: 'Payments',
+                    subtitle: 'Check receipts',
+                    color: AppColors.warningBg,
+                    iconColor: AppColors.warning,
+                    onTap: () => context.push('/manager/payments'),
+                  ),
+                  _buildActionCard(
+                    context,
+                    icon: LucideIcons.bellRing,
+                    title: 'Notify Tenant',
+                    subtitle: 'Send announcement',
+                    color: AppColors.successBg,
+                    iconColor: AppColors.success,
+                    onTap: () => context.push('/manager/notify'),
+                  ),
+                  _buildActionCard(
+                    context,
+                    icon: LucideIcons.settings,
+                    title: 'Settings',
+                    subtitle: 'App preferences',
+                    color: AppColors.border.withOpacity(0.3),
+                    iconColor: AppColors.secondaryText,
+                    onTap: () => context.push('/settings'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+
+              // 4. Recent Maintenance Requests
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'RECENT MAINTENANCE ISSUES',
+                    style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+                  ),
+                  TextButton(
+                    onPressed: () => context.push('/manager/maintenance'),
+                    child: const Text('View All', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              requestsState.when(
+                data: (requests) {
+                  final activeReqs = requests.where((r) => r.status != 'closed' && r.status != 'cancelled').toList();
+                  if (activeReqs.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'No active maintenance issues found.',
+                        style: AppTextStyles.bodyMedium,
+                      ),
+                    );
+                  }
+                  
+                  final recent = activeReqs.take(3).toList();
+                  return Column(
+                    children: recent.map((req) {
+                      return Card(
+                        color: context.cardColor,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          title: Text(req.title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor)),
+                          subtitle: Text('Unit: ${req.unitId.toUpperCase()} • ${req.category}', style: AppTextStyles.bodySmall.copyWith(color: context.secondaryTextColor)),
+                          trailing: StatusBadge(status: req.status),
+                          onTap: () => context.push('/manager/maintenance/${req.id}'),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
+                error: (e, _) => const Center(child: Text('Error loading issues')),
+              ),
+
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'APARTMENTS DIRECTORY',
+                      style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => context.push('/manager/leases/create'),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('+ Add Lease', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold, fontSize: 12)),
+                      ),
+                      const SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () => context.push('/manager/notify'),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('Broadcast All', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold, fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              tenantsState.when(
+                data: (tenants) {
+                  if (tenants.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'No registered tenants found.',
+                        style: AppTextStyles.bodyMedium,
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children: tenants.map((tenant) {
+                      return Card(
+                        color: context.cardColor,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: AppColors.lightBlue,
+                            child: Text(
+                              tenant.fullName.substring(0, 1).toUpperCase(),
+                              style: const TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          title: Text(
+                            tenant.fullName,
+                            style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
+                          ),
+                          subtitle: Text(
+                            '${tenant.unitNumber ?? "No Unit"} • ${tenant.email}',
+                            style: AppTextStyles.bodySmall.copyWith(color: context.secondaryTextColor),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(LucideIcons.messageSquare, color: AppColors.primaryNavy, size: 20),
+                            tooltip: 'Send Direct Message',
+                            onPressed: () {
+                              context.push('/manager/notify?tenantId=${tenant.id}');
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
+                error: (e, _) => const Center(child: Text('Error loading tenants directory')),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricsGrid(
+    BuildContext context,
+    AsyncValue<List<dynamic>> requestsState,
+    AsyncValue<List<dynamic>> paymentsState,
+  ) {
+    int activeIssues = 0;
+    double rentCollected = 0.0;
+
+    requestsState.whenData((reqs) {
+      activeIssues = reqs.where((r) => r.status != 'closed' && r.status != 'cancelled').length;
+    });
+
+    paymentsState.whenData((txns) {
+      rentCollected = txns.fold(0.0, (sum, item) => sum + item.amount);
+    });
+
+    return Row(
+      children: [
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(LucideIcons.activity, color: AppColors.primaryNavy, size: 20),
+                  const SizedBox(height: 12),
+                  Text(
+                    '$activeIssues Active',
+                    style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryNavy),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('Pending Repairs', style: AppTextStyles.bodySmall),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(LucideIcons.banknote, color: AppColors.success, size: 20),
+                  const SizedBox(height: 12),
+                  Text(
+                    '\$${rentCollected.toStringAsFixed(0)}',
+                    style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: AppColors.success),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('Total Revenue', style: AppTextStyles.bodySmall),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconColor, size: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: AppTextStyles.bodySmall.copyWith(fontSize: 10, color: AppColors.secondaryText)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
