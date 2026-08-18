@@ -509,62 +509,6 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-
-            // 3. Lease Requirements Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(LucideIcons.info, color: AppColors.primaryNavy, size: 20),
-                        const SizedBox(width: 10),
-                        Text(
-                          localizations.translate('lease_reqs'),
-                          style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _buildRequirementRow(localizations.translate('min_coverage')),
-                    const SizedBox(height: 12),
-                    _buildRequirementRow(localizations.translate('mgmt_listed')),
-                    const SizedBox(height: 12),
-                    _buildRequirementRow(localizations.translate('continuous_coverage')),
-                    const SizedBox(height: 20),
-
-                    // Red warning alert container
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorBg,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.error.withOpacity(0.5)),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(LucideIcons.alertTriangle, color: AppColors.error, size: 18),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              localizations.translate('insurance_warning'),
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.error,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -614,25 +558,4 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
     );
   }
 
-  Widget _buildRequirementRow(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(
-          LucideIcons.check,
-          color: AppColors.success,
-          size: 16,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.primaryText,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }

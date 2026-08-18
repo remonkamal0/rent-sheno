@@ -15,11 +15,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _pushNotifications = true;
-  bool _emailNotifications = true;
-  bool _paymentNotifications = true;
-  bool _maintenanceNotifications = true;
-  bool _insuranceAlerts = true;
   bool _darkMode = false;
 
   @override
@@ -28,18 +23,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _darkMode = ref.read(themeModeProvider) == ThemeMode.dark;
   }
 
-  void _toggleLanguage() {
-    final currentLocale = ref.read(localeProvider);
-    final newLangCode = currentLocale.languageCode == 'en' ? 'es' : 'en';
+  void _showLanguageSelector() {
+    final currentLang = ref.read(localeProvider).languageCode;
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: context.cardColor,
+          title: Text(
+            AppLocalizations.of(context).translate('lang_label'),
+            style: AppTextStyles.heading3.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.primaryTextColor,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildLanguageOption('en', 'English', currentLang),
+              const Divider(height: 1),
+              _buildLanguageOption('es', 'Español', currentLang),
+              const Divider(height: 1),
+              _buildLanguageOption('ar', 'العربية', currentLang),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-    ref.read(localeProvider.notifier).state = Locale(newLangCode);
-    ref.read(sharedPrefsProvider).setLanguage(newLangCode);
+  Widget _buildLanguageOption(String code, String label, String currentLang) {
+    final isSelected = currentLang == code;
+    return ListTile(
+      title: Text(
+        label,
+        style: AppTextStyles.bodyMedium.copyWith(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: context.primaryTextColor,
+        ),
+      ),
+      trailing: isSelected 
+          ? Icon(LucideIcons.check, color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, size: 18)
+          : null,
+      onTap: () {
+        ref.read(localeProvider.notifier).state = Locale(code);
+        ref.read(sharedPrefsProvider).setLanguage(code);
+        Navigator.pop(context);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    final isSpanish = ref.watch(localeProvider).languageCode == 'es';
+    final langCode = ref.watch(localeProvider).languageCode;
+    String langName = 'English';
+    if (langCode == 'es') {
+      langName = 'Español';
+    } else if (langCode == 'ar') {
+      langName = 'العربية';
+    }
     final themeAccentIconColor = context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy;
 
     return Scaffold(
@@ -52,8 +96,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           onPressed: () {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
-            } else {
+            } else if (context.canPop()) {
               context.pop();
+            } else {
+              final user = ref.read(authServiceProvider).currentUser;
+              if (user?.role == 'landlord' || user?.role == 'manager') {
+                context.go('/manager/home');
+              } else {
+                context.go('/');
+              }
             }
           },
         ),
@@ -80,53 +131,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 trailing: Text(
-                  isSpanish ? 'Español' : 'English',
+                  langName,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: themeAccentIconColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onTap: _toggleLanguage,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // 2. Notification switches
-            _buildSectionHeader('Notifications'),
-            Card(
-              color: context.cardColor,
-              child: Column(
-                children: [
-                  _buildSwitchTile(
-                    title: localizations.translate('push_notif'),
-                    value: _pushNotifications,
-                    onChanged: (val) => setState(() => _pushNotifications = val),
-                  ),
-                  Divider(height: 1, color: context.borderColor),
-                  _buildSwitchTile(
-                    title: localizations.translate('email_notif'),
-                    value: _emailNotifications,
-                    onChanged: (val) => setState(() => _emailNotifications = val),
-                  ),
-                  Divider(height: 1, color: context.borderColor),
-                  _buildSwitchTile(
-                    title: localizations.translate('pay_notif'),
-                    value: _paymentNotifications,
-                    onChanged: (val) => setState(() => _paymentNotifications = val),
-                  ),
-                  Divider(height: 1, color: context.borderColor),
-                  _buildSwitchTile(
-                    title: localizations.translate('maint_notif'),
-                    value: _maintenanceNotifications,
-                    onChanged: (val) => setState(() => _maintenanceNotifications = val),
-                  ),
-                  Divider(height: 1, color: context.borderColor),
-                  _buildSwitchTile(
-                    title: localizations.translate('ins_alert'),
-                    value: _insuranceAlerts,
-                    onChanged: (val) => setState(() => _insuranceAlerts = val),
-                  ),
-                ],
+                onTap: _showLanguageSelector,
               ),
             ),
             const SizedBox(height: 16),
@@ -214,6 +225,69 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     },
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              color: context.cardColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: AppColors.error, width: 1),
+              ),
+              child: ListTile(
+                leading: const Icon(LucideIcons.trash2, color: AppColors.error),
+                title: Text(
+                  'Delete Account',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.error,
+                  ),
+                ),
+                trailing: const Icon(LucideIcons.chevronRight, size: 18, color: AppColors.error),
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: context.cardColor,
+                        title: const Text('Delete Account', style: TextStyle(color: AppColors.error)),
+                        content: const Text('Are you sure you want to permanently delete your account? This action is irreversible and all your data will be permanently deleted.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text('Cancel', style: TextStyle(color: context.secondaryTextColor)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Delete Permanently'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirm == true) {
+                    try {
+                      await ref.read(authServiceProvider).deleteAccount();
+                      if (context.mounted) {
+                        context.go('/login');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Account deleted successfully.'), backgroundColor: AppColors.success),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+                        );
+                      }
+                    }
+                  }
+                },
               ),
             ),
             const SizedBox(height: 24),

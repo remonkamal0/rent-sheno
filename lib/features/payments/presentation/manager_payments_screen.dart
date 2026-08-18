@@ -6,6 +6,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../core/widgets/skeleton_loading.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -16,6 +17,7 @@ class ManagerPaymentsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final paymentsState = ref.watch(managerPaymentsProvider);
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -122,7 +124,7 @@ class ManagerPaymentsScreen extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                DateFormatter.formatRelative(pay.paymentDate),
+                                DateFormatter.formatRelative(pay.paymentDate, localizations),
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.secondaryText,
                                 ),
@@ -149,6 +151,7 @@ class ManagerPaymentsScreen extends ConsumerWidget {
   }
 
   void _showReceiptProofDialog(BuildContext context, dynamic payment) {
+    final localizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -205,7 +208,7 @@ class ManagerPaymentsScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             _buildDialogRow('Payment Channel', payment.paymentMethod),
             const SizedBox(height: 8),
-            _buildDialogRow('Payment Date', DateFormatter.formatRelative(payment.paymentDate)),
+            _buildDialogRow('Payment Date', DateFormatter.formatRelative(payment.paymentDate, localizations)),
           ],
         ),
         actions: [

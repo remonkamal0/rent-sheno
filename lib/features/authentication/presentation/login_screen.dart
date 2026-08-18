@@ -88,14 +88,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _toggleLanguage() {
-    final currentLocale = ref.read(localeProvider);
-    final newLangCode = currentLocale.languageCode == 'en' ? 'ar' : 'en';
-    
-    ref.read(localeProvider.notifier).state = Locale(newLangCode);
-    ref.read(sharedPrefsProvider).setLanguage(newLangCode);
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -106,7 +98,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    final isArabic = ref.watch(localeProvider).languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -255,33 +246,74 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     isLoading: _isLoading,
                     onTap: _handleLogin,
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
 
-                  // Language Switcher Toggle
-                  Center(
-                    child: GestureDetector(
-                      onTap: _toggleLanguage,
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.border, width: 1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          isArabic ? 'English | EN' : 'عربي | AR',
-                          style: AppTextStyles.bodyMedium.copyWith(
+                  // Register Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('New resident? ', style: AppTextStyles.bodyMedium),
+                      GestureDetector(
+                        onTap: () => context.push('/signup'),
+                        child: const Text(
+                          'Register Account',
+                          style: TextStyle(
                             color: AppColors.primaryNavy,
                             fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
-                    ),
+                    ],
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Language Switcher Selector
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLanguagePill('en', 'English'),
+                      const SizedBox(width: 8),
+                      _buildLanguagePill('es', 'Español'),
+                      const SizedBox(width: 8),
+                      _buildLanguagePill('ar', 'العربية'),
+                    ],
                   ),
                   const SizedBox(height: 20),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguagePill(String code, String label) {
+    final currentLang = ref.watch(localeProvider).languageCode;
+    final isActive = currentLang == code;
+    
+    return GestureDetector(
+      onTap: () {
+        ref.read(localeProvider.notifier).state = Locale(code);
+        ref.read(sharedPrefsProvider).setLanguage(code);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primaryNavy : Colors.transparent,
+          border: Border.all(
+            color: isActive ? AppColors.primaryNavy : AppColors.border,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: isActive ? Colors.white : AppColors.primaryNavy,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
           ),
         ),
       ),

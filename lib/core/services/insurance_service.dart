@@ -133,6 +133,39 @@ class InsuranceService {
     }
   }
 
+  Future<InsurancePolicy?> getPolicyForResident(String residentId) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return _mockPolicy;
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('insurance_policies')
+            .select()
+            .eq('resident_id', residentId)
+            .maybeSingle();
+
+        if (res == null) return null;
+
+        return InsurancePolicy(
+          id: res['id'],
+          residentId: res['resident_id'],
+          provider: res['provider'],
+          policyNumber: res['policy_number'],
+          coverageAmount: (res['coverage_amount'] as num).toDouble(),
+          deductible: (res['deductible'] as num).toDouble(),
+          effectiveDate: DateTime.parse(res['effective_date']),
+          expirationDate: DateTime.parse(res['expiration_date']),
+          documentUrl: res['document_url'],
+          status: res['status'],
+        );
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
   Future<InsurancePolicy> updatePolicy({
     required String provider,
     required String policyNumber,

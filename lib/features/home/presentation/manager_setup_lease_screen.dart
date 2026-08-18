@@ -9,7 +9,8 @@ import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
 
 class ManagerSetupLeaseScreen extends ConsumerStatefulWidget {
-  const ManagerSetupLeaseScreen({super.key});
+  final String? preSelectedUnitNumber;
+  const ManagerSetupLeaseScreen({super.key, this.preSelectedUnitNumber});
 
   @override
   ConsumerState<ManagerSetupLeaseScreen> createState() => _ManagerSetupLeaseScreenState();
@@ -17,7 +18,7 @@ class ManagerSetupLeaseScreen extends ConsumerStatefulWidget {
 
 class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _unitController = TextEditingController();
+  late final TextEditingController _unitController;
   final _floorController = TextEditingController(text: '1');
   final _rentController = TextEditingController(text: '1500.0');
   final _depositController = TextEditingController(text: '1000.0');
@@ -26,6 +27,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 365));
   bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _unitController = TextEditingController(text: widget.preSelectedUnitNumber ?? '');
+  }
 
   @override
   void dispose() {

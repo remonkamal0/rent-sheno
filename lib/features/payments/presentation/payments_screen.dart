@@ -26,6 +26,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   int _activeTab = 0; // 0: Balance & Charges, 1: History
 
   Future<void> _showCheckoutSheet(BuildContext context, double amount, List<String> chargeIds) async {
+    final localizations = AppLocalizations.of(context);
     String selectedMethod = 'Bank Transfer';
     PlatformFile? pickedFile;
     final notesController = TextEditingController();
@@ -55,13 +56,13 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      'Confirm Payment',
+                     Text(
+                      localizations.translate('confirm_payment'),
                       style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Select manual payment method, write payment reference details, and upload the receipt proof.',
+                      localizations.translate('payment_method_desc'),
                       style: AppTextStyles.bodyMedium,
                     ),
                     const SizedBox(height: 24),
@@ -77,7 +78,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total Amount Due',
+                            localizations.translate('total_due'),
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.primaryNavy,
                               fontWeight: FontWeight.w600,
@@ -97,7 +98,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   
                     // Payment method selector
                     Text(
-                      'SELECT PAYMENT METHOD',
+                      localizations.translate('select_payment_method').toUpperCase(),
                       style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
                     ),
                     const SizedBox(height: 10),
@@ -121,7 +122,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
 
                     // Payment reference details notes
                     Text(
-                      'DEPOSIT DETAILS / TRANSACTION ID',
+                      localizations.translate('txn_id').toUpperCase(),
                       style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
                     ),
                     const SizedBox(height: 8),
@@ -138,7 +139,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   // Receipt Upload Section (Conditional)
                   if (requiresReceipt) ...[
                     Text(
-                      'PROOF OF PAYMENT',
+                      localizations.translate('proof_of_payment'),
                       style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
                     ),
                     const SizedBox(height: 8),
@@ -180,11 +181,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                               size: 20,
                             ),
                             const SizedBox(width: 8),
-                            Expanded(
+                             Expanded(
                               child: Text(
                                 pickedFile != null
                                     ? pickedFile!.name
-                                    : 'Tap to Attach Payment Receipt (JPG, PNG, PDF)',
+                                    : localizations.translate('attach_payment_receipt'),
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: pickedFile != null ? AppColors.success : AppColors.secondaryText,
                                   fontWeight: pickedFile != null ? FontWeight.bold : FontWeight.normal,
@@ -211,7 +212,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
 
                   // Confirm button
                   AppPrimaryButton(
-                    text: 'Pay \$${amount.toStringAsFixed(2)}',
+                    text: localizations.translate('send_amount', '\$${amount.toStringAsFixed(2)}'),
                     onTap: () async {
                       if (requiresReceipt && pickedFile == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -284,6 +285,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   }
 
   void _showSuccessDialog() {
+    final localizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -297,13 +299,13 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Payment Received!',
+              localizations.translate('submission_success'),
               style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Thank you. Your balance has been updated successfully.',
+            Text(
+              localizations.translate('submission_success_desc'),
               style: AppTextStyles.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -315,11 +317,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {
-                  _activeTab = 1; // Go to Payment History
+                  _activeTab = 1; // Go to History tab
                 });
               },
               child: Text(
-                'View Transaction',
+                localizations.translate('view_transaction'),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.primaryNavy,
                   fontWeight: FontWeight.bold,
@@ -374,14 +376,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               children: [
                 Expanded(
                   child: _buildTabItem(
-                    label: 'Balance & Charges',
+                    label: localizations.translate('balance_charges'),
                     isSelected: _activeTab == 0,
                     onTap: () => setState(() => _activeTab = 0),
                   ),
                 ),
                 Expanded(
                   child: _buildTabItem(
-                    label: 'Payment History',
+                    label: localizations.translate('payment_history'),
                     isSelected: _activeTab == 1,
                     onTap: () => setState(() => _activeTab = 1),
                   ),
@@ -451,7 +453,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
         // Find closest due date
         unpaidCharges.sort((a, b) => a.dueDate.compareTo(b.dueDate));
         final nearestCharge = unpaidCharges.first;
-        final dueStatusText = DateFormatter.formatOverdueDate(nearestCharge.dueDate);
+        final dueStatusText = DateFormatter.formatOverdueDate(nearestCharge.dueDate, localizations);
         final bool isLate = nearestCharge.calculatedStatus == 'past_due';
 
         return ListView(

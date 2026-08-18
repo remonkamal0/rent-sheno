@@ -243,7 +243,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormatter.formatRelative(notification.createdAt),
+                          DateFormatter.formatRelative(notification.createdAt, AppLocalizations.of(context)),
                           style: AppTextStyles.bodySmall.copyWith(fontSize: 11),
                         ),
                       ],

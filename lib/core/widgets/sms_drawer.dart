@@ -208,7 +208,11 @@ class SmsDrawer extends ConsumerWidget {
         if (onTap != null) {
           onTap();
         } else if (route != null) {
-          context.go(route);
+          if (route == '/settings') {
+            context.push(route);
+          } else {
+            context.go(route);
+          }
         }
       },
       borderRadius: BorderRadius.circular(8),

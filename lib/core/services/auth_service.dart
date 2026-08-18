@@ -63,14 +63,21 @@ class AuthService {
     final token = await _secureStorage.getToken();
     if (token != null && token.startsWith('mock-session-token')) {
       final isManager = token.contains('manager');
-      _currentUser = UserProfile(
-        id: isManager ? 'mock-manager-999' : 'mock-user-123',
-        fullName: isManager ? 'Abu Mazen (Landlord)' : AppConstants.demoFullName,
-        email: isManager ? 'landlord@example.com' : AppConstants.demoEmail,
-        phone: isManager ? '+966500000000' : AppConstants.demoPhone, // fallback
-        preferredLanguage: 'en',
-        role: isManager ? 'manager' : 'tenant',
-      );
+      if (token.contains('mock-session-token-tenant-')) {
+        final userId = token.replaceFirst('mock-session-token-tenant-', '');
+        final idx = _mockTenants.indexWhere((t) => t.id == userId);
+        _currentUser = idx != -1 ? _mockTenants[idx] : null;
+      } else {
+        _currentUser = UserProfile(
+          id: isManager ? 'mock-manager-999' : 'mock-user-123',
+          fullName: isManager ? 'Abu Mazen (Landlord)' : AppConstants.demoFullName,
+          email: isManager ? 'landlord@example.com' : AppConstants.demoEmail,
+          phone: isManager ? '+966500000000' : AppConstants.demoPhone,
+          preferredLanguage: 'en',
+          role: isManager ? 'manager' : 'tenant',
+          unitNumber: isManager ? null : 'Bldg 1 - Apt 101',
+        );
+      }
       _authStateController.add(_currentUser);
       return;
     }
@@ -131,32 +138,49 @@ class AuthService {
   Future<bool> signIn(String email, String password, bool rememberMe) async {
     final inputEmail = email.trim().toLowerCase();
     
-    if ((inputEmail == AppConstants.demoEmail.toLowerCase() || inputEmail == 'landlord@example.com') &&
-        password == AppConstants.demoPassword) {
-      final isManager = inputEmail == 'landlord@example.com';
-      _currentUser = UserProfile(
-        id: isManager ? 'mock-manager-999' : 'mock-user-123',
-        fullName: isManager ? 'Abu Mazen (Landlord)' : AppConstants.demoFullName,
-        email: isManager ? 'landlord@example.com' : AppConstants.demoEmail,
-        phone: isManager ? '+966500000000' : AppConstants.demoPhone,
-        preferredLanguage: 'en',
-        role: isManager ? 'manager' : 'tenant',
-      );
-      
-      final token = isManager ? 'mock-session-token-manager' : 'mock-session-token-tenant';
-      await _secureStorage.saveToken(token);
-
-      if (rememberMe) {
-        await _secureStorage.saveRememberedEmail(email);
-      } else {
-        await _secureStorage.deleteRememberedEmail();
-      }
-      _authStateController.add(_currentUser);
-      return true;
-    }
-
     if (SupabaseClientHelper.isMockMode) {
-      await Future.delayed(const Duration(seconds: 1)); // Simulate api call
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (inputEmail == 'landlord@example.com') {
+        _currentUser = UserProfile(
+          id: 'mock-manager-999',
+          fullName: 'Abu Mazen (Landlord)',
+          email: 'landlord@example.com',
+          phone: '+966500000000',
+          preferredLanguage: 'en',
+          role: 'manager',
+        );
+        await _secureStorage.saveToken('mock-session-token-manager');
+        if (rememberMe) await _secureStorage.saveRememberedEmail(email);
+        _authStateController.add(_currentUser);
+        return true;
+      }
+
+      final tenantIdx = _mockTenants.indexWhere((t) => t.email.toLowerCase() == inputEmail);
+      if (tenantIdx != -1) {
+        _currentUser = _mockTenants[tenantIdx];
+        await _secureStorage.saveToken('mock-session-token-tenant-${_currentUser!.id}');
+        if (rememberMe) await _secureStorage.saveRememberedEmail(email);
+        _authStateController.add(_currentUser);
+        return true;
+      }
+
+      if (inputEmail == AppConstants.demoEmail.toLowerCase()) {
+        _currentUser = UserProfile(
+          id: 'mock-user-123',
+          fullName: AppConstants.demoFullName,
+          email: AppConstants.demoEmail,
+          phone: AppConstants.demoPhone,
+          preferredLanguage: 'en',
+          role: 'tenant',
+          unitNumber: 'Bldg 1 - Apt 101',
+        );
+        await _secureStorage.saveToken('mock-session-token-tenant');
+        if (rememberMe) await _secureStorage.saveRememberedEmail(email);
+        _authStateController.add(_currentUser);
+        return true;
+      }
+
       throw Exception('Invalid email or password');
     } else {
       try {
@@ -182,6 +206,88 @@ class AuthService {
     }
   }
 
+  Future<void> signUp({
+    required String fullName,
+    required String email,
+    required String password,
+    required String phone,
+  }) async {
+    final cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail.isEmpty || fullName.isEmpty || password.isEmpty) {
+      throw Exception('All registration fields are required.');
+    }
+
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      final newPendingUser = UserProfile(
+        id: 'mock-pending-${DateTime.now().millisecondsSinceEpoch}',
+        fullName: fullName,
+        email: cleanEmail,
+        phone: phone,
+        preferredLanguage: 'en',
+        role: 'pending',
+      );
+      _mockTenants.add(newPendingUser);
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final response = await client.auth.signUp(
+          email: cleanEmail,
+          password: password,
+        );
+
+        if (response.user != null) {
+          await client.from('profiles').insert({
+            'auth_user_id': response.user!.id,
+            'full_name': fullName,
+            'email': cleanEmail,
+            'phone': phone,
+            'role': 'pending',
+          });
+        }
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> approveTenant({
+    required String tenantId,
+  }) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      for (int i = 0; i < _mockTenants.length; i++) {
+        if (_mockTenants[i].id == tenantId) {
+          _mockTenants[i] = _mockTenants[i].copyWith(role: 'tenant');
+          break;
+        }
+      }
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        await client.from('profiles').update({'role': 'tenant'}).eq('id', tenantId);
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> rejectTenant({
+    required String tenantId,
+  }) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      _mockTenants.removeWhere((t) => t.id == tenantId);
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        await client.from('profiles').delete().eq('id', tenantId);
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
   Future<void> signOut() async {
     if (SupabaseClientHelper.isMockMode) {
       await _secureStorage.deleteToken();
@@ -193,6 +299,24 @@ class AuthService {
       _currentUser = null;
       _authStateController.add(null);
     }
+  }
+
+  Future<void> deleteAccount() async {
+    final user = _currentUser;
+    if (user == null) return;
+
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      _mockTenants.removeWhere((t) => t.id == user.id);
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        await client.from('profiles').delete().eq('id', user.id);
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+    await signOut();
   }
 
   Future<void> updateProfile({
@@ -258,7 +382,7 @@ class AuthService {
       phone: '+1 (555) 019-2834',
       preferredLanguage: 'en',
       role: 'tenant',
-      unitNumber: 'Apt 402',
+      unitNumber: 'Bldg 1 - Apt 101',
     ),
     UserProfile(
       id: 'mock-user-456',
@@ -267,7 +391,7 @@ class AuthService {
       phone: '+1 (555) 023-4567',
       preferredLanguage: 'en',
       role: 'tenant',
-      unitNumber: 'Apt 301',
+      unitNumber: 'Bldg 1 - Apt 102',
     ),
     UserProfile(
       id: 'mock-user-789',
@@ -276,7 +400,15 @@ class AuthService {
       phone: '+1 (555) 045-6789',
       preferredLanguage: 'en',
       role: 'tenant',
-      unitNumber: 'Apt 204',
+      unitNumber: 'Bldg 2 - Apt 204',
+    ),
+    UserProfile(
+      id: 'mock-user-pending',
+      fullName: 'Ahmed Ali (Pending)',
+      email: 'ahmed@example.com',
+      phone: '+20 100 123 4567',
+      preferredLanguage: 'en',
+      role: 'pending',
     ),
   ];
 
@@ -320,6 +452,67 @@ class AuthService {
             unitNumber: unitNum,
           );
         }).toList();
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<List<UserProfile>> getPendingTenants() async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return _mockTenants.where((t) => t.role == 'pending').toList();
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('profiles')
+            .select()
+            .eq('role', 'pending');
+
+        return (res as List).map((p) {
+          return UserProfile(
+            id: p['id'],
+            fullName: p['full_name'],
+            email: p['email'],
+            phone: p['phone'],
+            avatarUrl: p['avatar_url'],
+            preferredLanguage: p['preferred_language'] ?? 'en',
+            role: p['role'] ?? 'pending',
+          );
+        }).toList();
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<UserProfile?> getUserProfileById(String userId) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      final idx = _mockTenants.indexWhere((t) => t.id == userId);
+      return idx == -1 ? null : _mockTenants[idx];
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('profiles')
+            .select()
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (res == null) return null;
+
+        return UserProfile(
+          id: res['id'],
+          fullName: res['full_name'],
+          email: res['email'],
+          phone: res['phone'],
+          preferredLanguage: res['preferred_language'] ?? 'en',
+          role: res['role'],
+          unitNumber: res['unit_number'],
+          avatarUrl: res['avatar_url'],
+        );
       } catch (e) {
         throw Exception(e.toString());
       }

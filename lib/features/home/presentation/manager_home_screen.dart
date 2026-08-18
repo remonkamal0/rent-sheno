@@ -21,13 +21,24 @@ class ManagerHomeScreen extends ConsumerWidget {
     final tenantsState = ref.watch(managerTenantsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        title: Text(localizations.translate('app_name')),
+        backgroundColor: context.cardColor,
+        elevation: 0,
+        title: Text(
+          localizations.translate('app_name'),
+          style: TextStyle(color: context.primaryTextColor, fontWeight: FontWeight.bold),
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.logOut, color: AppColors.primaryNavy),
+            icon: Icon(LucideIcons.settings, color: context.primaryTextColor, size: 20),
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+          ),
+          IconButton(
+            icon: Icon(LucideIcons.logOut, color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, size: 20),
+            tooltip: 'Logout',
             onPressed: () async {
               await ref.read(authServiceProvider).signOut();
             },
@@ -41,6 +52,7 @@ class ManagerHomeScreen extends ConsumerWidget {
             ref.invalidate(managerMaintenanceProvider);
             ref.invalidate(managerPaymentsProvider);
             ref.invalidate(managerTenantsProvider);
+            ref.invalidate(managerPendingTenantsProvider);
           },
           child: ListView(
             padding: const EdgeInsets.all(24.0),
@@ -74,6 +86,50 @@ class ManagerHomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
+              // Pending Approvals Alert Banner
+              ref.watch(managerPendingTenantsProvider).when(
+                data: (pending) {
+                  if (pending.isEmpty) return const SizedBox.shrink();
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.warningBg,
+                      border: Border.all(color: AppColors.warning),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.userCheck, color: AppColors.warning),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Pending Registrations',
+                                style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.warning),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${pending.length} resident(s) are awaiting approval.',
+                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => context.push('/manager/approvals'),
+                          child: const Text('Review', style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+
               // 2. Metrics row
               _buildMetricsGrid(context, requestsState, paymentsState),
               const SizedBox(height: 24),
@@ -104,29 +160,51 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.creditCard,
-                    title: 'Payments',
-                    subtitle: 'Check receipts',
+                    title: localizations.translate('payments'),
+                    subtitle: localizations.translate('receipt'),
                     color: AppColors.warningBg,
                     iconColor: AppColors.warning,
                     onTap: () => context.push('/manager/payments'),
                   ),
                   _buildActionCard(
                     context,
+                    icon: LucideIcons.building,
+                    title: 'Properties & Units',
+                    subtitle: 'Manage buildings',
+                    color: AppColors.successBg,
+                    iconColor: AppColors.success,
+                    onTap: () => context.push('/manager/properties'),
+                  ),
+                  _buildActionCard(
+                    context,
+                    icon: LucideIcons.userPlus,
+                    title: 'New Lease',
+                    subtitle: 'Assign apartments',
+                    color: AppColors.lightBlue,
+                    iconColor: AppColors.primaryNavy,
+                    onTap: () => context.push('/manager/leases/create'),
+                  ),
+                  _buildActionCard(
+                    context,
                     icon: LucideIcons.bellRing,
                     title: 'Notify Tenant',
                     subtitle: 'Send announcement',
-                    color: AppColors.successBg,
-                    iconColor: AppColors.success,
+                    color: AppColors.warningBg,
+                    iconColor: AppColors.warning,
                     onTap: () => context.push('/manager/notify'),
                   ),
                   _buildActionCard(
                     context,
-                    icon: LucideIcons.settings,
-                    title: 'Settings',
-                    subtitle: 'App preferences',
-                    color: AppColors.border.withOpacity(0.3),
-                    iconColor: AppColors.secondaryText,
-                    onTap: () => context.push('/settings'),
+                    icon: LucideIcons.userCheck,
+                    title: 'Approvals',
+                    subtitle: ref.watch(managerPendingTenantsProvider).when(
+                      data: (list) => list.isEmpty ? 'No pending' : '${list.length} pending',
+                      loading: () => 'Loading...',
+                      error: (_, __) => 'Error',
+                    ),
+                    color: AppColors.successBg,
+                    iconColor: AppColors.success,
+                    onTap: () => context.push('/manager/approvals'),
                   ),
                 ],
               ),
@@ -351,7 +429,7 @@ class ManagerHomeScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     return Card(
-      color: Colors.white,
+      color: context.cardColor,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -364,15 +442,27 @@ class ManagerHomeScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color,
+                  color: context.isDarkMode ? color.withOpacity(0.15) : color,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: iconColor, size: 18),
               ),
               const SizedBox(height: 10),
-              Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                title, 
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.primaryTextColor,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(subtitle, style: AppTextStyles.bodySmall.copyWith(fontSize: 10, color: AppColors.secondaryText)),
+              Text(
+                subtitle, 
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontSize: 10, 
+                  color: context.secondaryTextColor,
+                ),
+              ),
             ],
           ),
         ),

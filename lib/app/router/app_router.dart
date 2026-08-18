@@ -4,11 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/providers.dart';
 import '../../features/authentication/presentation/login_screen.dart';
+import '../../features/authentication/presentation/signup_screen.dart';
+import '../../features/authentication/presentation/pending_approval_screen.dart';
 import '../../features/authentication/presentation/forgot_password_screen.dart';
 import '../../features/authentication/presentation/reset_password_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/manager_home_screen.dart';
 import '../../features/home/presentation/manager_setup_lease_screen.dart';
+import '../../features/home/presentation/manager_properties_screen.dart';
+import '../../features/home/presentation/manager_approvals_screen.dart';
 import '../../features/maintenance/presentation/maintenance_list_screen.dart';
 import '../../features/maintenance/presentation/manager_maintenance_screen.dart';
 import '../../features/maintenance/presentation/new_request_screen.dart';
@@ -42,6 +46,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final user = authState.value;
       final isLoggedIn = user != null;
       final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/signup' ||
           state.matchedLocation == '/forgot-password' ||
           state.matchedLocation == '/reset-password';
 
@@ -50,9 +55,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn) {
+        final isPending = user.role == 'pending';
+        if (isPending) {
+          if (state.matchedLocation != '/pending-approval') {
+            return '/pending-approval';
+          }
+          return null;
+        }
+
         final isManager = user.role == 'manager';
         
-        if (isAuthRoute) {
+        if (isAuthRoute || state.matchedLocation == '/pending-approval') {
           return isManager ? '/manager/home' : '/home';
         }
         
@@ -74,6 +87,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignupScreen(),
+      ),
+      GoRoute(
+        path: '/pending-approval',
+        builder: (context, state) => const PendingApprovalScreen(),
       ),
       GoRoute(
         path: '/forgot-password',
@@ -150,7 +171,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/manager/leases/create',
-        builder: (context, state) => const ManagerSetupLeaseScreen(),
+        builder: (context, state) {
+          final unitNumber = state.uri.queryParameters['unitNumber'];
+          return ManagerSetupLeaseScreen(preSelectedUnitNumber: unitNumber);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/manager/properties',
+        builder: (context, state) => const ManagerPropertiesScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/manager/approvals',
+        builder: (context, state) => const ManagerApprovalsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

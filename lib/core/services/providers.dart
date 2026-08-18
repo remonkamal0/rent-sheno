@@ -284,6 +284,18 @@ final managerTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((re
   return ref.watch(authServiceProvider).getAllTenants();
 });
 
+final managerPendingTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((ref) async {
+  return ref.watch(authServiceProvider).getPendingTenants();
+});
+
+final managerPropertiesProvider = FutureProvider.autoDispose<List<Property>>((ref) async {
+  return ref.watch(residenceServiceProvider).getAllProperties();
+});
+
+final managerUnitsProvider = FutureProvider.autoDispose<List<Unit>>((ref) async {
+  return ref.watch(residenceServiceProvider).getAllUnits();
+});
+
 // Theme Mode Provider for Dark Mode toggling and persistence
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   final Ref _ref;

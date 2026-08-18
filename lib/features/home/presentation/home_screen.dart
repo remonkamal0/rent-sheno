@@ -224,7 +224,7 @@ class HomeScreen extends ConsumerWidget {
                 // Find closest due date
                 outstanding.sort((a, b) => a.dueDate.compareTo(b.dueDate));
                 final nearestCharge = outstanding.first;
-                final daysText = DateFormatter.formatOverdueDate(nearestCharge.dueDate);
+                final daysText = DateFormatter.formatOverdueDate(nearestCharge.dueDate, localizations);
 
                 return GestureDetector(
                   onTap: () => context.go('/payments'),
@@ -403,6 +403,7 @@ class HomeNotificationCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = AppLocalizations.of(context);
     IconData icon;
     Color iconColor;
     Color bgColor;
@@ -487,7 +488,7 @@ class HomeNotificationCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormatter.formatRelative(notification.createdAt),
+                          DateFormatter.formatRelative(notification.createdAt, localizations),
                           style: AppTextStyles.bodySmall.copyWith(
                             fontSize: 11,
                           ),
