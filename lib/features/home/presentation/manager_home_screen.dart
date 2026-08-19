@@ -33,12 +33,12 @@ class ManagerHomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(LucideIcons.settings, color: context.primaryTextColor, size: 20),
-            tooltip: 'Settings',
+            tooltip: localizations.translate('settings'),
             onPressed: () => context.push('/settings'),
           ),
           IconButton(
             icon: Icon(LucideIcons.logOut, color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, size: 20),
-            tooltip: 'Logout',
+            tooltip: localizations.translate('log_out'),
             onPressed: () async {
               await ref.read(authServiceProvider).signOut();
             },
@@ -68,7 +68,7 @@ class ManagerHomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome Back, Owner',
+                      localizations.translate('manager_welcome'),
                       style: AppTextStyles.label.copyWith(color: AppColors.lightBlue),
                     ),
                     const SizedBox(height: 4),
@@ -78,8 +78,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'SMS Services Property Management Portal',
-                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withOpacity(0.8)),
+                      localizations.translate('manager_portal'),
+                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.8)),
                     ),
                   ],
                 ),
@@ -107,12 +107,12 @@ class ManagerHomeScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Pending Registrations',
+                                localizations.translate('pending_registrations'),
                                 style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.warning),
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${pending.length} resident(s) are awaiting approval.',
+                                localizations.translate('awaiting_approval', pending.length.toString()),
                                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
                               ),
                             ],
@@ -120,7 +120,7 @@ class ManagerHomeScreen extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed: () => context.push('/manager/approvals'),
-                          child: const Text('Review', style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                          child: Text(localizations.translate('review'), style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -136,7 +136,7 @@ class ManagerHomeScreen extends ConsumerWidget {
 
               // 3. Quick Actions Grid
               Text(
-                'QUICK ACTIONS',
+                localizations.translate('quick_actions'),
                 style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
               ),
               const SizedBox(height: 12),
@@ -151,8 +151,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.wrench,
-                    title: 'Maintenance',
-                    subtitle: 'Review requests',
+                    title: localizations.translate('maintenance'),
+                    subtitle: localizations.translate('history'),
                     color: AppColors.lightBlue,
                     iconColor: AppColors.primaryNavy,
                     onTap: () => context.push('/manager/maintenance'),
@@ -169,8 +169,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.building,
-                    title: 'Properties & Units',
-                    subtitle: 'Manage buildings',
+                    title: localizations.translate('properties_units'),
+                    subtitle: localizations.translate('manage_buildings'),
                     color: AppColors.successBg,
                     iconColor: AppColors.success,
                     onTap: () => context.push('/manager/properties'),
@@ -178,8 +178,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.userPlus,
-                    title: 'New Lease',
-                    subtitle: 'Assign apartments',
+                    title: localizations.translate('new_lease'),
+                    subtitle: localizations.translate('assign_apartments'),
                     color: AppColors.lightBlue,
                     iconColor: AppColors.primaryNavy,
                     onTap: () => context.push('/manager/leases/create'),
@@ -187,8 +187,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.bellRing,
-                    title: 'Notify Tenant',
-                    subtitle: 'Send announcement',
+                    title: localizations.translate('notify_tenant'),
+                    subtitle: localizations.translate('send_announcement'),
                     color: AppColors.warningBg,
                     iconColor: AppColors.warning,
                     onTap: () => context.push('/manager/notify'),
@@ -196,9 +196,9 @@ class ManagerHomeScreen extends ConsumerWidget {
                   _buildActionCard(
                     context,
                     icon: LucideIcons.userCheck,
-                    title: 'Approvals',
+                    title: localizations.translate('approvals'),
                     subtitle: ref.watch(managerPendingTenantsProvider).when(
-                      data: (list) => list.isEmpty ? 'No pending' : '${list.length} pending',
+                      data: (list) => list.isEmpty ? localizations.translate('no_pending') : localizations.translate('pending_count', list.length.toString()),
                       loading: () => 'Loading...',
                       error: (_, __) => 'Error',
                     ),
@@ -215,12 +215,12 @@ class ManagerHomeScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'RECENT MAINTENANCE ISSUES',
+                    localizations.translate('recent_maintenance_issues'),
                     style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
                   ),
                   TextButton(
                     onPressed: () => context.push('/manager/maintenance'),
-                    child: const Text('View All', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold)),
+                    child: Text(localizations.translate('view_all'), style: const TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -434,26 +434,28 @@ class ManagerHomeScreen extends ConsumerWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(14.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: context.isDarkMode ? color.withOpacity(0.15) : color,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                child: Icon(icon, color: iconColor, size: 16),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 title, 
                 style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.bold,
                   color: context.primaryTextColor,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
@@ -462,6 +464,8 @@ class ManagerHomeScreen extends ConsumerWidget {
                   fontSize: 10, 
                   color: context.secondaryTextColor,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

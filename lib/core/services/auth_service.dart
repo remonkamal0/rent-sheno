@@ -70,9 +70,9 @@ class AuthService {
       } else {
         _currentUser = UserProfile(
           id: isManager ? 'mock-manager-999' : 'mock-user-123',
-          fullName: isManager ? 'Abu Mazen (Landlord)' : AppConstants.demoFullName,
+          fullName: isManager ? 'William Harrison (Landlord)' : AppConstants.demoFullName,
           email: isManager ? 'landlord@example.com' : AppConstants.demoEmail,
-          phone: isManager ? '+966500000000' : AppConstants.demoPhone,
+          phone: isManager ? '+1 (555) 019-9999' : AppConstants.demoPhone,
           preferredLanguage: 'en',
           role: isManager ? 'manager' : 'tenant',
           unitNumber: isManager ? null : 'Bldg 1 - Apt 101',
@@ -144,9 +144,9 @@ class AuthService {
       if (inputEmail == 'landlord@example.com') {
         _currentUser = UserProfile(
           id: 'mock-manager-999',
-          fullName: 'Abu Mazen (Landlord)',
+          fullName: 'William Harrison (Landlord)',
           email: 'landlord@example.com',
-          phone: '+966500000000',
+          phone: '+1 (555) 019-9999',
           preferredLanguage: 'en',
           role: 'manager',
         );
@@ -404,9 +404,9 @@ class AuthService {
     ),
     UserProfile(
       id: 'mock-user-pending',
-      fullName: 'Ahmed Ali (Pending)',
-      email: 'ahmed@example.com',
-      phone: '+20 100 123 4567',
+      fullName: 'David Smith (Pending)',
+      email: 'david@example.com',
+      phone: '+1 (555) 012-3456',
       preferredLanguage: 'en',
       role: 'pending',
     ),

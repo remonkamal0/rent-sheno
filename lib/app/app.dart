@@ -25,17 +25,37 @@ class SmsServicesApp extends ConsumerWidget {
     final lightTheme = isArabic
         ? baseLightTheme.copyWith(
             textTheme: GoogleFonts.cairoTextTheme(baseLightTheme.textTheme),
+            appBarTheme: baseLightTheme.appBarTheme.copyWith(
+              titleTextStyle: GoogleFonts.cairo(
+                textStyle: baseLightTheme.appBarTheme.titleTextStyle,
+              ),
+            ),
           )
         : baseLightTheme.copyWith(
             textTheme: GoogleFonts.interTextTheme(baseLightTheme.textTheme),
+            appBarTheme: baseLightTheme.appBarTheme.copyWith(
+              titleTextStyle: GoogleFonts.inter(
+                textStyle: baseLightTheme.appBarTheme.titleTextStyle,
+              ),
+            ),
           );
 
     final darkTheme = isArabic
         ? baseDarkTheme.copyWith(
             textTheme: GoogleFonts.cairoTextTheme(baseDarkTheme.textTheme),
+            appBarTheme: baseDarkTheme.appBarTheme.copyWith(
+              titleTextStyle: GoogleFonts.cairo(
+                textStyle: baseDarkTheme.appBarTheme.titleTextStyle,
+              ),
+            ),
           )
         : baseDarkTheme.copyWith(
             textTheme: GoogleFonts.interTextTheme(baseDarkTheme.textTheme),
+            appBarTheme: baseDarkTheme.appBarTheme.copyWith(
+              titleTextStyle: GoogleFonts.inter(
+                textStyle: baseDarkTheme.appBarTheme.titleTextStyle,
+              ),
+            ),
           );
 
     return MaterialApp.router(

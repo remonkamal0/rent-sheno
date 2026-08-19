@@ -7,6 +7,7 @@ import '../../../core/services/providers.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/sms_back_button.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -71,10 +72,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => context.pop(),
-        ),
+        leading: const SmsBackButton(),
         title: Text(localizations.translate('change_pw')),
       ),
       body: SafeArea(

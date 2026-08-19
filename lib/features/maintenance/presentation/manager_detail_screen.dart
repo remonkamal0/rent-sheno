@@ -5,8 +5,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
+import '../../../core/services/auth_service.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/sms_back_button.dart';
 import '../../../core/widgets/app_buttons.dart';
 
 class ManagerDetailScreen extends ConsumerStatefulWidget {
@@ -50,15 +53,13 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final requestsState = ref.watch(managerMaintenanceProvider);
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Issue Ticket Details'),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('issue_ticket_details')),
       ),
       body: SafeArea(
         child: requestsState.when(
@@ -104,7 +105,13 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         
                         _buildInfoRow('Apartment Unit', req.unitId.toUpperCase()),
                         const SizedBox(height: 12),
-                        _buildInfoRow('Tenant ID', req.residentId),
+                        FutureBuilder<UserProfile?>(
+                          future: ref.read(authServiceProvider).getUserProfileById(req.residentId),
+                          builder: (context, snapshot) {
+                            final name = snapshot.data?.fullName ?? req.residentId;
+                            return _buildInfoRow('Tenant Name', name);
+                          },
+                        ),
                         const SizedBox(height: 12),
                         _buildInfoRow('Submitted Date', DateFormatter.formatRelative(req.createdAt)),
                         const SizedBox(height: 12),
@@ -116,7 +123,7 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                 const SizedBox(height: 24),
 
                 // Issue Description
-                Text('DESCRIPTION OF THE ISSUE', style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                Text(localizations.translate('description_of_issue'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
                 const SizedBox(height: 8),
                 Card(
                   child: Padding(
@@ -131,7 +138,7 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                 // Attached Images
                 if (req.attachmentUrls.isNotEmpty) ...[
-                  Text('ATTACHED PHOTOS', style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                  Text(localizations.translate('attached_photos'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 120,
@@ -167,7 +174,7 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                 // Action controls for owners
                 if (req.status != 'closed' && req.status != 'cancelled') ...[
-                  Text('TICKET ACTIONS', style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                  Text(localizations.translate('ticket_actions'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
                   const SizedBox(height: 12),
                   
                   if (_isUpdating)
@@ -200,7 +207,7 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => _updateStatus('cancelled'),
-                      child: const Text('Cancel / Reject Ticket', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(localizations.translate('cancel_reject_ticket'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ],

@@ -9,6 +9,7 @@ import '../../../core/services/notification_service.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/skeleton_loading.dart';
+import '../../../core/widgets/sms_back_button.dart';
 import '../../../core/widgets/empty_state.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -29,11 +30,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Notifications Center'),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('notifications_center')),
         actions: [
           TextButton(
             onPressed: () => ref.read(notificationsProvider.notifier).readAll(),

@@ -5,8 +5,10 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/sms_back_button.dart';
 
 class ManagerSetupLeaseScreen extends ConsumerStatefulWidget {
   final String? preSelectedUnitNumber;
@@ -135,22 +137,14 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
   @override
   Widget build(BuildContext context) {
     final tenantsState = ref.watch(managerTenantsProvider);
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: context.backgroundColor,
       appBar: AppBar(
         backgroundColor: context.cardColor,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              context.pop();
-            }
-          },
-        ),
-        title: Text('Setup Apartment Lease', style: TextStyle(color: context.primaryTextColor)),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('setup_apartment_lease'), style: TextStyle(color: context.primaryTextColor)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -161,19 +155,19 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Add Unit & Assign Tenant',
+                  localizations.translate('add_unit_assign_tenant'),
                   style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create a new apartment unit, define the monthly rent price, and select a registered tenant user to link them.',
+                  localizations.translate('create_lease_desc'),
                   style: AppTextStyles.bodyMedium.copyWith(color: context.secondaryTextColor),
                 ),
                 const SizedBox(height: 28),
 
                 // Select Tenant Dropdown
                 Text(
-                  'SELECT REGISTERED USER',
+                  localizations.translate('select_registered_user'),
                   style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
                 ),
                 const SizedBox(height: 8),
@@ -209,15 +203,15 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                     );
                   },
                   loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                  error: (e, _) => Text('Error loading users', style: TextStyle(color: context.primaryTextColor)),
+                  error: (e, _) => Text(localizations.translate('error_loading_users'), style: TextStyle(color: context.primaryTextColor)),
                 ),
                 const SizedBox(height: 20),
 
                 // Unit Number
                 AppTextField(
-                  label: 'Apartment Unit Number',
+                  label: localizations.translate('apartment_unit_number'),
                   controller: _unitController,
-                  hint: 'e.g. Unit 501 / Apt 304',
+                  hint: localizations.translate('hint_unit_number'),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
                     return null;
@@ -227,9 +221,9 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
                 // Floor
                 AppTextField(
-                  label: 'Floor Number',
+                  label: localizations.translate('floor_number'),
                   controller: _floorController,
-                  hint: 'e.g. 5',
+                  hint: localizations.translate('hint_floor'),
                   keyboardType: TextInputType.number,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
@@ -240,9 +234,9 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
                 // Monthly Rent
                 AppTextField(
-                  label: 'Monthly Rent (\$)',
+                  label: localizations.translate('monthly_rent_label'),
                   controller: _rentController,
-                  hint: 'e.g. 1500.00',
+                  hint: localizations.translate('hint_rent_amount'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
@@ -253,9 +247,9 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
                 // Security Deposit
                 AppTextField(
-                  label: 'Security Deposit (\$)',
+                  label: localizations.translate('security_deposit_label'),
                   controller: _depositController,
-                  hint: 'e.g. 1000.00',
+                  hint: localizations.translate('hint_rent_amount'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
@@ -272,7 +266,7 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'LEASE START DATE',
+                            localizations.translate('lease_start_date'),
                             style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
                           ),
                           const SizedBox(height: 8),
@@ -307,7 +301,7 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'LEASE END DATE',
+                            localizations.translate('lease_end_date'),
                             style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
                           ),
                           const SizedBox(height: 8),
@@ -342,7 +336,7 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
                 // Submit button
                 AppPrimaryButton(
-                  text: 'Create Lease & Link Tenant',
+                  text: localizations.translate('create_lease_link_tenant'),
                   isLoading: _isSaving,
                   onTap: _handleSave,
                 ),

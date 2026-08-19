@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
+import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/sms_back_button.dart';
 
 class ManagerNotifyScreen extends ConsumerStatefulWidget {
   final String? preSelectedTenantId;
@@ -113,15 +115,13 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
   @override
   Widget build(BuildContext context) {
     final tenantsState = ref.watch(managerTenantsProvider);
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Send Alert to Apartment'),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('send_alert_to_apartment')),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

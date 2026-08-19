@@ -101,6 +101,18 @@ class PaymentService {
     final now = DateTime.now();
     _mockCharges = [
       Charge(
+        id: 'charge-paid-1',
+        residentId: 'mock-user-123',
+        leaseId: 'lease-101',
+        chargeType: 'rent',
+        title: 'September Rent',
+        description: 'Base lease amount',
+        amount: 2200.0,
+        dueDate: now.subtract(const Duration(days: 25)),
+        status: 'paid',
+        createdAt: now.subtract(const Duration(days: 40)),
+      ),
+      Charge(
         id: 'charge-1',
         residentId: 'mock-user-123',
         leaseId: 'lease-101',
@@ -283,7 +295,21 @@ class PaymentService {
   Future<List<Payment>> getAllPayments() async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 600));
-      return _mockPayments;
+      final List<Payment> paymentsFromCharges = _mockCharges.map((c) {
+        return Payment(
+          id: c.id,
+          residentId: c.residentId,
+          amount: c.amount,
+          paymentMethod: 'Offline Payment (Check/Cash)',
+          transactionReference: c.title,
+          status: c.status == 'paid' ? 'paid' : 'pending',
+          paymentDate: c.dueDate,
+        );
+      }).toList();
+      return [
+        ...paymentsFromCharges,
+        ..._mockPayments,
+      ];
     } else {
       try {
         final client = SupabaseClientHelper.client;
@@ -346,6 +372,72 @@ class PaymentService {
           'due_date': dueDate.toIso8601String().split('T').first,
           'status': 'due',
         });
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<List<Charge>> getChargesForResident(String residentId) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return _mockCharges.where((c) => c.residentId == residentId).toList();
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('charges')
+            .select()
+            .eq('resident_id', residentId);
+
+        return (res as List).map((c) {
+          return Charge(
+            id: c['id'],
+            residentId: c['resident_id'],
+            leaseId: c['lease_id'],
+            chargeType: c['charge_type'],
+            title: c['title'],
+            description: c['description'],
+            amount: (c['amount'] as num).toDouble(),
+            dueDate: DateTime.parse(c['due_date']),
+            status: c['status'],
+            createdAt: DateTime.parse(c['created_at']),
+          );
+        }).toList();
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<void> updateChargeStatus(String chargeId, String status) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      _mockCharges = _mockCharges.map((c) {
+        if (c.id == chargeId) {
+          if (status == 'paid' && c.status != 'paid') {
+            final now = DateTime.now();
+            final paymentRecord = Payment(
+              id: 'TXN-${now.millisecondsSinceEpoch ~/ 1000}',
+              residentId: c.residentId,
+              amount: c.amount,
+              paymentMethod: 'Offline Payment (Check/Cash)',
+              transactionReference: 'ch_${c.id}',
+              status: 'paid',
+              paymentDate: now,
+            );
+            _mockPayments.insert(0, paymentRecord);
+          }
+          return c.copyWith(status: status);
+        }
+        return c;
+      }).toList();
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        await client.from('charges').update({
+          'status': status,
+        }).eq('id', chargeId);
       } catch (e) {
         throw Exception(e.toString());
       }

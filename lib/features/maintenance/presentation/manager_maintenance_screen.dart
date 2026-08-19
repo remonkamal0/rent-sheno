@@ -7,6 +7,7 @@ import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/sms_back_button.dart';
 import '../../../core/widgets/skeleton_loading.dart';
 import '../../../core/widgets/empty_state.dart';
 
@@ -40,11 +41,8 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Maintenance Management'),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('maintenance_management')),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primaryNavy,

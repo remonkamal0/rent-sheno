@@ -5,8 +5,10 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/sms_back_button.dart';
 
 class ManagerCreateChargeScreen extends ConsumerStatefulWidget {
   const ManagerCreateChargeScreen({super.key});
@@ -111,21 +113,13 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
   @override
   Widget build(BuildContext context) {
     final tenantsState = ref.watch(managerTenantsProvider);
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              context.pop();
-            }
-          },
-        ),
-        title: const Text('Issue Rent Claim'),
+        leading: const SmsBackButton(),
+        title: Text(localizations.translate('issue_rent_claim')),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -136,19 +130,19 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Create Rent Claim Bill',
+                  localizations.translate('create_rent_claim_bill'),
                   style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Define the monthly rent bill for an apartment unit. The tenant will receive a bill alert in their dashboard to submit proof of payment.',
+                Text(
+                  localizations.translate('define_rent_bill_desc'),
                   style: AppTextStyles.bodyMedium,
                 ),
                 const SizedBox(height: 28),
 
                 // Select Tenant Dropdown
                 Text(
-                  'TARGET APARTMENT / RESIDENT',
+                  localizations.translate('target_apartment_resident'),
                   style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
                 ),
                 const SizedBox(height: 8),
@@ -180,15 +174,15 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                     );
                   },
                   loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                  error: (e, _) => const Text('Error loading tenants directory'),
+                  error: (e, _) => Text(localizations.translate('error_loading_tenants')),
                 ),
                 const SizedBox(height: 20),
 
                 // Title
                 AppTextField(
-                  label: 'Rent Claim Title',
+                  label: localizations.translate('rent_claim_title'),
                   controller: _titleController,
-                  hint: 'e.g. September 2026 Rent Bill',
+                  hint: localizations.translate('hint_rent_title'),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
                     return null;
@@ -198,9 +192,9 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
 
                 // Amount
                 AppTextField(
-                  label: 'Rent Amount (\$)',
+                  label: localizations.translate('rent_amount'),
                   controller: _amountController,
-                  hint: 'e.g. 1500.00',
+                  hint: localizations.translate('hint_rent_amount'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
@@ -212,16 +206,16 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
 
                 // Description
                 AppTextField(
-                  label: 'Payment Description',
+                  label: localizations.translate('payment_description'),
                   controller: _descController,
-                  hint: 'e.g. Monthly rent due by first of month.',
+                  hint: localizations.translate('hint_rent_desc'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 20),
 
                 // Due Date Picker Trigger
                 Text(
-                  'PAYMENT DUE DATE',
+                  localizations.translate('payment_due_date'),
                   style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
                 ),
                 const SizedBox(height: 8),
@@ -251,7 +245,7 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
 
                 // Submit CTA
                 AppPrimaryButton(
-                  text: 'Issue Rent Claim & Send Bill',
+                  text: localizations.translate('issue_rent_claim_send_bill'),
                   isLoading: _isSaving,
                   onTap: _handleSave,
                 ),
