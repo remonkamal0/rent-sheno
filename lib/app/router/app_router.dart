@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,21 +33,37 @@ import '../../features/settings/presentation/change_password_screen.dart';
 import '../../core/widgets/sms_bottom_navigation.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
+
+class _AuthRouterRefresh extends ChangeNotifier {
+  _AuthRouterRefresh(Stream<Object?> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<Object?> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  final authService = ref.watch(authServiceProvider);
+  final refresh = _AuthRouterRefresh(authService.authStateChanges);
+  ref.onDispose(refresh.dispose);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
+    refreshListenable: refresh,
     redirect: (context, state) {
-      // Don't redirect while loading
-      if (authState.isLoading) return null;
-
-      final user = authState.value;
+      final user = authService.currentUser;
       final isLoggedIn = user != null;
-      final isAuthRoute = state.matchedLocation == '/login' ||
+      final isAuthRoute =
+          state.matchedLocation == '/login' ||
           state.matchedLocation == '/signup' ||
           state.matchedLocation == '/forgot-password' ||
           state.matchedLocation == '/reset-password';
@@ -64,11 +82,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
 
         final isManager = user.role == 'manager';
-        
+
         if (isAuthRoute || state.matchedLocation == '/pending-approval') {
           return isManager ? '/manager/home' : '/home';
         }
-        
+
         final location = state.matchedLocation;
         // If manager attempts to visit standard tenant home, redirect to manager home
         if (isManager && location == '/home') {
@@ -84,10 +102,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // Authentication Routes
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
@@ -114,27 +129,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomeScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: HomeScreen()),
           ),
           GoRoute(
             path: '/maintenance',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: MaintenanceListScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MaintenanceListScreen()),
           ),
           GoRoute(
             path: '/payments',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: PaymentsScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: PaymentsScreen()),
           ),
           GoRoute(
             path: '/profile',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),

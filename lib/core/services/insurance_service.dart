@@ -31,14 +31,22 @@ class InsurancePolicy {
   int get daysUntilExpiration {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final expiry = DateTime(expirationDate.year, expirationDate.month, expirationDate.day);
+    final expiry = DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    );
     return expiry.difference(today).inDays;
   }
 
   String get calculatedStatus {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final expiry = DateTime(expirationDate.year, expirationDate.month, expirationDate.day);
+    final expiry = DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    );
 
     if (expiry.isBefore(today)) {
       return 'expired';
@@ -177,7 +185,7 @@ class InsuranceService {
 
     final now = DateTime.now();
     final effectiveDate = DateTime(now.year, now.month, now.day);
-    
+
     if (SupabaseClientHelper.isMockMode) {
       _mockPolicy = InsurancePolicy(
         id: _mockPolicy?.id ?? 'policy-101',
@@ -191,7 +199,7 @@ class InsuranceService {
         documentUrl: localDocumentPath ?? _mockPolicy?.documentUrl,
         status: 'active',
       );
-      
+
       // Force status update based on expiration date
       final status = _mockPolicy!.calculatedStatus;
       _mockPolicy = _mockPolicy!.copyWith(status: status);
@@ -224,7 +232,11 @@ class InsuranceService {
         if (current == null) {
           // insert new
           payload['created_at'] = now.toUtc().toIso8601String();
-          res = await client.from('insurance_policies').insert(payload).select().single();
+          res = await client
+              .from('insurance_policies')
+              .insert(payload)
+              .select()
+              .single();
         } else {
           // update existing
           res = await client

@@ -19,7 +19,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   bool _rememberMe = false;
   bool _isLoading = false;
   String? _errorMessage;
@@ -33,7 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _loadSavedCredentials() async {
     final secureStorage = ref.read(secureStorageProvider);
     final sharedPrefs = ref.read(sharedPrefsProvider);
-    
+
     final rememberMe = sharedPrefs.getRememberMe();
     setState(() {
       _rememberMe = rememberMe;
@@ -58,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       final sharedPrefs = ref.read(sharedPrefsProvider);
-      
+
       final success = await authService.signIn(
         _emailController.text,
         _passwordController.text,
@@ -68,11 +68,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (success) {
         await sharedPrefs.setRememberMe(_rememberMe);
         if (mounted) {
-          context.go('/home');
+          final user = authService.currentUser;
+          if (user?.role == 'pending') {
+            context.go('/pending-approval');
+          } else if (user?.role == 'manager') {
+            context.go('/manager/home');
+          } else {
+            context.go('/home');
+          }
         }
       } else {
         setState(() {
-          _errorMessage = AppLocalizations.of(context).translate('invalid_auth');
+          _errorMessage = AppLocalizations.of(
+            context,
+          ).translate('invalid_auth');
         });
       }
     } catch (e) {
@@ -144,7 +153,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       child: Text(
                         _errorMessage!,
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.error,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -159,9 +170,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Email is required';
+                        return AppLocalizations.of(
+                          context,
+                        ).text('Email is required');
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(val.trim())) {
                         return 'Enter a valid email';
                       }
                       return null;
@@ -177,10 +192,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     isPassword: true,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
-                        return 'Password is required';
+                        return AppLocalizations.of(
+                          context,
+                        ).text('Password is required');
                       }
                       if (val.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return AppLocalizations.of(
+                          context,
+                        ).text('Password must be at least 6 characters');
                       }
                       return null;
                     },
@@ -188,8 +207,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
 
                   // Remember me & Forgot Password Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    runAlignment: WrapAlignment.center,
+                    spacing: 16,
+                    runSpacing: 8,
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -252,11 +274,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('New resident? ', style: AppTextStyles.bodyMedium),
+                      Text(
+                        AppLocalizations.of(context).text('New resident? '),
+                        style: AppTextStyles.bodyMedium,
+                      ),
                       GestureDetector(
                         onTap: () => context.push('/signup'),
-                        child: const Text(
-                          'Register Account',
+                        child: Text(
+                          AppLocalizations.of(context).text('Register Account'),
                           style: TextStyle(
                             color: AppColors.primaryNavy,
                             fontWeight: FontWeight.bold,
@@ -292,7 +317,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildLanguagePill(String code, String label) {
     final currentLang = ref.watch(localeProvider).languageCode;
     final isActive = currentLang == code;
-    
+
     return GestureDetector(
       onTap: () {
         ref.read(localeProvider.notifier).state = Locale(code);

@@ -13,13 +13,14 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  
+
   bool _isLoading = false;
   bool _successSent = false;
   String? _errorMessage;
@@ -80,19 +81,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Check Your Email',
+                      AppLocalizations.of(context).text('Check Your Email'),
                       style: AppTextStyles.heading2,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'We have sent a password recovery instructions link to ${_emailController.text}.',
+                      AppLocalizations.of(context).text(
+                        'We have sent password recovery instructions to {}.',
+                        _emailController.text,
+                      ),
                       style: AppTextStyles.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 36),
                     AppPrimaryButton(
-                      text: 'Go to Sign In',
+                      text: AppLocalizations.of(context).text('Go to Sign In'),
                       onTap: () {
                         context.go('/login');
                       },
@@ -106,12 +110,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     children: [
                       const SizedBox(height: 20),
                       Text(
-                        'Reset Password',
+                        AppLocalizations.of(context).text('Reset Password'),
                         style: AppTextStyles.heading2,
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Enter the email address associated with your account and we\'ll send you instructions to reset your password.',
+                        AppLocalizations.of(context).text(
+                          'Enter the email address associated with your account and we\'ll send you instructions to reset your password.',
+                        ),
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: 36),
@@ -122,11 +128,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.errorBg,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.error, width: 1),
+                            border: Border.all(
+                              color: AppColors.error,
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             _errorMessage!,
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.error,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -140,9 +151,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         keyboardType: TextInputType.emailAddress,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return 'Email is required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Email is required');
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(val.trim())) {
                             return 'Enter a valid email';
                           }
                           return null;
@@ -150,7 +165,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ),
                       const SizedBox(height: 24),
                       AppPrimaryButton(
-                        text: 'Send Reset Link',
+                        text: AppLocalizations.of(
+                          context,
+                        ).text('Send Reset Link'),
                         isLoading: _isLoading,
                         onTap: _handleReset,
                       ),

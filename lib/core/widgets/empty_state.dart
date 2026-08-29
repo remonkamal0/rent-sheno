@@ -32,18 +32,12 @@ class EmptyState extends StatelessWidget {
               color: AppColors.lightBlue.withOpacity(0.5),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              size: 48,
-              color: AppColors.primaryNavy,
-            ),
+            child: Icon(icon, size: 48, color: AppColors.primaryNavy),
           ),
           const SizedBox(height: 20),
           Text(
             title,
-            style: AppTextStyles.heading3.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),

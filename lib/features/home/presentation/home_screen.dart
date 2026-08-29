@@ -44,7 +44,8 @@ class HomeScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       CachedImageBanner(
-                        imageUrl: residence.property.imageUrl ??
+                        imageUrl:
+                            residence.property.imageUrl ??
                             'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=600',
                       ),
                       Padding(
@@ -54,7 +55,10 @@ class HomeScreen extends ConsumerWidget {
                           children: [
                             // Current Residence Badge
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.lightBlue,
                                 borderRadius: BorderRadius.circular(12),
@@ -69,7 +73,9 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    localizations.translate('current_residence'),
+                                    localizations.translate(
+                                      'current_residence',
+                                    ),
                                     style: AppTextStyles.label.copyWith(
                                       color: AppColors.primaryNavy,
                                       fontSize: 10,
@@ -147,7 +153,9 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              localizations.translate('maintenance_request_desc'),
+                              localizations.translate(
+                                'maintenance_request_desc',
+                              ),
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.lightBlue.withOpacity(0.85),
                               ),
@@ -171,7 +179,9 @@ class HomeScreen extends ConsumerWidget {
             chargesState.when(
               data: (charges) {
                 // Filter outstanding charges
-                final outstanding = charges.where((c) => c.status != 'paid').toList();
+                final outstanding = charges
+                    .where((c) => c.status != 'paid')
+                    .toList();
                 if (outstanding.isEmpty) {
                   return Card(
                     child: Padding(
@@ -224,7 +234,10 @@ class HomeScreen extends ConsumerWidget {
                 // Find closest due date
                 outstanding.sort((a, b) => a.dueDate.compareTo(b.dueDate));
                 final nearestCharge = outstanding.first;
-                final daysText = DateFormatter.formatOverdueDate(nearestCharge.dueDate, localizations);
+                final daysText = DateFormatter.formatOverdueDate(
+                  nearestCharge.dueDate,
+                  localizations,
+                );
 
                 return GestureDetector(
                   onTap: () => context.go('/payments'),
@@ -251,9 +264,14 @@ class HomeScreen extends ConsumerWidget {
                               ),
                               // Due Badge
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: nearestCharge.calculatedStatus == 'past_due'
+                                  color:
+                                      nearestCharge.calculatedStatus ==
+                                          'past_due'
                                       ? AppColors.errorBg
                                       : AppColors.warningBg,
                                   borderRadius: BorderRadius.circular(12),
@@ -261,7 +279,9 @@ class HomeScreen extends ConsumerWidget {
                                 child: Text(
                                   daysText.toUpperCase(),
                                   style: AppTextStyles.label.copyWith(
-                                    color: nearestCharge.calculatedStatus == 'past_due'
+                                    color:
+                                        nearestCharge.calculatedStatus ==
+                                            'past_due'
                                         ? AppColors.error
                                         : AppColors.warning,
                                     fontSize: 10,
@@ -290,7 +310,8 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 );
               },
-              loading: () => const SkeletonContainer(width: double.infinity, height: 110),
+              loading: () =>
+                  const SkeletonContainer(width: double.infinity, height: 110),
               error: (err, stack) => const SizedBox.shrink(),
             ),
             const SizedBox(height: 24),
@@ -299,16 +320,23 @@ class HomeScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  localizations.translate('recent_notifications'),
-                  style: AppTextStyles.heading3.copyWith(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    localizations.translate('recent_notifications'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.heading3.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 12),
                 GestureDetector(
-                  onTap: () => ref.read(notificationsProvider.notifier).readAll(),
+                  onTap: () =>
+                      ref.read(notificationsProvider.notifier).readAll(),
                   child: Text(
                     localizations.translate('mark_all_read'),
+                    maxLines: 1,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.primaryNavy,
                       fontWeight: FontWeight.w600,
@@ -327,13 +355,15 @@ class HomeScreen extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        'No notifications yet.',
+                        AppLocalizations.of(
+                          context,
+                        ).text('No notifications yet.'),
                         style: AppTextStyles.bodyMedium,
                       ),
                     ),
                   );
                 }
-                
+
                 final recentList = list.take(2).toList();
                 return Column(
                   children: recentList.map((notify) {
@@ -425,8 +455,8 @@ class HomeNotificationCard extends ConsumerWidget {
         bgColor = AppColors.successBg;
         break;
       default: // general
-        icon = notification.title.toLowerCase().contains('alarm') 
-            ? LucideIcons.megaphone 
+        icon = notification.title.toLowerCase().contains('alarm')
+            ? LucideIcons.megaphone
             : LucideIcons.droplets;
         iconColor = AppColors.primaryNavy;
         bgColor = AppColors.lightBlue;
@@ -460,11 +490,7 @@ class HomeNotificationCard extends ConsumerWidget {
                   color: bgColor,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 20,
-                ),
+                child: Icon(icon, color: iconColor, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -488,10 +514,11 @@ class HomeNotificationCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormatter.formatRelative(notification.createdAt, localizations),
-                          style: AppTextStyles.bodySmall.copyWith(
-                            fontSize: 11,
+                          DateFormatter.formatRelative(
+                            notification.createdAt,
+                            localizations,
                           ),
+                          style: AppTextStyles.bodySmall.copyWith(fontSize: 11),
                         ),
                       ],
                     ),

@@ -124,6 +124,13 @@ If these keys are left unset, the app **automatically detects the placeholders a
 - **Email:** `john.doe@example.com`
 - **Password:** `password123`
 
+For local development, copy the values into the ignored
+`dart_defines.local.json` file and run:
+
+```bash
+flutter run --dart-define-from-file=dart_defines.local.json
+```
+
 ---
 
 ## Building the Application

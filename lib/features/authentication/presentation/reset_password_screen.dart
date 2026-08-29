@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
@@ -11,14 +12,15 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLoading = false;
   bool _success = false;
   String? _errorMessage;
@@ -57,11 +59,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Reset Password'),
+        title: Text(AppLocalizations.of(context).text('Reset Password')),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -79,19 +80,21 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Password Reset Done',
+                      AppLocalizations.of(context).text('Password Reset Done'),
                       style: AppTextStyles.heading2,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Your password has been reset successfully. You can now log in with your new password.',
+                    Text(
+                      AppLocalizations.of(context).text(
+                        'Your password has been reset successfully. You can now log in with your new password.',
+                      ),
                       style: AppTextStyles.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 36),
                     AppPrimaryButton(
-                      text: 'Go to Sign In',
+                      text: AppLocalizations.of(context).text('Go to Sign In'),
                       onTap: () {
                         context.go('/login');
                       },
@@ -105,12 +108,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     children: [
                       const SizedBox(height: 20),
                       Text(
-                        'Create New Password',
+                        AppLocalizations.of(
+                          context,
+                        ).text('Create New Password'),
                         style: AppTextStyles.heading2,
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Please enter your new password below.',
+                      Text(
+                        AppLocalizations.of(
+                          context,
+                        ).text('Please enter your new password below.'),
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: 36),
@@ -121,11 +128,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.errorBg,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.error, width: 1),
+                            border: Border.all(
+                              color: AppColors.error,
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             _errorMessage!,
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.error,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -133,39 +145,53 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       ],
 
                       AppTextField(
-                        label: 'New Password',
+                        label: AppLocalizations.of(
+                          context,
+                        ).text('New Password'),
                         hint: '••••••••',
                         controller: _passwordController,
                         isPassword: true,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
-                            return 'Password is required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Password is required');
                           }
                           if (val.length < 6) {
-                            return 'Password must be at least 6 characters';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Password must be at least 6 characters');
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 20),
                       AppTextField(
-                        label: 'Confirm New Password',
+                        label: AppLocalizations.of(
+                          context,
+                        ).text('Confirm New Password'),
                         hint: '••••••••',
                         controller: _confirmPasswordController,
                         isPassword: true,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
-                            return 'Confirm Password is required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Confirm Password is required');
                           }
                           if (val != _passwordController.text) {
-                            return 'Passwords do not match';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Passwords do not match');
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 32),
                       AppPrimaryButton(
-                        text: 'Update Password',
+                        text: AppLocalizations.of(
+                          context,
+                        ).text('Update Password'),
                         isLoading: _isLoading,
                         onTap: _handleReset,
                       ),

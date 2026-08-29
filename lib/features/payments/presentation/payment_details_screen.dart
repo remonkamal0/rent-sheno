@@ -47,7 +47,11 @@ class PaymentDetailsScreen extends ConsumerWidget {
             );
 
             if (payment.amount == 0.0) {
-              return const Center(child: Text('Receipt not found.'));
+              return Center(
+                child: Text(
+                  AppLocalizations.of(context).text('Receipt not found.'),
+                ),
+              );
             }
 
             return Padding(
@@ -58,7 +62,10 @@ class PaymentDetailsScreen extends ConsumerWidget {
                   // Success Header
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24.0,
+                        horizontal: 16.0,
+                      ),
                       child: Column(
                         children: [
                           Container(
@@ -76,7 +83,9 @@ class PaymentDetailsScreen extends ConsumerWidget {
                           const SizedBox(height: 16),
                           Text(
                             'Payment Successful',
-                            style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                            style: AppTextStyles.heading3.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -114,11 +123,13 @@ class PaymentDetailsScreen extends ConsumerWidget {
                           const Divider(height: 24),
                           _buildReceiptDetailRow(
                             label: localizations.translate('pay_date'),
-                            value: DateFormatter.formatDateTime(payment.paymentDate),
+                            value: DateFormatter.formatDateTime(
+                              payment.paymentDate,
+                            ),
                           ),
                           const Divider(height: 24),
                           _buildReceiptDetailRow(
-                            label: 'Status',
+                            label: AppLocalizations.of(context).text('Status'),
                             value: payment.status.toUpperCase(),
                             valueColor: AppColors.success,
                           ),
@@ -134,8 +145,12 @@ class PaymentDetailsScreen extends ConsumerWidget {
                     icon: LucideIcons.download,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Receipt PDF saved to Downloads directory.'),
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(
+                              context,
+                            ).text('Receipt PDF saved to Downloads directory.'),
+                          ),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -150,7 +165,8 @@ class PaymentDetailsScreen extends ConsumerWidget {
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryNavy),
             ),
           ),
-          error: (err, stack) => Center(child: Text(localizations.translate('error_loading'))),
+          error: (err, stack) =>
+              Center(child: Text(localizations.translate('error_loading'))),
         ),
       ),
     );
@@ -166,13 +182,21 @@ class PaymentDetailsScreen extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
-        ),
-        Text(
-          value,
           style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: valueColor ?? AppColors.primaryText,
+            color: AppColors.secondaryText,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? AppColors.primaryText,
+            ),
           ),
         ),
       ],

@@ -12,13 +12,11 @@ import '../../../core/widgets/sms_back_button.dart';
 class ManagerNotifyScreen extends ConsumerStatefulWidget {
   final String? preSelectedTenantId;
 
-  const ManagerNotifyScreen({
-    super.key,
-    this.preSelectedTenantId,
-  });
+  const ManagerNotifyScreen({super.key, this.preSelectedTenantId});
 
   @override
-  ConsumerState<ManagerNotifyScreen> createState() => _ManagerNotifyScreenState();
+  ConsumerState<ManagerNotifyScreen> createState() =>
+      _ManagerNotifyScreenState();
 }
 
 class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
@@ -60,7 +58,14 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
       final tenants = tenantsState.value ?? [];
       if (tenants.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No tenants found to broadcast to!'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('No tenants found to broadcast to!'),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
         return;
       }
@@ -68,7 +73,14 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
     } else {
       if (_selectedTenant == null || _selectedTenant!.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a target tenant!'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Please select a target tenant!'),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
         return;
       }
@@ -93,9 +105,16 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
         ref.invalidate(notificationsProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_broadcastToAll
-                ? 'Broadcast message sent to ${targets.length} apartments successfully!'
-                : 'Notification dispatched successfully!'),
+            content: Text(
+              _broadcastToAll
+                  ? AppLocalizations.of(context).text(
+                      'Broadcast message sent to {} apartments successfully!',
+                      targets.length.toString(),
+                    )
+                  : AppLocalizations.of(
+                      context,
+                    ).text('Notification dispatched successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -104,7 +123,12 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).text('Error: {}', e.toString()),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
@@ -132,12 +156,16 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Dispatch Notification',
-                  style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                  AppLocalizations.of(context).text('Dispatch Notification'),
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Write a message and target it to a specific resident or broadcast it to everyone in the building. They will receive it in their app dashboard immediately.',
+                Text(
+                  AppLocalizations.of(context).text(
+                    'Write a message and target it to a specific resident or broadcast it to everyone in the building. They will receive it in their app dashboard immediately.',
+                  ),
                   style: AppTextStyles.bodyMedium,
                 ),
                 const SizedBox(height: 24),
@@ -153,9 +181,14 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Broadcast message to all apartments',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    Text(
+                      AppLocalizations.of(
+                        context,
+                      ).text('Broadcast message to all apartments'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -164,29 +197,44 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                 // Select Tenant Dropdown (Visible only if not broadcasting)
                 if (!_broadcastToAll) ...[
                   Text(
-                    'TARGET TENANT / UNIT',
-                    style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
+                    AppLocalizations.of(context).text('TARGET TENANT / UNIT'),
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.secondaryText,
+                      fontSize: 10,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   tenantsState.when(
                     data: (tenants) {
                       // Ensure selected value is valid or fallback to first
-                      final containsSelected = tenants.any((t) => t.id == _selectedTenant);
-                      if (!containsSelected && tenants.isNotEmpty && _selectedTenant == null) {
+                      final containsSelected = tenants.any(
+                        (t) => t.id == _selectedTenant,
+                      );
+                      if (!containsSelected &&
+                          tenants.isNotEmpty &&
+                          _selectedTenant == null) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           setState(() => _selectedTenant = tenants.first.id);
                         });
                       }
 
                       return DropdownButtonFormField<String>(
-                        value: containsSelected ? _selectedTenant : (tenants.isNotEmpty ? tenants.first.id : null),
+                        value: containsSelected
+                            ? _selectedTenant
+                            : (tenants.isNotEmpty ? tenants.first.id : null),
                         decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                         items: tenants.map((t) {
                           return DropdownMenuItem<String>(
                             value: t.id,
-                            child: Text('${t.fullName} (${t.unitNumber ?? "Unit"})', style: AppTextStyles.bodyMedium),
+                            child: Text(
+                              '${t.fullName} (${t.unitNumber ?? "Unit"})',
+                              style: AppTextStyles.bodyMedium,
+                            ),
                           );
                         }).toList(),
                         onChanged: (val) {
@@ -196,22 +244,36 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                         },
                       );
                     },
-                    loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                    error: (e, _) => const Text('Error loading tenants directory'),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryNavy,
+                      ),
+                    ),
+                    error: (e, _) => Text(
+                      AppLocalizations.of(
+                        context,
+                      ).text('Error loading tenants directory'),
+                    ),
                   ),
                   const SizedBox(height: 20),
                 ],
 
                 // Select Notification Type Dropdown
                 Text(
-                  'ALERT CATEGORY',
-                  style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
+                  AppLocalizations.of(context).text('ALERT CATEGORY'),
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.secondaryText,
+                    fontSize: 10,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _selectedType,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                   items: _typesList.map((t) {
                     return DropdownMenuItem<String>(
@@ -229,7 +291,7 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
 
                 // Notification Title
                 AppTextField(
-                  label: 'Subject Title',
+                  label: AppLocalizations.of(context).text('Subject Title'),
                   hint: 'e.g. Water Maintenance Tomorrow morning',
                   controller: _titleController,
                   validator: (val) {
@@ -243,21 +305,28 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
 
                 // Notification Message Body
                 Text(
-                  'MESSAGE BODY',
-                  style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
+                  AppLocalizations.of(context).text('MESSAGE BODY'),
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.secondaryText,
+                    fontSize: 10,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _messageController,
                   maxLines: 5,
                   style: AppTextStyles.bodyMedium,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter announcement details here...',
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(
+                      context,
+                    ).text('Enter announcement details here...'),
                     contentPadding: EdgeInsets.all(16),
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return 'Please enter the message details';
+                      return AppLocalizations.of(
+                        context,
+                      ).text('Please enter the message details');
                     }
                     return null;
                   },
@@ -266,7 +335,11 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
 
                 // Submit CTA
                 AppPrimaryButton(
-                  text: _broadcastToAll ? 'Broadcast Alert to All' : 'Dispatch Notification Alert',
+                  text: _broadcastToAll
+                      ? 'Broadcast Alert to All'
+                      : AppLocalizations.of(
+                          context,
+                        ).text('Dispatch Notification Alert'),
                   isLoading: _isSending,
                   onTap: _handleSend,
                 ),

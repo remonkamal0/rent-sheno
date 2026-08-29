@@ -59,10 +59,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
                       Icon(widget.icon, color: Colors.white, size: 20),
                       const SizedBox(width: 8),
                     ],
-                    Text(
-                      widget.text,
-                      style: AppTextStyles.button,
-                    ),
+                    Text(widget.text, style: AppTextStyles.button),
                   ],
                 ),
         ),
@@ -121,7 +118,9 @@ class _AppSecondaryButtonState extends State<AppSecondaryButton> {
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryNavy),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryNavy,
+                    ),
                     strokeWidth: 2,
                   ),
                 )
@@ -135,7 +134,9 @@ class _AppSecondaryButtonState extends State<AppSecondaryButton> {
                     Text(
                       widget.text,
                       style: AppTextStyles.button.copyWith(
-                        color: isEnabled ? AppColors.primaryNavy : AppColors.secondaryText,
+                        color: isEnabled
+                            ? AppColors.primaryNavy
+                            : AppColors.secondaryText,
                       ),
                     ),
                   ],

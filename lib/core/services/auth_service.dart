@@ -70,7 +70,9 @@ class AuthService {
       } else {
         _currentUser = UserProfile(
           id: isManager ? 'mock-manager-999' : 'mock-user-123',
-          fullName: isManager ? 'William Harrison (Landlord)' : AppConstants.demoFullName,
+          fullName: isManager
+              ? 'William Harrison (Landlord)'
+              : AppConstants.demoFullName,
           email: isManager ? 'landlord@example.com' : AppConstants.demoEmail,
           phone: isManager ? '+1 (555) 019-9999' : AppConstants.demoPhone,
           preferredLanguage: 'en',
@@ -137,10 +139,10 @@ class AuthService {
 
   Future<bool> signIn(String email, String password, bool rememberMe) async {
     final inputEmail = email.trim().toLowerCase();
-    
+
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       if (inputEmail == 'landlord@example.com') {
         _currentUser = UserProfile(
           id: 'mock-manager-999',
@@ -156,10 +158,14 @@ class AuthService {
         return true;
       }
 
-      final tenantIdx = _mockTenants.indexWhere((t) => t.email.toLowerCase() == inputEmail);
+      final tenantIdx = _mockTenants.indexWhere(
+        (t) => t.email.toLowerCase() == inputEmail,
+      );
       if (tenantIdx != -1) {
         _currentUser = _mockTenants[tenantIdx];
-        await _secureStorage.saveToken('mock-session-token-tenant-${_currentUser!.id}');
+        await _secureStorage.saveToken(
+          'mock-session-token-tenant-${_currentUser!.id}',
+        );
         if (rememberMe) await _secureStorage.saveRememberedEmail(email);
         _authStateController.add(_currentUser);
         return true;
@@ -234,16 +240,28 @@ class AuthService {
         final response = await client.auth.signUp(
           email: cleanEmail,
           password: password,
+          data: {'full_name': fullName, 'phone': phone},
         );
 
         if (response.user != null) {
-          await client.from('profiles').insert({
+          // The database trigger normally creates this row. Upsert also keeps
+          // signup compatible with projects where the trigger is not installed.
+          await client.from('profiles').upsert({
             'auth_user_id': response.user!.id,
             'full_name': fullName,
             'email': cleanEmail,
             'phone': phone,
             'role': 'pending',
-          });
+          }, onConflict: 'auth_user_id');
+
+          // Email confirmation may be disabled during development, in which
+          // case signUp creates a live session. Registration must still end on
+          // the login screen until the manager approves the pending profile.
+          if (response.session != null) {
+            await client.auth.signOut();
+            _currentUser = null;
+            _authStateController.add(null);
+          }
         }
       } catch (e) {
         throw Exception(e.toString());
@@ -251,9 +269,7 @@ class AuthService {
     }
   }
 
-  Future<void> approveTenant({
-    required String tenantId,
-  }) async {
+  Future<void> approveTenant({required String tenantId}) async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 300));
       for (int i = 0; i < _mockTenants.length; i++) {
@@ -265,16 +281,17 @@ class AuthService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
-        await client.from('profiles').update({'role': 'tenant'}).eq('id', tenantId);
+        await client
+            .from('profiles')
+            .update({'role': 'tenant'})
+            .eq('id', tenantId);
       } catch (e) {
         throw Exception(e.toString());
       }
     }
   }
 
-  Future<void> rejectTenant({
-    required String tenantId,
-  }) async {
+  Future<void> rejectTenant({required String tenantId}) async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 300));
       _mockTenants.removeWhere((t) => t.id == tenantId);
@@ -336,13 +353,16 @@ class AuthService {
     } else {
       if (_currentUser == null) return;
       final client = SupabaseClientHelper.client;
-      await client.from('profiles').update({
-        'full_name': fullName,
-        'phone': phone,
-        'avatar_url': avatarUrl,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      }).eq('id', _currentUser!.id);
-      
+      await client
+          .from('profiles')
+          .update({
+            'full_name': fullName,
+            'phone': phone,
+            'avatar_url': avatarUrl,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', _currentUser!.id);
+
       _currentUser = _currentUser!.copyWith(
         fullName: fullName,
         phone: phone,
@@ -358,9 +378,7 @@ class AuthService {
       return;
     } else {
       final client = SupabaseClientHelper.client;
-      await client.auth.updateUser(
-        sb.UserAttributes(password: newPassword),
-      );
+      await client.auth.updateUser(sb.UserAttributes(password: newPassword));
     }
   }
 

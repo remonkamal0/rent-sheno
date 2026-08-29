@@ -40,7 +40,7 @@ class Charge {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final due = DateTime(dueDate.year, dueDate.month, dueDate.day);
-    
+
     if (due.isBefore(today)) {
       return 'past_due';
     } else if (due.isAtSameMomentAs(today)) {
@@ -268,21 +268,27 @@ class PaymentService {
         if (residentId == null) return false;
 
         // Insert payment details
-        final paymentRes = await client.from('payments').insert({
-          'resident_id': residentId,
-          'amount': totalAmount,
-          'payment_method': paymentMethod,
-          'transaction_reference': 'ref_${DateTime.now().millisecondsSinceEpoch}',
-          'status': 'paid',
-          'payment_date': now,
-          'receipt_url': receiptUrl,
-        }).select().single();
+        final paymentRes = await client
+            .from('payments')
+            .insert({
+              'resident_id': residentId,
+              'amount': totalAmount,
+              'payment_method': paymentMethod,
+              'transaction_reference':
+                  'ref_${DateTime.now().millisecondsSinceEpoch}',
+              'status': 'paid',
+              'payment_date': now,
+              'receipt_url': receiptUrl,
+            })
+            .select()
+            .single();
 
         // Update charge statuses
         for (var chargeId in chargeIds) {
-          await client.from('charges').update({
-            'status': 'paid',
-          }).eq('id', chargeId);
+          await client
+              .from('charges')
+              .update({'status': 'paid'})
+              .eq('id', chargeId);
         }
 
         return true;
@@ -306,10 +312,7 @@ class PaymentService {
           paymentDate: c.dueDate,
         );
       }).toList();
-      return [
-        ...paymentsFromCharges,
-        ..._mockPayments,
-      ];
+      return [...paymentsFromCharges, ..._mockPayments];
     } else {
       try {
         final client = SupabaseClientHelper.client;
@@ -435,9 +438,10 @@ class PaymentService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
-        await client.from('charges').update({
-          'status': status,
-        }).eq('id', chargeId);
+        await client
+            .from('charges')
+            .update({'status': status})
+            .eq('id', chargeId);
       } catch (e) {
         throw Exception(e.toString());
       }

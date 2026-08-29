@@ -16,11 +16,13 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  String _selectedFilter = 'all'; // all, unread, maintenance, payment, insurance, general
+  String _selectedFilter =
+      'all'; // all, unread, maintenance, payment, insurance, general
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +62,40 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               ),
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 children: [
-                  _buildFilterChip(id: 'all', label: localizations.translate('all')),
+                  _buildFilterChip(
+                    id: 'all',
+                    label: localizations.translate('all'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip(id: 'unread', label: localizations.translate('unread')),
+                  _buildFilterChip(
+                    id: 'unread',
+                    label: localizations.translate('unread'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip(id: 'maintenance', label: localizations.translate('maintenance')),
+                  _buildFilterChip(
+                    id: 'maintenance',
+                    label: localizations.translate('maintenance'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip(id: 'payment', label: localizations.translate('payments')),
+                  _buildFilterChip(
+                    id: 'payment',
+                    label: localizations.translate('payments'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip(id: 'insurance', label: 'Insurance'),
+                  _buildFilterChip(
+                    id: 'insurance',
+                    label: AppLocalizations.of(context).text('Insurance'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip(id: 'general', label: localizations.translate('general')),
+                  _buildFilterChip(
+                    id: 'general',
+                    label: localizations.translate('general'),
+                  ),
                 ],
               ),
             ),
@@ -88,16 +111,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     if (_selectedFilter == 'all') {
                       filteredList = notifications;
                     } else if (_selectedFilter == 'unread') {
-                      filteredList = notifications.where((n) => !n.isRead).toList();
+                      filteredList = notifications
+                          .where((n) => !n.isRead)
+                          .toList();
                     } else {
-                      filteredList = notifications.where((n) => n.type == _selectedFilter).toList();
+                      filteredList = notifications
+                          .where((n) => n.type == _selectedFilter)
+                          .toList();
                     }
 
                     if (filteredList.isEmpty) {
                       return EmptyState(
                         icon: LucideIcons.bellOff,
-                        title: 'No notifications found',
-                        description: 'You\'re all caught up! There are no announcements or alerts in this category.',
+                        title: AppLocalizations.of(
+                          context,
+                        ).text('No notifications found'),
+                        description: AppLocalizations.of(context).text(
+                          'You\'re all caught up! There are no announcements or alerts in this category.',
+                        ),
                       );
                     }
 
@@ -140,7 +171,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryNavy : AppColors.lightBlue.withOpacity(0.3),
+          color: isSelected
+              ? AppColors.primaryNavy
+              : AppColors.lightBlue.withOpacity(0.3),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primaryNavy : AppColors.border,
@@ -157,7 +190,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context, AppNotification notification) {
+  Widget _buildNotificationCard(
+    BuildContext context,
+    AppNotification notification,
+  ) {
     IconData icon;
     Color iconColor;
     Color bgColor;
@@ -179,8 +215,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         bgColor = AppColors.successBg;
         break;
       default: // general
-        icon = notification.title.toLowerCase().contains('alarm') 
-            ? LucideIcons.megaphone 
+        icon = notification.title.toLowerCase().contains('alarm')
+            ? LucideIcons.megaphone
             : LucideIcons.droplets;
         iconColor = AppColors.primaryNavy;
         bgColor = AppColors.lightBlue;
@@ -188,11 +224,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      color: notification.isRead ? Colors.white : AppColors.lightBlue.withOpacity(0.15),
+      color: notification.isRead
+          ? Colors.white
+          : AppColors.lightBlue.withOpacity(0.15),
       child: InkWell(
         onTap: () {
           ref.read(notificationsProvider.notifier).readSingle(notification.id);
-          
+
           if (notification.type == 'maintenance') {
             context.go('/maintenance');
           } else if (notification.type == 'payment') {
@@ -213,11 +251,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   color: bgColor,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 20,
-                ),
+                child: Icon(icon, color: iconColor, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -232,7 +266,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           child: Text(
                             notification.title,
                             style: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: notification.isRead ? FontWeight.bold : FontWeight.w900,
+                              fontWeight: notification.isRead
+                                  ? FontWeight.bold
+                                  : FontWeight.w900,
                               color: AppColors.primaryText,
                             ),
                             maxLines: 1,
@@ -241,7 +277,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormatter.formatRelative(notification.createdAt, AppLocalizations.of(context)),
+                          DateFormatter.formatRelative(
+                            notification.createdAt,
+                            AppLocalizations.of(context),
+                          ),
                           style: AppTextStyles.bodySmall.copyWith(fontSize: 11),
                         ),
                       ],

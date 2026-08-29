@@ -27,17 +27,30 @@ class ManagerHomeScreen extends ConsumerWidget {
         elevation: 0,
         title: Text(
           localizations.translate('app_name'),
-          style: TextStyle(color: context.primaryTextColor, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: context.primaryTextColor,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: Icon(LucideIcons.settings, color: context.primaryTextColor, size: 20),
+            icon: Icon(
+              LucideIcons.settings,
+              color: context.primaryTextColor,
+              size: 20,
+            ),
             tooltip: localizations.translate('settings'),
             onPressed: () => context.push('/settings'),
           ),
           IconButton(
-            icon: Icon(LucideIcons.logOut, color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, size: 20),
+            icon: Icon(
+              LucideIcons.logOut,
+              color: context.isDarkMode
+                  ? AppColors.lightBlue
+                  : AppColors.primaryNavy,
+              size: 20,
+            ),
             tooltip: localizations.translate('log_out'),
             onPressed: () async {
               await ref.read(authServiceProvider).signOut();
@@ -69,17 +82,24 @@ class ManagerHomeScreen extends ConsumerWidget {
                   children: [
                     Text(
                       localizations.translate('manager_welcome'),
-                      style: AppTextStyles.label.copyWith(color: AppColors.lightBlue),
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.lightBlue,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       user?.fullName ?? 'Property Owner',
-                      style: AppTextStyles.heading2.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: AppTextStyles.heading2.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       localizations.translate('manager_portal'),
-                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.8)),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: Colors.white.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ),
@@ -87,48 +107,70 @@ class ManagerHomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // Pending Approvals Alert Banner
-              ref.watch(managerPendingTenantsProvider).when(
-                data: (pending) {
-                  if (pending.isEmpty) return const SizedBox.shrink();
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 24),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.warningBg,
-                      border: Border.all(color: AppColors.warning),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.userCheck, color: AppColors.warning),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                localizations.translate('pending_registrations'),
-                                style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.warning),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                localizations.translate('awaiting_approval', pending.length.toString()),
-                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
-                              ),
-                            ],
-                          ),
+              ref
+                  .watch(managerPendingTenantsProvider)
+                  .when(
+                    data: (pending) {
+                      if (pending.isEmpty) return const SizedBox.shrink();
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 24),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.warningBg,
+                          border: Border.all(color: AppColors.warning),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        TextButton(
-                          onPressed: () => context.push('/manager/approvals'),
-                          child: Text(localizations.translate('review'), style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              LucideIcons.userCheck,
+                              color: AppColors.warning,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    localizations.translate(
+                                      'pending_registrations',
+                                    ),
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.warning,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    localizations.translate(
+                                      'awaiting_approval',
+                                      pending.length.toString(),
+                                    ),
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.secondaryText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  context.push('/manager/approvals'),
+                              child: Text(
+                                localizations.translate('review'),
+                                style: const TextStyle(
+                                  color: AppColors.warning,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-                loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
 
               // 2. Metrics row
               _buildMetricsGrid(context, requestsState, paymentsState),
@@ -137,7 +179,10 @@ class ManagerHomeScreen extends ConsumerWidget {
               // 3. Quick Actions Grid
               Text(
                 localizations.translate('quick_actions'),
-                style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+                style: AppTextStyles.label.copyWith(
+                  color: AppColors.secondaryText,
+                  fontSize: 11,
+                ),
               ),
               const SizedBox(height: 12),
               GridView.count(
@@ -197,11 +242,20 @@ class ManagerHomeScreen extends ConsumerWidget {
                     context,
                     icon: LucideIcons.userCheck,
                     title: localizations.translate('approvals'),
-                    subtitle: ref.watch(managerPendingTenantsProvider).when(
-                      data: (list) => list.isEmpty ? localizations.translate('no_pending') : localizations.translate('pending_count', list.length.toString()),
-                      loading: () => 'Loading...',
-                      error: (_, __) => 'Error',
-                    ),
+                    subtitle: ref
+                        .watch(managerPendingTenantsProvider)
+                        .when(
+                          data: (list) => list.isEmpty
+                              ? localizations.translate('no_pending')
+                              : localizations.translate(
+                                  'pending_count',
+                                  list.length.toString(),
+                                ),
+                          loading: () =>
+                              AppLocalizations.of(context).text('Loading...'),
+                          error: (_, __) =>
+                              AppLocalizations.of(context).text('Error'),
+                        ),
                     color: AppColors.successBg,
                     iconColor: AppColors.success,
                     onTap: () => context.push('/manager/approvals'),
@@ -214,13 +268,27 @@ class ManagerHomeScreen extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    localizations.translate('recent_maintenance_issues'),
-                    style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+                  Expanded(
+                    child: Text(
+                      localizations.translate('recent_maintenance_issues'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.secondaryText,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   TextButton(
                     onPressed: () => context.push('/manager/maintenance'),
-                    child: Text(localizations.translate('view_all'), style: const TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      localizations.translate('view_all'),
+                      style: const TextStyle(
+                        color: AppColors.primaryNavy,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -228,18 +296,24 @@ class ManagerHomeScreen extends ConsumerWidget {
 
               requestsState.when(
                 data: (requests) {
-                  final activeReqs = requests.where((r) => r.status != 'closed' && r.status != 'cancelled').toList();
+                  final activeReqs = requests
+                      .where(
+                        (r) => r.status != 'closed' && r.status != 'cancelled',
+                      )
+                      .toList();
                   if (activeReqs.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       alignment: Alignment.center,
-                      child: const Text(
-                        'No active maintenance issues found.',
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).text('No active maintenance issues found.'),
                         style: AppTextStyles.bodyMedium,
                       ),
                     );
                   }
-                  
+
                   final recent = activeReqs.take(3).toList();
                   return Column(
                     children: recent.map((req) {
@@ -247,17 +321,37 @@ class ManagerHomeScreen extends ConsumerWidget {
                         color: context.cardColor,
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ListTile(
-                          title: Text(req.title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor)),
-                          subtitle: Text('Unit: ${req.unitId.toUpperCase()} • ${req.category}', style: AppTextStyles.bodySmall.copyWith(color: context.secondaryTextColor)),
+                          title: Text(
+                            req.title,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.primaryTextColor,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Unit: ${req.unitId.toUpperCase()} • ${req.category}',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: context.secondaryTextColor,
+                            ),
+                          ),
                           trailing: StatusBadge(status: req.status),
-                          onTap: () => context.push('/manager/maintenance/${req.id}'),
+                          onTap: () =>
+                              context.push('/manager/maintenance/${req.id}'),
                         ),
                       );
                     }).toList(),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                error: (e, _) => const Center(child: Text('Error loading issues')),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryNavy,
+                  ),
+                ),
+                error: (e, _) => Center(
+                  child: Text(
+                    AppLocalizations.of(context).text('Error loading issues'),
+                  ),
+                ),
               ),
 
               const SizedBox(height: 28),
@@ -266,8 +360,11 @@ class ManagerHomeScreen extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'APARTMENTS DIRECTORY',
-                      style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11),
+                      AppLocalizations.of(context).text('APARTMENTS DIRECTORY'),
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.secondaryText,
+                        fontSize: 11,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -278,21 +375,41 @@ class ManagerHomeScreen extends ConsumerWidget {
                       TextButton(
                         onPressed: () => context.push('/manager/leases/create'),
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text('+ Add Lease', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold, fontSize: 12)),
+                        child: Text(
+                          AppLocalizations.of(context).text('+ Add Lease'),
+                          style: TextStyle(
+                            color: AppColors.primaryNavy,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 4),
                       TextButton(
                         onPressed: () => context.push('/manager/notify'),
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text('Broadcast All', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold, fontSize: 12)),
+                        child: Text(
+                          AppLocalizations.of(context).text('Broadcast All'),
+                          style: TextStyle(
+                            color: AppColors.primaryNavy,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -306,8 +423,10 @@ class ManagerHomeScreen extends ConsumerWidget {
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       alignment: Alignment.center,
-                      child: const Text(
-                        'No registered tenants found.',
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).text('No registered tenants found.'),
                         style: AppTextStyles.bodyMedium,
                       ),
                     );
@@ -323,22 +442,38 @@ class ManagerHomeScreen extends ConsumerWidget {
                             backgroundColor: AppColors.lightBlue,
                             child: Text(
                               tenant.fullName.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: AppColors.primaryNavy,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           title: Text(
                             tenant.fullName,
-                            style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.primaryTextColor,
+                            ),
                           ),
                           subtitle: Text(
                             '${tenant.unitNumber ?? "No Unit"} • ${tenant.email}',
-                            style: AppTextStyles.bodySmall.copyWith(color: context.secondaryTextColor),
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: context.secondaryTextColor,
+                            ),
                           ),
                           trailing: IconButton(
-                            icon: const Icon(LucideIcons.messageSquare, color: AppColors.primaryNavy, size: 20),
-                            tooltip: 'Send Direct Message',
+                            icon: const Icon(
+                              LucideIcons.messageSquare,
+                              color: AppColors.primaryNavy,
+                              size: 20,
+                            ),
+                            tooltip: AppLocalizations.of(
+                              context,
+                            ).text('Send Direct Message'),
                             onPressed: () {
-                              context.push('/manager/notify?tenantId=${tenant.id}');
+                              context.push(
+                                '/manager/notify?tenantId=${tenant.id}',
+                              );
                             },
                           ),
                         ),
@@ -346,8 +481,18 @@ class ManagerHomeScreen extends ConsumerWidget {
                     }).toList(),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                error: (e, _) => const Center(child: Text('Error loading tenants directory')),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryNavy,
+                  ),
+                ),
+                error: (e, _) => Center(
+                  child: Text(
+                    AppLocalizations.of(
+                      context,
+                    ).text('Error loading tenants directory'),
+                  ),
+                ),
               ),
             ],
           ),
@@ -365,7 +510,9 @@ class ManagerHomeScreen extends ConsumerWidget {
     double rentCollected = 0.0;
 
     requestsState.whenData((reqs) {
-      activeIssues = reqs.where((r) => r.status != 'closed' && r.status != 'cancelled').length;
+      activeIssues = reqs
+          .where((r) => r.status != 'closed' && r.status != 'cancelled')
+          .length;
     });
 
     paymentsState.whenData((txns) {
@@ -381,14 +528,24 @@ class ManagerHomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(LucideIcons.activity, color: AppColors.primaryNavy, size: 20),
+                  const Icon(
+                    LucideIcons.activity,
+                    color: AppColors.primaryNavy,
+                    size: 20,
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     '$activeIssues Active',
-                    style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryNavy),
+                    style: AppTextStyles.heading2.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryNavy,
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  const Text('Pending Repairs', style: AppTextStyles.bodySmall),
+                  Text(
+                    AppLocalizations.of(context).text('Pending Repairs'),
+                    style: AppTextStyles.bodySmall,
+                  ),
                 ],
               ),
             ),
@@ -402,14 +559,24 @@ class ManagerHomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(LucideIcons.banknote, color: AppColors.success, size: 20),
+                  const Icon(
+                    LucideIcons.banknote,
+                    color: AppColors.success,
+                    size: 20,
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     '\$${rentCollected.toStringAsFixed(0)}',
-                    style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: AppColors.success),
+                    style: AppTextStyles.heading2.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.success,
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  const Text('Total Revenue', style: AppTextStyles.bodySmall),
+                  Text(
+                    AppLocalizations.of(context).text('Total Revenue'),
+                    style: AppTextStyles.bodySmall,
+                  ),
                 ],
               ),
             ),
@@ -449,7 +616,7 @@ class ManagerHomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                title, 
+                title,
                 style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.bold,
                   color: context.primaryTextColor,
@@ -459,9 +626,9 @@ class ManagerHomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                subtitle, 
+                subtitle,
                 style: AppTextStyles.bodySmall.copyWith(
-                  fontSize: 10, 
+                  fontSize: 10,
                   color: context.secondaryTextColor,
                 ),
                 maxLines: 1,

@@ -13,24 +13,25 @@ class SupabaseClientHelper {
 
     if (url.startsWith('https://placeholder-url') || key == 'placeholder-key') {
       if (kDebugMode) {
-        print('SMS SERVICES: Running in MOCK DATA mode. (Placeholder Supabase URL or Key found)');
+        print(
+          'SMS SERVICES: Running in MOCK DATA mode. (Placeholder Supabase URL or Key found)',
+        );
       }
       _isMockMode = true;
       return;
     }
 
     try {
-      await Supabase.initialize(
-        url: url,
-        anonKey: key,
-      );
+      await Supabase.initialize(url: url, anonKey: key);
       _isMockMode = false;
       if (kDebugMode) {
         print('SMS SERVICES: Connected to Supabase successfully.');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('SMS SERVICES ERROR: Failed to connect to Supabase: $e. Falling back to MOCK DATA mode.');
+        print(
+          'SMS SERVICES ERROR: Failed to connect to Supabase: $e. Falling back to MOCK DATA mode.',
+        );
       }
       _isMockMode = true;
     }

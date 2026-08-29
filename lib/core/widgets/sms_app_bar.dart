@@ -15,12 +15,10 @@ class SmsAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsState = ref.watch(notificationsProvider);
-    
+
     // Calculate unread notifications count
-    final int unreadCount = notificationsState.value
-            ?.where((n) => !n.isRead)
-            .length ??
-        0;
+    final int unreadCount =
+        notificationsState.value?.where((n) => !n.isRead).length ?? 0;
 
     return AppBar(
       elevation: 0,

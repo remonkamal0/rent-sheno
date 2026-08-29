@@ -29,7 +29,10 @@ class _SkeletonContainerState extends State<SkeletonContainer>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
-    _opacityAnimation = Tween<double>(begin: 0.35, end: 0.8).animate(_controller);
+    _opacityAnimation = Tween<double>(
+      begin: 0.35,
+      end: 0.8,
+    ).animate(_controller);
   }
 
   @override
@@ -102,7 +105,11 @@ class SkeletonResidenceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SkeletonContainer(width: double.infinity, height: 160, borderRadius: 12),
+          const SkeletonContainer(
+            width: double.infinity,
+            height: 160,
+            borderRadius: 12,
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -115,7 +122,7 @@ class SkeletonResidenceCard extends StatelessWidget {
                 SkeletonContainer(width: 100, height: 20),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

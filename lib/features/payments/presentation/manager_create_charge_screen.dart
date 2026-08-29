@@ -14,14 +14,16 @@ class ManagerCreateChargeScreen extends ConsumerStatefulWidget {
   const ManagerCreateChargeScreen({super.key});
 
   @override
-  ConsumerState<ManagerCreateChargeScreen> createState() => _ManagerCreateChargeScreenState();
+  ConsumerState<ManagerCreateChargeScreen> createState() =>
+      _ManagerCreateChargeScreenState();
 }
 
-class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeScreen> {
+class _ManagerCreateChargeScreenState
+    extends ConsumerState<ManagerCreateChargeScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController(text: 'Monthly Rent Invoice');
+  final _titleController = TextEditingController();
   final _amountController = TextEditingController(text: '1500.0');
-  final _descController = TextEditingController(text: 'Standard monthly apartment unit rent.');
+  final _descController = TextEditingController();
 
   String? _selectedTenant;
   DateTime _dueDate = DateTime.now().add(const Duration(days: 10));
@@ -65,7 +67,14 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
     if (!_formKey.currentState!.validate()) return;
     if (_selectedTenant == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a target apartment resident!'), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Please select a target apartment resident!'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -73,7 +82,12 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
     final double? amount = double.tryParse(_amountController.text.trim());
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount!'), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).text('Please enter a valid amount!'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -92,8 +106,12 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Rent claim issued and sent to tenant successfully!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Rent claim issued and sent to tenant successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -102,7 +120,12 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).text('Error: {}', e.toString()),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
@@ -131,7 +154,9 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
               children: [
                 Text(
                   localizations.translate('create_rent_claim_bill'),
-                  style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -143,12 +168,17 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                 // Select Tenant Dropdown
                 Text(
                   localizations.translate('target_apartment_resident'),
-                  style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.secondaryText,
+                    fontSize: 10,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 tenantsState.when(
                   data: (tenants) {
-                    final containsSelected = tenants.any((t) => t.id == _selectedTenant);
+                    final containsSelected = tenants.any(
+                      (t) => t.id == _selectedTenant,
+                    );
                     if (!containsSelected && tenants.isNotEmpty) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() => _selectedTenant = tenants.first.id);
@@ -156,14 +186,22 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                     }
 
                     return DropdownButtonFormField<String>(
-                      value: containsSelected ? _selectedTenant : (tenants.isNotEmpty ? tenants.first.id : null),
+                      value: containsSelected
+                          ? _selectedTenant
+                          : (tenants.isNotEmpty ? tenants.first.id : null),
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       items: tenants.map((t) {
                         return DropdownMenuItem<String>(
                           value: t.id,
-                          child: Text('${t.fullName} (${t.unitNumber ?? "Unit"})', style: AppTextStyles.bodyMedium),
+                          child: Text(
+                            '${t.fullName} (${t.unitNumber ?? "Unit"})',
+                            style: AppTextStyles.bodyMedium,
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -173,8 +211,13 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                  error: (e, _) => Text(localizations.translate('error_loading_tenants')),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryNavy,
+                    ),
+                  ),
+                  error: (e, _) =>
+                      Text(localizations.translate('error_loading_tenants')),
                 ),
                 const SizedBox(height: 20),
 
@@ -184,7 +227,8 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                   controller: _titleController,
                   hint: localizations.translate('hint_rent_title'),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
                     return null;
                   },
                 ),
@@ -195,10 +239,14 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                   label: localizations.translate('rent_amount'),
                   controller: _amountController,
                   hint: localizations.translate('hint_rent_amount'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
-                    if (double.tryParse(val.trim()) == null) return 'Enter valid amount';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
+                    if (double.tryParse(val.trim()) == null)
+                      return 'Enter valid amount';
                     return null;
                   },
                 ),
@@ -216,14 +264,20 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                 // Due Date Picker Trigger
                 Text(
                   localizations.translate('payment_due_date'),
-                  style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 10),
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.secondaryText,
+                    fontSize: 10,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 InkWell(
                   onTap: () => _selectDueDate(context),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(color: AppColors.border),
@@ -234,9 +288,16 @@ class _ManagerCreateChargeScreenState extends ConsumerState<ManagerCreateChargeS
                       children: [
                         Text(
                           DateFormatter.formatShortDate(_dueDate),
-                          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryNavy),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryNavy,
+                          ),
                         ),
-                        const Icon(Icons.calendar_today_rounded, color: AppColors.primaryNavy, size: 18),
+                        const Icon(
+                          Icons.calendar_today_rounded,
+                          color: AppColors.primaryNavy,
+                          size: 18,
+                        ),
                       ],
                     ),
                   ),

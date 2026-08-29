@@ -17,7 +17,8 @@ class ManagerDetailScreen extends ConsumerStatefulWidget {
   const ManagerDetailScreen({super.key, required this.requestId});
 
   @override
-  ConsumerState<ManagerDetailScreen> createState() => _ManagerDetailScreenState();
+  ConsumerState<ManagerDetailScreen> createState() =>
+      _ManagerDetailScreenState();
 }
 
 class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
@@ -28,12 +29,16 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
     try {
       final maintenanceService = ref.read(maintenanceServiceProvider);
       await maintenanceService.updateRequestStatus(widget.requestId, status);
-      
+
       if (mounted) {
         ref.invalidate(managerMaintenanceProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Request status updated to ${status.toUpperCase()}'),
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Request status updated to {}', status.toUpperCase()),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -42,7 +47,12 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).text('Error: {}', e.toString()),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
@@ -68,7 +78,13 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
             final req = reqList.isNotEmpty ? reqList.first : null;
 
             if (req == null) {
-              return const Center(child: Text('Request ticket not found.'));
+              return Center(
+                child: Text(
+                  AppLocalizations.of(
+                    context,
+                  ).text('Request ticket not found.'),
+                ),
+              );
             }
 
             return ListView(
@@ -86,7 +102,9 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                           children: [
                             Text(
                               req.requestNumber,
-                              style: AppTextStyles.label.copyWith(color: AppColors.secondaryText),
+                              style: AppTextStyles.label.copyWith(
+                                color: AppColors.secondaryText,
+                              ),
                             ),
                             StatusBadge(status: req.status),
                           ],
@@ -94,28 +112,51 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         const SizedBox(height: 12),
                         Text(
                           req.title,
-                          style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryNavy),
+                          style: AppTextStyles.heading2.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryNavy,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Category: ${req.category.toUpperCase()}',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText, fontWeight: FontWeight.bold),
+                          AppLocalizations.of(
+                            context,
+                          ).text('Category: {}', req.category.toUpperCase()),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.secondaryText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Divider(height: 32),
-                        
-                        _buildInfoRow('Apartment Unit', req.unitId.toUpperCase()),
+
+                        _buildInfoRow(
+                          AppLocalizations.of(context).text('Apartment Unit'),
+                          req.unitId.toUpperCase(),
+                        ),
                         const SizedBox(height: 12),
                         FutureBuilder<UserProfile?>(
-                          future: ref.read(authServiceProvider).getUserProfileById(req.residentId),
+                          future: ref
+                              .read(authServiceProvider)
+                              .getUserProfileById(req.residentId),
                           builder: (context, snapshot) {
-                            final name = snapshot.data?.fullName ?? req.residentId;
-                            return _buildInfoRow('Tenant Name', name);
+                            final name =
+                                snapshot.data?.fullName ?? req.residentId;
+                            return _buildInfoRow(
+                              AppLocalizations.of(context).text('Tenant Name'),
+                              name,
+                            );
                           },
                         ),
                         const SizedBox(height: 12),
-                        _buildInfoRow('Submitted Date', DateFormatter.formatRelative(req.createdAt)),
+                        _buildInfoRow(
+                          AppLocalizations.of(context).text('Submitted Date'),
+                          DateFormatter.formatRelative(req.createdAt),
+                        ),
                         const SizedBox(height: 12),
-                        _buildInfoRow('Preferred Visit', DateFormatter.formatRelative(req.preferredDate)),
+                        _buildInfoRow(
+                          AppLocalizations.of(context).text('Preferred Visit'),
+                          DateFormatter.formatRelative(req.preferredDate),
+                        ),
                       ],
                     ),
                   ),
@@ -123,7 +164,13 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                 const SizedBox(height: 24),
 
                 // Issue Description
-                Text(localizations.translate('description_of_issue'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                Text(
+                  localizations.translate('description_of_issue'),
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.secondaryText,
+                    fontSize: 11,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Card(
                   child: Padding(
@@ -138,7 +185,13 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                 // Attached Images
                 if (req.attachmentUrls.isNotEmpty) ...[
-                  Text(localizations.translate('attached_photos'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                  Text(
+                    localizations.translate('attached_photos'),
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.secondaryText,
+                      fontSize: 11,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 120,
@@ -161,7 +214,10 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                               img,
                               fit: BoxFit.cover,
                               errorBuilder: (c, e, s) => const Center(
-                                child: Icon(LucideIcons.image, color: AppColors.secondaryText),
+                                child: Icon(
+                                  LucideIcons.image,
+                                  color: AppColors.secondaryText,
+                                ),
                               ),
                             ),
                           ),
@@ -174,27 +230,44 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                 // Action controls for owners
                 if (req.status != 'closed' && req.status != 'cancelled') ...[
-                  Text(localizations.translate('ticket_actions'), style: AppTextStyles.label.copyWith(color: AppColors.secondaryText, fontSize: 11)),
+                  Text(
+                    localizations.translate('ticket_actions'),
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.secondaryText,
+                      fontSize: 11,
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  
+
                   if (_isUpdating)
-                    const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy))
+                    const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryNavy,
+                      ),
+                    )
                   else ...[
                     if (req.status == 'pending') ...[
                       AppPrimaryButton(
-                        text: 'Mark In Progress',
+                        text: AppLocalizations.of(
+                          context,
+                        ).text('Mark In Progress'),
                         onTap: () => _updateStatus('in_progress'),
                       ),
                       const SizedBox(height: 12),
                       AppSecondaryButton(
-                        text: 'Schedule Repair',
+                        text: AppLocalizations.of(
+                          context,
+                        ).text('Schedule Repair'),
                         onTap: () => _updateStatus('scheduled'),
                       ),
                       const SizedBox(height: 12),
                     ],
-                    if (req.status == 'in_progress' || req.status == 'scheduled') ...[
+                    if (req.status == 'in_progress' ||
+                        req.status == 'scheduled') ...[
                       AppPrimaryButton(
-                        text: 'Mark as Completed / Resolved',
+                        text: AppLocalizations.of(
+                          context,
+                        ).text('Mark as Completed / Resolved'),
                         onTap: () => _updateStatus('closed'),
                       ),
                       const SizedBox(height: 12),
@@ -204,10 +277,15 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         foregroundColor: AppColors.error,
                         side: const BorderSide(color: AppColors.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () => _updateStatus('cancelled'),
-                      child: Text(localizations.translate('cancel_reject_ticket'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(
+                        localizations.translate('cancel_reject_ticket'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ],
@@ -215,8 +293,14 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
               ],
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-          error: (e, _) => const Center(child: Text('Error loading ticket')),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryNavy),
+          ),
+          error: (e, _) => Center(
+            child: Text(
+              AppLocalizations.of(context).text('Error loading ticket'),
+            ),
+          ),
         ),
       ),
     );
@@ -226,8 +310,25 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText)),
-        Text(value, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryText)),
+        Text(
+          label,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.secondaryText,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
+            ),
+          ),
+        ),
       ],
     );
   }

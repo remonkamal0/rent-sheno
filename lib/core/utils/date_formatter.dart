@@ -16,12 +16,15 @@ class DateFormatter {
     return DateFormat('h:mm a').format(date);
   }
 
-  static String formatRelative(DateTime date, [AppLocalizations? localizations]) {
+  static String formatRelative(
+    DateTime date, [
+    AppLocalizations? localizations,
+  ]) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final tomorrow = today.add(const Duration(days: 1));
-    
+
     final compareDate = DateTime(date.year, date.month, date.day);
 
     if (compareDate == today) {
@@ -52,7 +55,10 @@ class DateFormatter {
     return formatShortDate(date);
   }
 
-  static String formatOverdueDate(DateTime dueDate, [AppLocalizations? localizations]) {
+  static String formatOverdueDate(
+    DateTime dueDate, [
+    AppLocalizations? localizations,
+  ]) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final due = DateTime(dueDate.year, dueDate.month, dueDate.day);

@@ -15,10 +15,13 @@ class ManagerMaintenanceScreen extends ConsumerStatefulWidget {
   const ManagerMaintenanceScreen({super.key});
 
   @override
-  ConsumerState<ManagerMaintenanceScreen> createState() => _ManagerMaintenanceScreenState();
+  ConsumerState<ManagerMaintenanceScreen> createState() =>
+      _ManagerMaintenanceScreenState();
 }
 
-class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScreen> with SingleTickerProviderStateMixin {
+class _ManagerMaintenanceScreenState
+    extends ConsumerState<ManagerMaintenanceScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -49,9 +52,9 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
           unselectedLabelColor: AppColors.secondaryText,
           indicatorColor: AppColors.primaryNavy,
           indicatorSize: TabBarIndicatorSize.tab,
-          tabs: const [
-            Tab(text: 'Active Issues'),
-            Tab(text: 'Closed / History'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context).text('Active Issues')),
+            Tab(text: AppLocalizations.of(context).text('Closed / History')),
           ],
         ),
       ),
@@ -68,8 +71,20 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
             return TabBarView(
               controller: _tabController,
               children: [
-                _buildRequestsList(context, activeRequests, 'No active maintenance issues! All systems running smoothly.'),
-                _buildRequestsList(context, closedRequests, 'No maintenance history records found.'),
+                _buildRequestsList(
+                  context,
+                  activeRequests,
+                  AppLocalizations.of(context).text(
+                    'No active maintenance issues! All systems running smoothly.',
+                  ),
+                ),
+                _buildRequestsList(
+                  context,
+                  closedRequests,
+                  AppLocalizations.of(
+                    context,
+                  ).text('No maintenance history records found.'),
+                ),
               ],
             );
           },
@@ -78,19 +93,22 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
             itemCount: 4,
             itemBuilder: (context, index) => const SkeletonCard(),
           ),
-          error: (err, _) => Center(
-            child: Text(localizations.translate('error_loading')),
-          ),
+          error: (err, _) =>
+              Center(child: Text(localizations.translate('error_loading'))),
         ),
       ),
     );
   }
 
-  Widget _buildRequestsList(BuildContext context, List<dynamic> list, String emptyMsg) {
+  Widget _buildRequestsList(
+    BuildContext context,
+    List<dynamic> list,
+    String emptyMsg,
+  ) {
     if (list.isEmpty) {
       return EmptyState(
         icon: LucideIcons.wrench,
-        title: 'All Clear',
+        title: AppLocalizations.of(context).text('All Clear'),
         description: emptyMsg,
       );
     }
@@ -134,7 +152,11 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
                       color: AppColors.lightBlue,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(categoryIcon, color: AppColors.primaryNavy, size: 20),
+                    child: Icon(
+                      categoryIcon,
+                      color: AppColors.primaryNavy,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -143,14 +165,18 @@ class _ManagerMaintenanceScreenState extends ConsumerState<ManagerMaintenanceScr
                       children: [
                         Text(
                           req.title,
-                          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Unit ${req.unitId.toUpperCase()} • ${req.requestNumber}',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.secondaryText,
+                          ),
                         ),
                       ],
                     ),

@@ -57,8 +57,12 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
             child: chargesState.when(
               data: (charges) {
                 if (charges.isEmpty) {
-                  return const Center(
-                    child: Text('No rent history found.'),
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      ).text('No rent history found.'),
+                    ),
                   );
                 }
 
@@ -84,16 +88,22 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                               decoration: BoxDecoration(
                                 color: charge.status == 'paid'
                                     ? AppColors.successBg
-                                    : (isLate ? AppColors.errorBg : AppColors.warningBg),
+                                    : (isLate
+                                          ? AppColors.errorBg
+                                          : AppColors.warningBg),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 charge.status == 'paid'
                                     ? LucideIcons.check
-                                    : (isLate ? LucideIcons.alertTriangle : LucideIcons.calendar),
+                                    : (isLate
+                                          ? LucideIcons.alertTriangle
+                                          : LucideIcons.calendar),
                                 color: charge.status == 'paid'
                                     ? AppColors.success
-                                    : (isLate ? AppColors.error : AppColors.warning),
+                                    : (isLate
+                                          ? AppColors.error
+                                          : AppColors.warning),
                                 size: 20,
                               ),
                             ),
@@ -130,7 +140,11 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 6),
-                                StatusBadge(status: charge.status == 'paid' ? 'paid' : charge.calculatedStatus),
+                                StatusBadge(
+                                  status: charge.status == 'paid'
+                                      ? 'paid'
+                                      : charge.calculatedStatus,
+                                ),
                               ],
                             ),
                           ],
@@ -145,9 +159,8 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                 itemCount: 4,
                 itemBuilder: (context, index) => const SkeletonCard(),
               ),
-              error: (err, stack) => Center(
-                child: Text(localizations.translate('error_loading')),
-              ),
+              error: (err, stack) =>
+                  Center(child: Text(localizations.translate('error_loading'))),
             ),
           ),
         ],

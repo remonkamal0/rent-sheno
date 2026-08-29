@@ -18,7 +18,7 @@ class SmsServicesApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     final isArabic = locale.languageCode == 'ar';
-    
+
     final baseLightTheme = AppTheme.lightTheme;
     final baseDarkTheme = AppTheme.darkTheme;
 
@@ -59,7 +59,7 @@ class SmsServicesApp extends ConsumerWidget {
           );
 
     return MaterialApp.router(
-      title: 'SMS SERVICES',
+      title: 'SMS service',
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,

@@ -12,7 +12,7 @@ class StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final cleanStatus = status.trim().toLowerCase();
     final localizations = AppLocalizations.of(context);
-    
+
     Color bgColor;
     Color textColor;
     String label;
@@ -40,9 +40,11 @@ class StatusBadge extends StatelessWidget {
       case 'active':
         bgColor = AppColors.successBg;
         textColor = AppColors.success;
-        label = cleanStatus == 'paid' 
-            ? localizations.translate('paid') 
-            : (cleanStatus == 'active' ? localizations.translate('active') : localizations.translate(cleanStatus));
+        label = cleanStatus == 'paid'
+            ? localizations.translate('paid')
+            : (cleanStatus == 'active'
+                  ? localizations.translate('active')
+                  : localizations.translate(cleanStatus));
         break;
       case 'cancelled':
       case 'canceled':
@@ -56,9 +58,11 @@ class StatusBadge extends StatelessWidget {
       case 'expired':
         bgColor = AppColors.errorBg;
         textColor = AppColors.error;
-        label = cleanStatus == 'expired' 
-            ? localizations.translate('expired') 
-            : (cleanStatus == 'past_due' || cleanStatus == 'past due' ? localizations.translate('past_due') : localizations.translate('failed'));
+        label = cleanStatus == 'expired'
+            ? localizations.translate('expired')
+            : (cleanStatus == 'past_due' || cleanStatus == 'past due'
+                  ? localizations.translate('past_due')
+                  : localizations.translate('failed'));
         break;
       case 'upcoming':
         bgColor = AppColors.lightBlue;

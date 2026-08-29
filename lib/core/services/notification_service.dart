@@ -47,16 +47,18 @@ class NotificationService {
   final AuthService _authService;
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  
+
   List<AppNotification> _mockNotifications = [];
-  final _notificationsStreamController = StreamController<List<AppNotification>>.broadcast();
+  final _notificationsStreamController =
+      StreamController<List<AppNotification>>.broadcast();
 
   NotificationService(this._authService) {
     _initializeLocalNotifications();
     _initMockData();
   }
 
-  Stream<List<AppNotification>> get notificationsStream => _notificationsStreamController.stream;
+  Stream<List<AppNotification>> get notificationsStream =>
+      _notificationsStreamController.stream;
 
   void _initMockData() {
     final now = DateTime.now();
@@ -66,7 +68,8 @@ class NotificationService {
         residentId: 'mock-user-123',
         type: 'general',
         title: 'Fire Alarm Testing',
-        message: 'Annual fire alarm testing will take place tomorrow between 10 AM and 2 PM. Please expect loud noises.',
+        message:
+            'Annual fire alarm testing will take place tomorrow between 10 AM and 2 PM. Please expect loud noises.',
         isRead: false,
         createdAt: now.subtract(const Duration(hours: 3)),
       ),
@@ -75,7 +78,8 @@ class NotificationService {
         residentId: 'mock-user-123',
         type: 'general',
         title: 'Water Shutoff Notice',
-        message: 'Water will be temporarily shut off in building B for emergency pipe repairs from 1 PM to 3 PM.',
+        message:
+            'Water will be temporarily shut off in building B for emergency pipe repairs from 1 PM to 3 PM.',
         isRead: false,
         createdAt: now.subtract(const Duration(days: 5)),
       ),
@@ -86,11 +90,12 @@ class NotificationService {
   Future<void> _initializeLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-        
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: DarwinInitializationSettings(),
-    );
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: DarwinInitializationSettings(),
+        );
 
     await _localNotificationsPlugin.initialize(
       initializationSettings,
@@ -110,13 +115,13 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      AppConstants.notificationChannelId,
-      AppConstants.notificationChannelName,
-      channelDescription: AppConstants.notificationChannelDescription,
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
+          AppConstants.notificationChannelId,
+          AppConstants.notificationChannelName,
+          channelDescription: AppConstants.notificationChannelDescription,
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -169,7 +174,9 @@ class NotificationService {
 
   Future<void> markAllAsRead() async {
     if (SupabaseClientHelper.isMockMode) {
-      _mockNotifications = _mockNotifications.map((n) => n.copyWith(isRead: true)).toList();
+      _mockNotifications = _mockNotifications
+          .map((n) => n.copyWith(isRead: true))
+          .toList();
       _notificationsStreamController.add(_mockNotifications);
     } else {
       try {

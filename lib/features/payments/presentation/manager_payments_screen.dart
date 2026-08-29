@@ -17,7 +17,8 @@ class ManagerPaymentsScreen extends ConsumerStatefulWidget {
   const ManagerPaymentsScreen({super.key});
 
   @override
-  ConsumerState<ManagerPaymentsScreen> createState() => _ManagerPaymentsScreenState();
+  ConsumerState<ManagerPaymentsScreen> createState() =>
+      _ManagerPaymentsScreenState();
 }
 
 class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
@@ -51,7 +52,10 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
         title: Text(localizations.translate('review_tenant_payments')),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.plusCircle, color: AppColors.primaryNavy),
+            icon: const Icon(
+              LucideIcons.plusCircle,
+              color: AppColors.primaryNavy,
+            ),
             tooltip: localizations.translate('issue_rent_claim'),
             onPressed: () => context.push('/manager/payments/create'),
           ),
@@ -70,7 +74,11 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(LucideIcons.slidersHorizontal, size: 16, color: AppColors.primaryNavy),
+                      const Icon(
+                        LucideIcons.slidersHorizontal,
+                        size: 16,
+                        color: AppColors.primaryNavy,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         localizations.translate('filter_by'),
@@ -90,7 +98,9 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                           label: localizations.translate('year'),
                           value: _selectedYear,
                           items: ['All', '2026', '2025', '2024'],
-                          itemLabel: (val) => val == 'All' ? localizations.translate('all_years') : val,
+                          itemLabel: (val) => val == 'All'
+                              ? localizations.translate('all_years')
+                              : val,
                           onChanged: (val) {
                             setState(() => _selectedYear = val!);
                           },
@@ -100,7 +110,9 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                           label: localizations.translate('building'),
                           value: _selectedBuilding,
                           items: ['All', ...buildingsList],
-                          itemLabel: (val) => val == 'All' ? localizations.translate('all_buildings') : val,
+                          itemLabel: (val) => val == 'All'
+                              ? localizations.translate('all_buildings')
+                              : val,
                           onChanged: (val) {
                             setState(() => _selectedBuilding = val!);
                           },
@@ -111,8 +123,18 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                           value: _selectedResident,
                           items: ['All', ...tenantsList.map((t) => t.id)],
                           itemLabel: (val) {
-                            if (val == 'All') return localizations.translate('all_residents');
-                            final tenant = tenantsList.firstWhere((t) => t.id == val, orElse: () => UserProfile(id: '', fullName: val, email: '', role: 'tenant', preferredLanguage: 'en'));
+                            if (val == 'All')
+                              return localizations.translate('all_residents');
+                            final tenant = tenantsList.firstWhere(
+                              (t) => t.id == val,
+                              orElse: () => UserProfile(
+                                id: '',
+                                fullName: val,
+                                email: '',
+                                role: 'tenant',
+                                preferredLanguage: 'en',
+                              ),
+                            );
                             return tenant.fullName;
                           },
                           onChanged: (val) {
@@ -148,7 +170,13 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                       if (_selectedBuilding != 'All') {
                         final tenant = tenantsList.firstWhere(
                           (t) => t.id == pay.residentId,
-                          orElse: () => UserProfile(id: '', fullName: '', email: '', role: 'tenant', preferredLanguage: 'en'),
+                          orElse: () => UserProfile(
+                            id: '',
+                            fullName: '',
+                            email: '',
+                            role: 'tenant',
+                            preferredLanguage: 'en',
+                          ),
                         );
                         final bldg = getBuildingName(tenant.unitNumber);
                         if (bldg != _selectedBuilding) {
@@ -166,8 +194,12 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                             child: Center(
                               child: EmptyState(
                                 icon: LucideIcons.filter,
-                                title: 'No Matching Payments',
-                                description: 'Try adjusting your filters to find payment records.',
+                                title: AppLocalizations.of(
+                                  context,
+                                ).text('No Matching Payments'),
+                                description: AppLocalizations.of(context).text(
+                                  'Try adjusting your filters to find payment records.',
+                                ),
                               ),
                             ),
                           ),
@@ -189,11 +221,15 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'REF: ${pay.transactionReference ?? pay.id}',
+                                        AppLocalizations.of(context).text(
+                                          'REF: {}',
+                                          pay.transactionReference ?? pay.id,
+                                        ),
                                         style: AppTextStyles.label.copyWith(
                                           color: AppColors.secondaryText,
                                           fontSize: 10,
@@ -208,22 +244,28 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             '\$${pay.amount.toStringAsFixed(2)}',
-                                            style: AppTextStyles.heading2.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.success,
-                                            ),
+                                            style: AppTextStyles.heading2
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.success,
+                                                ),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'Paid via: ${pay.paymentMethod}',
+                                            AppLocalizations.of(context).text(
+                                              'Paid via: {}',
+                                              pay.paymentMethod,
+                                            ),
                                             style: AppTextStyles.bodySmall,
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
@@ -234,62 +276,111 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                                     const SizedBox(width: 8),
                                     ElevatedButton.icon(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: pay.status == 'paid' ? AppColors.lightBlue : AppColors.primaryNavy,
-                                        foregroundColor: pay.status == 'paid' ? AppColors.primaryNavy : Colors.white,
+                                        backgroundColor: pay.status == 'paid'
+                                            ? AppColors.lightBlue
+                                            : AppColors.primaryNavy,
+                                        foregroundColor: pay.status == 'paid'
+                                            ? AppColors.primaryNavy
+                                            : Colors.white,
                                         elevation: 0,
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
                                         minimumSize: Size.zero,
-                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       onPressed: () async {
                                         if (pay.status == 'paid') {
                                           _showReceiptProofDialog(context, pay);
                                         } else {
-                                          await ref.read(paymentServiceProvider).updateChargeStatus(pay.id, 'paid');
-                                          ref.invalidate(managerPaymentsProvider);
+                                          await ref
+                                              .read(paymentServiceProvider)
+                                              .updateChargeStatus(
+                                                pay.id,
+                                                'paid',
+                                              );
+                                          ref.invalidate(
+                                            managerPaymentsProvider,
+                                          );
                                           ref.invalidate(chargesProvider);
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Payment marked as paid successfully!'),
-                                                backgroundColor: AppColors.success,
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  AppLocalizations.of(
+                                                    context,
+                                                  ).text(
+                                                    'Payment marked as paid successfully!',
+                                                  ),
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.success,
                                               ),
                                             );
                                           }
                                         }
                                       },
-                                      icon: Icon(pay.status == 'paid' ? LucideIcons.fileSearch : LucideIcons.checkCircle, size: 14),
-                                      label: Text(pay.status == 'paid' ? 'View Receipt' : 'Mark Paid'),
+                                      icon: Icon(
+                                        pay.status == 'paid'
+                                            ? LucideIcons.fileSearch
+                                            : LucideIcons.checkCircle,
+                                        size: 14,
+                                      ),
+                                      label: Text(
+                                        pay.status == 'paid'
+                                            ? AppLocalizations.of(
+                                                context,
+                                              ).text('View Receipt')
+                                            : AppLocalizations.of(
+                                                context,
+                                              ).text('Mark Paid'),
+                                      ),
                                     ),
                                   ],
                                 ),
                                 const Divider(height: 24),
                                 FutureBuilder<UserProfile?>(
-                                  future: ref.read(authServiceProvider).getUserProfileById(pay.residentId),
+                                  future: ref
+                                      .read(authServiceProvider)
+                                      .getUserProfileById(pay.residentId),
                                   builder: (context, snapshot) {
-                                    final name = snapshot.data?.fullName ?? pay.residentId;
+                                    final name =
+                                        snapshot.data?.fullName ??
+                                        pay.residentId;
                                     return Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: Text(
                                             'Tenant: $name',
-                                            style: AppTextStyles.bodySmall.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: AppTextStyles.bodySmall
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          DateFormatter.formatRelative(pay.paymentDate, localizations),
-                                          style: AppTextStyles.bodySmall.copyWith(
-                                            color: AppColors.secondaryText,
+                                          DateFormatter.formatRelative(
+                                            pay.paymentDate,
+                                            localizations,
                                           ),
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(
+                                                color: AppColors.secondaryText,
+                                              ),
                                         ),
                                       ],
                                     );
@@ -307,7 +398,13 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                     itemCount: 4,
                     itemBuilder: (context, index) => const SkeletonCard(),
                   ),
-                  error: (err, _) => const Center(child: Text('Error loading payments history')),
+                  error: (err, _) => Center(
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      ).text('Error loading payments history'),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -369,7 +466,7 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Verification Receipt',
+          AppLocalizations.of(context).text('Verification Receipt'),
           style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
         ),
         content: Column(
@@ -383,11 +480,17 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: AppColors.border),
               ),
-              child: payment.receiptUrl != null && !payment.receiptUrl!.startsWith('http')
+              child:
+                  payment.receiptUrl != null &&
+                      !payment.receiptUrl!.startsWith('http')
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(LucideIcons.fileText, color: AppColors.primaryNavy, size: 40),
+                        const Icon(
+                          LucideIcons.fileText,
+                          color: AppColors.primaryNavy,
+                          size: 40,
+                        ),
                         const SizedBox(height: 12),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -400,34 +503,79 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text('Uploaded Receipt Attachment', style: TextStyle(fontSize: 11, color: AppColors.secondaryText)),
+                        Text(
+                          AppLocalizations.of(
+                            context,
+                          ).text('Uploaded Receipt Attachment'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
                       ],
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(LucideIcons.shieldCheck, color: AppColors.success, size: 40),
+                        const Icon(
+                          LucideIcons.shieldCheck,
+                          color: AppColors.success,
+                          size: 40,
+                        ),
                         const SizedBox(height: 12),
-                        const Text('Verified Receipt', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          AppLocalizations.of(context).text('Verified Receipt'),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 4),
-                        Text(payment.receiptUrl != null ? 'Secured Attachment Link' : 'Secure Card Checkout', style: const TextStyle(fontSize: 11, color: AppColors.secondaryText)),
+                        Text(
+                          payment.receiptUrl != null
+                              ? AppLocalizations.of(
+                                  context,
+                                ).text('Secured Attachment Link')
+                              : AppLocalizations.of(
+                                  context,
+                                ).text('Secure Card Checkout'),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
                       ],
                     ),
             ),
             const SizedBox(height: 16),
-            _buildDialogRow('Ref Number', payment.transactionReference ?? payment.id),
+            _buildDialogRow(
+              AppLocalizations.of(context).text('Ref Number'),
+              payment.transactionReference ?? payment.id,
+            ),
             const SizedBox(height: 8),
-            _buildDialogRow('Amount Paid', '\$${payment.amount.toStringAsFixed(2)}'),
+            _buildDialogRow(
+              AppLocalizations.of(context).text('Amount Paid'),
+              '\$${payment.amount.toStringAsFixed(2)}',
+            ),
             const SizedBox(height: 8),
-            _buildDialogRow('Payment Channel', payment.paymentMethod),
+            _buildDialogRow(
+              AppLocalizations.of(context).text('Payment Channel'),
+              payment.paymentMethod,
+            ),
             const SizedBox(height: 8),
-            _buildDialogRow('Payment Date', DateFormatter.formatRelative(payment.paymentDate, localizations)),
+            _buildDialogRow(
+              AppLocalizations.of(context).text('Payment Date'),
+              DateFormatter.formatRelative(payment.paymentDate, localizations),
+            ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold)),
+            child: Text(
+              AppLocalizations.of(context).text('Close'),
+              style: TextStyle(
+                color: AppColors.primaryNavy,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -438,8 +586,20 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.secondaryText)),
-        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.secondaryText),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ),
       ],
     );
   }

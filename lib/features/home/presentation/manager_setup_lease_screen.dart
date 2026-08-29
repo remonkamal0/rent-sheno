@@ -15,10 +15,12 @@ class ManagerSetupLeaseScreen extends ConsumerStatefulWidget {
   const ManagerSetupLeaseScreen({super.key, this.preSelectedUnitNumber});
 
   @override
-  ConsumerState<ManagerSetupLeaseScreen> createState() => _ManagerSetupLeaseScreenState();
+  ConsumerState<ManagerSetupLeaseScreen> createState() =>
+      _ManagerSetupLeaseScreenState();
 }
 
-class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScreen> {
+class _ManagerSetupLeaseScreenState
+    extends ConsumerState<ManagerSetupLeaseScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _unitController;
   final _floorController = TextEditingController(text: '1');
@@ -33,7 +35,9 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
   @override
   void initState() {
     super.initState();
-    _unitController = TextEditingController(text: widget.preSelectedUnitNumber ?? '');
+    _unitController = TextEditingController(
+      text: widget.preSelectedUnitNumber ?? '',
+    );
   }
 
   @override
@@ -82,7 +86,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
     if (!_formKey.currentState!.validate()) return;
     if (_selectedTenant == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a tenant user!'), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).text('Please select a tenant user!'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -93,7 +102,14 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
     if (rent == null || rent <= 0 || deposit == null || floor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter valid numeric details!'), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Please enter valid numeric details!'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -116,8 +132,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('New unit created and tenant linked successfully!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('New unit created and tenant linked successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -126,7 +146,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).text('Error: {}', e.toString()),
+            ),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
@@ -144,7 +169,10 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
       appBar: AppBar(
         backgroundColor: context.cardColor,
         leading: const SmsBackButton(),
-        title: Text(localizations.translate('setup_apartment_lease'), style: TextStyle(color: context.primaryTextColor)),
+        title: Text(
+          localizations.translate('setup_apartment_lease'),
+          style: TextStyle(color: context.primaryTextColor),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -156,24 +184,34 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
               children: [
                 Text(
                   localizations.translate('add_unit_assign_tenant'),
-                  style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.primaryTextColor,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   localizations.translate('create_lease_desc'),
-                  style: AppTextStyles.bodyMedium.copyWith(color: context.secondaryTextColor),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: context.secondaryTextColor,
+                  ),
                 ),
                 const SizedBox(height: 28),
 
                 // Select Tenant Dropdown
                 Text(
                   localizations.translate('select_registered_user'),
-                  style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
+                  style: AppTextStyles.label.copyWith(
+                    color: context.secondaryTextColor,
+                    fontSize: 10,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 tenantsState.when(
                   data: (tenants) {
-                    final containsSelected = tenants.any((t) => t.id == _selectedTenant);
+                    final containsSelected = tenants.any(
+                      (t) => t.id == _selectedTenant,
+                    );
                     if (!containsSelected && tenants.isNotEmpty) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() => _selectedTenant = tenants.first.id);
@@ -181,17 +219,24 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                     }
 
                     return DropdownButtonFormField<String>(
-                      value: containsSelected ? _selectedTenant : (tenants.isNotEmpty ? tenants.first.id : null),
+                      value: containsSelected
+                          ? _selectedTenant
+                          : (tenants.isNotEmpty ? tenants.first.id : null),
                       dropdownColor: context.cardColor,
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       items: tenants.map((t) {
                         return DropdownMenuItem<String>(
                           value: t.id,
                           child: Text(
                             '${t.fullName} (${t.email})',
-                            style: AppTextStyles.bodyMedium.copyWith(color: context.primaryTextColor),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: context.primaryTextColor,
+                            ),
                           ),
                         );
                       }).toList(),
@@ -202,8 +247,15 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primaryNavy)),
-                  error: (e, _) => Text(localizations.translate('error_loading_users'), style: TextStyle(color: context.primaryTextColor)),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryNavy,
+                    ),
+                  ),
+                  error: (e, _) => Text(
+                    localizations.translate('error_loading_users'),
+                    style: TextStyle(color: context.primaryTextColor),
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -213,7 +265,8 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                   controller: _unitController,
                   hint: localizations.translate('hint_unit_number'),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
                     return null;
                   },
                 ),
@@ -226,7 +279,8 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                   hint: localizations.translate('hint_floor'),
                   keyboardType: TextInputType.number,
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
                     return null;
                   },
                 ),
@@ -237,9 +291,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                   label: localizations.translate('monthly_rent_label'),
                   controller: _rentController,
                   hint: localizations.translate('hint_rent_amount'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
                     return null;
                   },
                 ),
@@ -250,9 +307,12 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                   label: localizations.translate('security_deposit_label'),
                   controller: _depositController,
                   hint: localizations.translate('hint_rent_amount'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (val == null || val.trim().isEmpty)
+                      return AppLocalizations.of(context).text('Required');
                     return null;
                   },
                 ),
@@ -267,27 +327,41 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                         children: [
                           Text(
                             localizations.translate('lease_start_date'),
-                            style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
+                            style: AppTextStyles.label.copyWith(
+                              color: context.secondaryTextColor,
+                              fontSize: 10,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           InkWell(
                             onTap: () => _selectDate(context, true),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 14,
+                              ),
                               decoration: BoxDecoration(
                                 color: context.cardColor,
                                 border: Border.all(color: context.borderColor),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     DateFormatter.formatShortDate(_startDate),
-                                    style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: context.primaryTextColor,
+                                    ),
                                   ),
-                                  const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.primaryNavy),
+                                  const Icon(
+                                    Icons.calendar_today_rounded,
+                                    size: 16,
+                                    color: AppColors.primaryNavy,
+                                  ),
                                 ],
                               ),
                             ),
@@ -302,27 +376,41 @@ class _ManagerSetupLeaseScreenState extends ConsumerState<ManagerSetupLeaseScree
                         children: [
                           Text(
                             localizations.translate('lease_end_date'),
-                            style: AppTextStyles.label.copyWith(color: context.secondaryTextColor, fontSize: 10),
+                            style: AppTextStyles.label.copyWith(
+                              color: context.secondaryTextColor,
+                              fontSize: 10,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           InkWell(
                             onTap: () => _selectDate(context, false),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 14,
+                              ),
                               decoration: BoxDecoration(
                                 color: context.cardColor,
                                 border: Border.all(color: context.borderColor),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     DateFormatter.formatShortDate(_endDate),
-                                    style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: context.primaryTextColor),
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: context.primaryTextColor,
+                                    ),
                                   ),
-                                  const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.primaryNavy),
+                                  const Icon(
+                                    Icons.calendar_today_rounded,
+                                    size: 16,
+                                    color: AppColors.primaryNavy,
+                                  ),
                                 ],
                               ),
                             ),

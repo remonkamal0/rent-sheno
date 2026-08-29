@@ -1,15 +1,16 @@
 class AppConstants {
   AppConstants._();
 
-  // Supabase Configurations (to be set via env variables or constants)
+  // Supabase configuration. Build-time values can still override these defaults.
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://placeholder-url.supabase.co',
+    defaultValue: 'https://edcqfrspugydxnvarjmg.supabase.co',
   );
-  
+
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'placeholder-key',
+    defaultValue:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkY3FmcnNwdWd5ZHhudmFyam1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5OTgzNjMsImV4cCI6MjEwMzU3NDM2M30.vyFAXvMdH-mfuJh77Wb5FBcJKP3xJP3FoQKbcs2Dkls',
   );
 
   // Storage keys
@@ -22,7 +23,8 @@ class AppConstants {
   // Notification Channels
   static const String notificationChannelId = 'sms_services_channel';
   static const String notificationChannelName = 'SMS Services Notifications';
-  static const String notificationChannelDescription = 'Notifications for lease, maintenance, and payment updates';
+  static const String notificationChannelDescription =
+      'Notifications for lease, maintenance, and payment updates';
 
   // Demo / Fallback Data
   static const String demoEmail = 'john.doe@example.com';

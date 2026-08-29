@@ -18,7 +18,9 @@ final secureStorageProvider = Provider<SecureStorageService>((ref) {
 
 // SharedPreferences is initialized in main() and overriden in ProviderScope
 final sharedPrefsProvider = Provider<SharedPrefsService>((ref) {
-  throw UnimplementedError('sharedPrefsProvider must be overridden in main.dart');
+  throw UnimplementedError(
+    'sharedPrefsProvider must be overridden in main.dart',
+  );
 });
 
 // 2. Services Providers
@@ -70,7 +72,8 @@ final residenceDetailsProvider = FutureProvider<ResidenceDetails?>((ref) async {
 });
 
 // Maintenance Requests Provider with AsyncNotifier to support adding requests
-class MaintenanceRequestsNotifier extends AutoDisposeAsyncNotifier<List<MaintenanceRequest>> {
+class MaintenanceRequestsNotifier
+    extends AutoDisposeAsyncNotifier<List<MaintenanceRequest>> {
   @override
   Future<List<MaintenanceRequest>> build() async {
     final authState = ref.watch(authStateProvider);
@@ -87,7 +90,9 @@ class MaintenanceRequestsNotifier extends AutoDisposeAsyncNotifier<List<Maintena
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(maintenanceServiceProvider).createRequest(
+      await ref
+          .read(maintenanceServiceProvider)
+          .createRequest(
             title: title,
             category: category,
             description: description,
@@ -100,9 +105,12 @@ class MaintenanceRequestsNotifier extends AutoDisposeAsyncNotifier<List<Maintena
 }
 
 final maintenanceRequestsProvider =
-    AsyncNotifierProvider.autoDispose<MaintenanceRequestsNotifier, List<MaintenanceRequest>>(() {
-  return MaintenanceRequestsNotifier();
-});
+    AsyncNotifierProvider.autoDispose<
+      MaintenanceRequestsNotifier,
+      List<MaintenanceRequest>
+    >(() {
+      return MaintenanceRequestsNotifier();
+    });
 
 // Charges Provider
 class ChargesNotifier extends AutoDisposeAsyncNotifier<List<Charge>> {
@@ -115,7 +123,9 @@ class ChargesNotifier extends AutoDisposeAsyncNotifier<List<Charge>> {
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => ref.read(paymentServiceProvider).getCharges());
+    state = await AsyncValue.guard(
+      () => ref.read(paymentServiceProvider).getCharges(),
+    );
   }
 
   Future<void> createTenantCharge({
@@ -128,7 +138,9 @@ class ChargesNotifier extends AutoDisposeAsyncNotifier<List<Charge>> {
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(paymentServiceProvider).createCharge(
+      await ref
+          .read(paymentServiceProvider)
+          .createCharge(
             residentId: residentId,
             leaseId: leaseId,
             chargeType: 'rent',
@@ -142,9 +154,10 @@ class ChargesNotifier extends AutoDisposeAsyncNotifier<List<Charge>> {
   }
 }
 
-final chargesProvider = AsyncNotifierProvider.autoDispose<ChargesNotifier, List<Charge>>(() {
-  return ChargesNotifier();
-});
+final chargesProvider =
+    AsyncNotifierProvider.autoDispose<ChargesNotifier, List<Charge>>(() {
+      return ChargesNotifier();
+    });
 
 // Payments History Provider
 class PaymentsHistoryNotifier extends AutoDisposeAsyncNotifier<List<Payment>> {
@@ -163,7 +176,9 @@ class PaymentsHistoryNotifier extends AutoDisposeAsyncNotifier<List<Payment>> {
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(paymentServiceProvider).makePayment(
+      await ref
+          .read(paymentServiceProvider)
+          .makePayment(
             chargeIds: chargeIds,
             totalAmount: amount,
             paymentMethod: method,
@@ -177,12 +192,15 @@ class PaymentsHistoryNotifier extends AutoDisposeAsyncNotifier<List<Payment>> {
 }
 
 final paymentsHistoryProvider =
-    AsyncNotifierProvider.autoDispose<PaymentsHistoryNotifier, List<Payment>>(() {
-  return PaymentsHistoryNotifier();
-});
+    AsyncNotifierProvider.autoDispose<PaymentsHistoryNotifier, List<Payment>>(
+      () {
+        return PaymentsHistoryNotifier();
+      },
+    );
 
 // Insurance Policy Provider
-class InsurancePolicyNotifier extends AutoDisposeAsyncNotifier<InsurancePolicy?> {
+class InsurancePolicyNotifier
+    extends AutoDisposeAsyncNotifier<InsurancePolicy?> {
   @override
   Future<InsurancePolicy?> build() async {
     final authState = ref.watch(authStateProvider);
@@ -199,7 +217,9 @@ class InsurancePolicyNotifier extends AutoDisposeAsyncNotifier<InsurancePolicy?>
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(insuranceServiceProvider).updatePolicy(
+      await ref
+          .read(insuranceServiceProvider)
+          .updatePolicy(
             provider: provider,
             policyNumber: policyNumber,
             coverageAmount: coverageAmount,
@@ -212,20 +232,24 @@ class InsurancePolicyNotifier extends AutoDisposeAsyncNotifier<InsurancePolicy?>
 }
 
 final insurancePolicyProvider =
-    AsyncNotifierProvider.autoDispose<InsurancePolicyNotifier, InsurancePolicy?>(() {
-  return InsurancePolicyNotifier();
-});
+    AsyncNotifierProvider.autoDispose<
+      InsurancePolicyNotifier,
+      InsurancePolicy?
+    >(() {
+      return InsurancePolicyNotifier();
+    });
 
 // Notifications List Provider
-class NotificationsNotifier extends AutoDisposeAsyncNotifier<List<AppNotification>> {
+class NotificationsNotifier
+    extends AutoDisposeAsyncNotifier<List<AppNotification>> {
   @override
   Future<List<AppNotification>> build() async {
     final authState = ref.watch(authStateProvider);
     if (authState.value == null) return [];
-    
+
     // Listen to real-time changes if applicable, otherwise fetch
     final notificationService = ref.watch(notificationServiceProvider);
-    
+
     // Auto-update state when stream fires in mock mode
     final sub = notificationService.notificationsStream.listen((data) {
       state = AsyncValue.data(data);
@@ -253,9 +277,12 @@ class NotificationsNotifier extends AutoDisposeAsyncNotifier<List<AppNotificatio
 }
 
 final notificationsProvider =
-    AsyncNotifierProvider.autoDispose<NotificationsNotifier, List<AppNotification>>(() {
-  return NotificationsNotifier();
-});
+    AsyncNotifierProvider.autoDispose<
+      NotificationsNotifier,
+      List<AppNotification>
+    >(() {
+      return NotificationsNotifier();
+    });
 
 // Locale State Provider for Language support (EN | ES)
 final localeProvider = StateProvider<Locale>((ref) {
@@ -272,27 +299,37 @@ final localeProvider = StateProvider<Locale>((ref) {
 });
 
 // Manager Providers
-final managerMaintenanceProvider = FutureProvider.autoDispose<List<MaintenanceRequest>>((ref) async {
-  return ref.watch(maintenanceServiceProvider).getAllRequests();
-});
+final managerMaintenanceProvider =
+    FutureProvider.autoDispose<List<MaintenanceRequest>>((ref) async {
+      return ref.watch(maintenanceServiceProvider).getAllRequests();
+    });
 
-final managerPaymentsProvider = FutureProvider.autoDispose<List<Payment>>((ref) async {
+final managerPaymentsProvider = FutureProvider.autoDispose<List<Payment>>((
+  ref,
+) async {
   return ref.watch(paymentServiceProvider).getAllPayments();
 });
 
-final managerTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((ref) async {
+final managerTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((
+  ref,
+) async {
   return ref.watch(authServiceProvider).getAllTenants();
 });
 
-final managerPendingTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((ref) async {
-  return ref.watch(authServiceProvider).getPendingTenants();
-});
+final managerPendingTenantsProvider =
+    FutureProvider.autoDispose<List<UserProfile>>((ref) async {
+      return ref.watch(authServiceProvider).getPendingTenants();
+    });
 
-final managerPropertiesProvider = FutureProvider.autoDispose<List<Property>>((ref) async {
+final managerPropertiesProvider = FutureProvider.autoDispose<List<Property>>((
+  ref,
+) async {
   return ref.watch(residenceServiceProvider).getAllProperties();
 });
 
-final managerUnitsProvider = FutureProvider.autoDispose<List<Unit>>((ref) async {
+final managerUnitsProvider = FutureProvider.autoDispose<List<Unit>>((
+  ref,
+) async {
   return ref.watch(residenceServiceProvider).getAllUnits();
 });
 
@@ -318,7 +355,8 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   }
 }
 
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
   return ThemeModeNotifier(ref);
 });
-

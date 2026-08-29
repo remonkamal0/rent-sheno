@@ -13,14 +13,15 @@ class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -42,11 +43,15 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       await authService.changePassword(_passwordController.text);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password updated successfully!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Password updated successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -85,12 +90,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'Change Password',
-                  style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                  AppLocalizations.of(context).text('Change Password'),
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Enter your new password below. Make sure it is at least 6 characters long.',
+                Text(
+                  AppLocalizations.of(context).text(
+                    'Enter your new password below. Make sure it is at least 6 characters long.',
+                  ),
                   style: AppTextStyles.bodyMedium,
                 ),
                 const SizedBox(height: 36),
@@ -105,7 +114,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -114,16 +125,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
                 // New password
                 AppTextField(
-                  label: 'New Password',
+                  label: AppLocalizations.of(context).text('New Password'),
                   hint: '••••••••',
                   controller: _passwordController,
                   isPassword: true,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
-                      return 'Password is required';
+                      return AppLocalizations.of(
+                        context,
+                      ).text('Password is required');
                     }
                     if (val.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return AppLocalizations.of(
+                        context,
+                      ).text('Password must be at least 6 characters');
                     }
                     return null;
                   },
@@ -132,16 +147,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
                 // Confirm new password
                 AppTextField(
-                  label: 'Confirm Password',
+                  label: AppLocalizations.of(context).text('Confirm Password'),
                   hint: '••••••••',
                   controller: _confirmPasswordController,
                   isPassword: true,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
-                      return 'Confirm password is required';
+                      return AppLocalizations.of(
+                        context,
+                      ).text('Confirm password is required');
                     }
                     if (val != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return AppLocalizations.of(
+                        context,
+                      ).text('Passwords do not match');
                     }
                     return null;
                   },
@@ -150,7 +169,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
                 // Update CTA
                 AppPrimaryButton(
-                  text: 'Update Password',
+                  text: AppLocalizations.of(context).text('Update Password'),
                   isLoading: _isLoading,
                   onTap: _handleUpdate,
                 ),

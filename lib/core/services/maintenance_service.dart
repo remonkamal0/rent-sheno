@@ -78,7 +78,8 @@ class MaintenanceService {
         requestNumber: 'MR-2023-00124',
         category: 'plumbing',
         title: 'Leaking Kitchen Faucet',
-        description: 'The faucet in the kitchen sink has a constant drip that is getting worse. Need someone to fix it.',
+        description:
+            'The faucet in the kitchen sink has a constant drip that is getting worse. Need someone to fix it.',
         preferredDate: now.add(const Duration(days: 2)),
         status: 'pending',
         createdAt: now.subtract(const Duration(days: 1)),
@@ -107,7 +108,8 @@ class MaintenanceService {
         requestNumber: 'MR-2023-00052',
         category: 'other',
         title: 'Broken Window Blinds',
-        description: 'The cord on the living room blinds snapped. Cannot raise or lower them.',
+        description:
+            'The cord on the living room blinds snapped. Cannot raise or lower them.',
         preferredDate: now.subtract(const Duration(days: 40)),
         status: 'closed',
         createdAt: now.subtract(const Duration(days: 43)),
@@ -132,7 +134,8 @@ class MaintenanceService {
             .order('created_at', ascending: false);
 
         return (res as List).map((r) {
-          final attachments = (r['maintenance_attachments'] as List?)
+          final attachments =
+              (r['maintenance_attachments'] as List?)
                   ?.map((a) => a['file_url'] as String)
                   .toList() ??
               [];
@@ -149,7 +152,9 @@ class MaintenanceService {
             assignedTo: r['assigned_to'],
             createdAt: DateTime.parse(r['created_at']),
             updatedAt: DateTime.parse(r['updated_at']),
-            resolvedAt: r['resolved_at'] != null ? DateTime.parse(r['resolved_at']) : null,
+            resolvedAt: r['resolved_at'] != null
+                ? DateTime.parse(r['resolved_at'])
+                : null,
             attachmentUrls: attachments,
           );
         }).toList();
@@ -169,8 +174,9 @@ class MaintenanceService {
     await Future.delayed(const Duration(seconds: 2)); // Simulate api upload
 
     final now = DateTime.now();
-    final reqNo = 'MR-${now.year}-${(now.millisecondsSinceEpoch % 100000).toString().padLeft(5, '0')}';
-    
+    final reqNo =
+        'MR-${now.year}-${(now.millisecondsSinceEpoch % 100000).toString().padLeft(5, '0')}';
+
     if (SupabaseClientHelper.isMockMode) {
       final newReq = MaintenanceRequest(
         id: reqNo,
@@ -184,7 +190,8 @@ class MaintenanceService {
         status: 'pending',
         createdAt: now,
         updatedAt: now,
-        attachmentUrls: localAttachmentPaths, // locally we simulate file path listing
+        attachmentUrls:
+            localAttachmentPaths, // locally we simulate file path listing
       );
 
       _mockRequests.insert(0, newReq);
@@ -193,7 +200,7 @@ class MaintenanceService {
       try {
         final client = SupabaseClientHelper.client;
         final residentId = _authService.currentUser?.id;
-        
+
         // Fetch active lease to get the unit_id
         final leaseRes = await client
             .from('leases')
@@ -207,16 +214,20 @@ class MaintenanceService {
           throw Exception('Unable to locate active unit/lease for this user.');
         }
 
-        final insertRes = await client.from('maintenance_requests').insert({
-          'resident_id': residentId,
-          'unit_id': unitId,
-          'request_number': reqNo,
-          'category': category,
-          'title': title,
-          'description': description,
-          'preferred_date': preferredDate.toIso8601String().split('T')[0],
-          'status': 'pending',
-        }).select().single();
+        final insertRes = await client
+            .from('maintenance_requests')
+            .insert({
+              'resident_id': residentId,
+              'unit_id': unitId,
+              'request_number': reqNo,
+              'category': category,
+              'title': title,
+              'description': description,
+              'preferred_date': preferredDate.toIso8601String().split('T')[0],
+              'status': 'pending',
+            })
+            .select()
+            .single();
 
         final requestId = insertRes['id'];
 
@@ -225,7 +236,9 @@ class MaintenanceService {
           await client.from('maintenance_attachments').insert({
             'maintenance_request_id': requestId,
             'file_url': fileUrl,
-            'file_type': fileUrl.endsWith('.pdf') ? 'application/pdf' : 'image/png',
+            'file_type': fileUrl.endsWith('.pdf')
+                ? 'application/pdf'
+                : 'image/png',
           });
         }
 
@@ -262,7 +275,8 @@ class MaintenanceService {
             .order('created_at', ascending: false);
 
         return (res as List).map((r) {
-          final attachments = (r['maintenance_attachments'] as List?)
+          final attachments =
+              (r['maintenance_attachments'] as List?)
                   ?.map((a) => a['file_url'] as String)
                   .toList() ??
               [];
@@ -279,7 +293,9 @@ class MaintenanceService {
             assignedTo: r['assigned_to'],
             createdAt: DateTime.parse(r['created_at']),
             updatedAt: DateTime.parse(r['updated_at']),
-            resolvedAt: r['resolved_at'] != null ? DateTime.parse(r['resolved_at']) : null,
+            resolvedAt: r['resolved_at'] != null
+                ? DateTime.parse(r['resolved_at'])
+                : null,
             attachmentUrls: attachments,
           );
         }).toList();
@@ -310,7 +326,10 @@ class MaintenanceService {
         if (status == 'closed') {
           updateData['resolved_at'] = DateTime.now().toUtc().toIso8601String();
         }
-        await client.from('maintenance_requests').update(updateData).eq('id', requestId);
+        await client
+            .from('maintenance_requests')
+            .update(updateData)
+            .eq('id', requestId);
       } catch (e) {
         throw Exception(e.toString());
       }

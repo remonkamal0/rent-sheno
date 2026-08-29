@@ -20,21 +20,19 @@ class SmsDrawer extends ConsumerWidget {
     final residence = residenceState.value;
 
     final name = user?.fullName ?? localizations.translate('profile');
-    final unitText = residence != null 
+    final unitText = residence != null
         ? localizations.translate('unit', residence.unit.unitNumber)
         : '';
     final leaseExpiryText = residence != null
         ? localizations.translate(
-            'lease_expires', 
+            'lease_expires',
             DateFormatter.formatShortDate(residence.lease.endDate),
           )
         : '';
 
     return Drawer(
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +58,7 @@ class SmsDrawer extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Resident Info Card
                   Row(
                     children: [
@@ -69,11 +67,14 @@ class SmsDrawer extends ConsumerWidget {
                         height: 52,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primaryNavy, width: 1.5),
+                          border: Border.all(
+                            color: AppColors.primaryNavy,
+                            width: 1.5,
+                          ),
                           image: DecorationImage(
                             image: NetworkImage(
-                              user?.avatarUrl ?? 
-                              'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150',
+                              user?.avatarUrl ??
+                                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150',
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -126,7 +127,10 @@ class SmsDrawer extends ConsumerWidget {
             // Navigation items
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 children: [
                   _buildDrawerItem(
                     context: context,
@@ -229,14 +233,22 @@ class SmsDrawer extends ConsumerWidget {
             Icon(
               icon,
               size: 20,
-              color: iconColor ?? (isSelected ? AppColors.primaryNavy : AppColors.secondaryText),
+              color:
+                  iconColor ??
+                  (isSelected
+                      ? AppColors.primaryNavy
+                      : AppColors.secondaryText),
             ),
             const SizedBox(width: 16),
             Text(
               label,
               style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: textColor ?? (isSelected ? AppColors.primaryNavy : AppColors.primaryText),
+                color:
+                    textColor ??
+                    (isSelected
+                        ? AppColors.primaryNavy
+                        : AppColors.primaryText),
               ),
             ),
           ],

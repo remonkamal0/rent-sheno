@@ -47,7 +47,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
   Future<void> _selectExpirationDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedExpirationDate ?? DateTime.now().add(const Duration(days: 30)),
+      initialDate:
+          _selectedExpirationDate ??
+          DateTime.now().add(const Duration(days: 30)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
       builder: (context, child) {
@@ -67,7 +69,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
     if (picked != null) {
       setState(() {
         _selectedExpirationDate = picked;
-        _expirationDateController.text = DateFormat('MM/dd/yyyy').format(picked);
+        _expirationDateController.text = DateFormat(
+          'MM/dd/yyyy',
+        ).format(picked);
       });
     }
   }
@@ -85,7 +89,13 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
 
         if (sizeInMb > 5.0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File size must be less than 5MB')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(
+                  context,
+                ).text('File size must be less than 5MB'),
+              ),
+            ),
           );
           return;
         }
@@ -97,7 +107,13 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick document: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Failed to pick document: {}', e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -113,7 +129,13 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedExpirationDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an expiration date')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Please select an expiration date'),
+          ),
+        ),
       );
       return;
     }
@@ -146,8 +168,12 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Policy information updated successfully!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Policy information updated successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -164,7 +190,13 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating policy: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Error updating policy: {}', e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) {
@@ -209,15 +241,21 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
-                          const Icon(LucideIcons.shieldAlert, color: AppColors.warning, size: 40),
+                          const Icon(
+                            LucideIcons.shieldAlert,
+                            color: AppColors.warning,
+                            size: 40,
+                          ),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'No Active Policy Registered',
                             style: AppTextStyles.heading3,
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Please upload your renter\'s insurance policy to comply with your lease agreement.',
+                          Text(
+                            AppLocalizations.of(context).text(
+                              'Please upload your renter\'s insurance policy to comply with your lease agreement.',
+                            ),
                             style: AppTextStyles.bodyMedium,
                             textAlign: TextAlign.center,
                           ),
@@ -227,7 +265,8 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                   );
                 }
 
-                final bool isWarning = policy.calculatedStatus == 'expiring_soon';
+                final bool isWarning =
+                    policy.calculatedStatus == 'expiring_soon';
 
                 return Card(
                   child: Padding(
@@ -258,7 +297,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                                 children: [
                                   Text(
                                     policy.provider,
-                                    style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                                    style: AppTextStyles.heading3.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -280,15 +321,21 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                               children: [
                                 Expanded(
                                   child: _buildPolicyDetailPill(
-                                    label: localizations.translate('coverage_amount'),
-                                    value: '\$${NumberFormat('#,###').format(policy.coverageAmount)}',
+                                    label: localizations.translate(
+                                      'coverage_amount',
+                                    ),
+                                    value:
+                                        '\$${NumberFormat('#,###').format(policy.coverageAmount)}',
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _buildPolicyDetailPill(
-                                    label: localizations.translate('deductible'),
-                                    value: '\$${NumberFormat('#,###').format(policy.deductible)}',
+                                    label: localizations.translate(
+                                      'deductible',
+                                    ),
+                                    value:
+                                        '\$${NumberFormat('#,###').format(policy.deductible)}',
                                   ),
                                 ),
                               ],
@@ -298,15 +345,23 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                               children: [
                                 Expanded(
                                   child: _buildPolicyDetailPill(
-                                    label: localizations.translate('effective_date'),
-                                    value: DateFormatter.formatShortDate(policy.effectiveDate),
+                                    label: localizations.translate(
+                                      'effective_date',
+                                    ),
+                                    value: DateFormatter.formatShortDate(
+                                      policy.effectiveDate,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _buildPolicyDetailPill(
-                                    label: localizations.translate('expiration_date'),
-                                    value: DateFormatter.formatShortDate(policy.expirationDate),
+                                    label: localizations.translate(
+                                      'expiration_date',
+                                    ),
+                                    value: DateFormatter.formatShortDate(
+                                      policy.expirationDate,
+                                    ),
                                     isWarning: isWarning,
                                   ),
                                 ),
@@ -323,7 +378,11 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                             icon: LucideIcons.fileText,
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Mock PDF Viewer: Policy loaded successfully.')),
+                                SnackBar(
+                                  content: Text(
+                                    'Mock PDF Viewer: Policy loaded successfully.',
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -332,7 +391,8 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                   ),
                 );
               },
-              loading: () => const SkeletonContainer(width: double.infinity, height: 260),
+              loading: () =>
+                  const SkeletonContainer(width: double.infinity, height: 260),
               error: (err, stack) => const SizedBox.shrink(),
             ),
             const SizedBox(height: 24),
@@ -348,11 +408,17 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(LucideIcons.fileEdit, color: AppColors.primaryNavy, size: 20),
+                          const Icon(
+                            LucideIcons.fileEdit,
+                            color: AppColors.primaryNavy,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             localizations.translate('update_policy'),
-                            style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                            style: AppTextStyles.heading3.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -361,7 +427,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                       const SizedBox(height: 16),
 
                       Text(
-                        'If you have recently renewed or changed your provider, please update your details below.',
+                        AppLocalizations.of(context).text(
+                          'If you have recently renewed or changed your provider, please update your details below.',
+                        ),
                         style: AppTextStyles.bodySmall,
                       ),
                       const SizedBox(height: 20),
@@ -373,7 +441,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                         controller: _providerController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return 'Provider is required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Provider is required');
                           }
                           return null;
                         },
@@ -383,7 +453,7 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                       // Policy Number
                       AppTextField(
                         label: localizations.translate('policy_number'),
-                        hint: 'Policy ID',
+                        hint: AppLocalizations.of(context).text('Policy ID'),
                         controller: _policyNumberController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
@@ -402,7 +472,9 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                         keyboardType: TextInputType.number,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return 'Coverage amount is required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Coverage amount is required');
                           }
                           final amt = double.tryParse(val);
                           if (amt == null || amt <= 0) {
@@ -419,7 +491,10 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                         controller: _expirationDateController,
                         readOnly: true,
                         hint: 'mm/dd/yyyy',
-                        suffixIcon: const Icon(LucideIcons.calendar, color: AppColors.secondaryText),
+                        suffixIcon: const Icon(
+                          LucideIcons.calendar,
+                          color: AppColors.secondaryText,
+                        ),
                         onTap: () => _selectExpirationDate(context),
                       ),
                       const SizedBox(height: 20),
@@ -436,25 +511,38 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
 
                       if (_selectedProofFileName != null) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             border: Border.all(color: AppColors.border),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
-                              const Icon(LucideIcons.fileText, color: AppColors.primaryNavy, size: 24),
+                              const Icon(
+                                LucideIcons.fileText,
+                                color: AppColors.primaryNavy,
+                                size: 24,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   _selectedProofFileName!,
-                                  style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(LucideIcons.trash2, color: AppColors.error, size: 18),
+                                icon: const Icon(
+                                  LucideIcons.trash2,
+                                  color: AppColors.error,
+                                  size: 18,
+                                ),
                                 onPressed: _removeProofFile,
                               ),
                             ],
@@ -466,22 +554,32 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
                           onTap: _pickProofFile,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 24,
+                              horizontal: 16,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.lightBlue.withOpacity(0.15),
                               border: Border.all(
                                 color: AppColors.primaryNavy.withOpacity(0.3),
-                                style: BorderStyle.values[0], // dashed/dotted border would be custom painter, standard border is solid
+                                style: BorderStyle
+                                    .values[0], // dashed/dotted border would be custom painter, standard border is solid
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Column(
                               children: [
-                                const Icon(LucideIcons.uploadCloud, color: AppColors.primaryNavy, size: 36),
+                                const Icon(
+                                  LucideIcons.uploadCloud,
+                                  color: AppColors.primaryNavy,
+                                  size: 36,
+                                ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'Click to upload or drag and drop',
+                                  AppLocalizations.of(
+                                    context,
+                                  ).text('Click to upload or drag and drop'),
                                   style: AppTextStyles.bodyMedium.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.primaryNavy,
@@ -549,7 +647,11 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
               ),
               if (isWarning) ...[
                 const SizedBox(width: 6),
-                const Icon(LucideIcons.alertCircle, color: AppColors.error, size: 14),
+                const Icon(
+                  LucideIcons.alertCircle,
+                  color: AppColors.error,
+                  size: 14,
+                ),
               ],
             ],
           ),
@@ -557,5 +659,4 @@ class _InsuranceScreenState extends ConsumerState<InsuranceScreen> {
       ),
     );
   }
-
 }

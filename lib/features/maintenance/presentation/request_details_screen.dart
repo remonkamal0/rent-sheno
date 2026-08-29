@@ -27,7 +27,7 @@ class RequestDetailsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('Request $requestId'),
+        title: Text(localizations.text('Request {}', requestId)),
       ),
       body: SafeArea(
         child: requestsState.when(
@@ -41,8 +41,10 @@ class RequestDetailsScreen extends ConsumerWidget {
                 unitId: 'unit-402',
                 requestNumber: requestId,
                 category: 'other',
-                title: 'Request Not Found',
-                description: 'We couldn\'t find the requested maintenance details.',
+                title: AppLocalizations.of(context).text('Request Not Found'),
+                description: AppLocalizations.of(
+                  context,
+                ).text('We couldn\'t find the requested maintenance details.'),
                 preferredDate: DateTime.now(),
                 status: 'cancelled',
                 createdAt: DateTime.now(),
@@ -51,10 +53,9 @@ class RequestDetailsScreen extends ConsumerWidget {
               ),
             );
 
-            if (request.title == 'Request Not Found') {
-              return Center(
-                child: Text(request.description),
-              );
+            if (request.title ==
+                AppLocalizations.of(context).text('Request Not Found')) {
+              return Center(child: Text(request.description));
             }
 
             return SingleChildScrollView(
@@ -67,7 +68,10 @@ class RequestDetailsScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.lightBlue,
                           borderRadius: BorderRadius.circular(8),
@@ -98,7 +102,9 @@ class RequestDetailsScreen extends ConsumerWidget {
                       children: [
                         Text(
                           request.title,
-                          style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                          style: AppTextStyles.heading2.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Divider(color: AppColors.border),
@@ -107,25 +113,37 @@ class RequestDetailsScreen extends ConsumerWidget {
                         // Date columns
                         _buildDetailRow(
                           icon: LucideIcons.calendar,
-                          title: 'Submitted Date',
-                          value: DateFormatter.formatShortDate(request.createdAt),
+                          title: AppLocalizations.of(
+                            context,
+                          ).text('Submitted Date'),
+                          value: DateFormatter.formatShortDate(
+                            request.createdAt,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(
                           icon: LucideIcons.calendarRange,
-                          title: 'Preferred Date',
-                          value: DateFormatter.formatShortDate(request.preferredDate),
+                          title: AppLocalizations.of(
+                            context,
+                          ).text('Preferred Date'),
+                          value: DateFormatter.formatShortDate(
+                            request.preferredDate,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(
                           icon: LucideIcons.user,
-                          title: 'Assigned Tech',
+                          title: AppLocalizations.of(
+                            context,
+                          ).text('Assigned Tech'),
                           value: request.assignedTo ?? 'TBD',
                         ),
-                        
+
                         const SizedBox(height: 20),
                         Text(
-                          'Issue Description'.toUpperCase(),
+                          AppLocalizations.of(
+                            context,
+                          ).text('Issue Description').toUpperCase(),
                           style: AppTextStyles.label.copyWith(
                             color: AppColors.secondaryText,
                             fontSize: 11,
@@ -159,17 +177,24 @@ class RequestDetailsScreen extends ConsumerWidget {
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    _showFullScreenImage(context, request.attachmentUrls[index]);
+                                    _showFullScreenImage(
+                                      context,
+                                      request.attachmentUrls[index],
+                                    );
                                   },
                                   child: Container(
                                     width: 80,
                                     height: 80,
                                     margin: const EdgeInsets.only(right: 12),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: AppColors.border),
+                                      border: Border.all(
+                                        color: AppColors.border,
+                                      ),
                                       borderRadius: BorderRadius.circular(8),
                                       image: DecorationImage(
-                                        image: NetworkImage(request.attachmentUrls[index]),
+                                        image: NetworkImage(
+                                          request.attachmentUrls[index],
+                                        ),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -177,7 +202,7 @@ class RequestDetailsScreen extends ConsumerWidget {
                                 );
                               },
                             ),
-                          )
+                          ),
                         ],
                       ],
                     ),
@@ -198,10 +223,12 @@ class RequestDetailsScreen extends ConsumerWidget {
                       children: [
                         Text(
                           localizations.translate('timeline'),
-                          style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                          style: AppTextStyles.heading3.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 24),
-                        _buildTimeline(request.status),
+                        _buildTimeline(context, request.status),
                       ],
                     ),
                   ),
@@ -214,9 +241,8 @@ class RequestDetailsScreen extends ConsumerWidget {
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryNavy),
             ),
           ),
-          error: (err, stack) => Center(
-            child: Text(localizations.translate('error_loading')),
-          ),
+          error: (err, stack) =>
+              Center(child: Text(localizations.translate('error_loading'))),
         ),
       ),
     );
@@ -233,7 +259,9 @@ class RequestDetailsScreen extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           title,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.secondaryText,
+          ),
         ),
         const Spacer(),
         Text(
@@ -247,7 +275,7 @@ class RequestDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimeline(String status) {
+  Widget _buildTimeline(BuildContext context, String status) {
     // pending, in_progress, scheduled, closed, cancelled
     final int step;
     switch (status.trim().toLowerCase()) {
@@ -271,26 +299,34 @@ class RequestDetailsScreen extends ConsumerWidget {
     return Column(
       children: [
         _buildTimelineStep(
-          title: 'Request Submitted',
-          subtitle: 'We have received your request.',
+          title: AppLocalizations.of(context).text('Request Submitted'),
+          subtitle: AppLocalizations.of(
+            context,
+          ).text('We have received your request.'),
           isCompleted: step >= 1,
           isLast: false,
         ),
         _buildTimelineStep(
-          title: 'Request Reviewed',
-          subtitle: 'Our management has verified the details.',
+          title: AppLocalizations.of(context).text('Request Reviewed'),
+          subtitle: AppLocalizations.of(
+            context,
+          ).text('Our management has verified the details.'),
           isCompleted: step >= 2,
           isLast: false,
         ),
         _buildTimelineStep(
-          title: 'Technician Assigned',
-          subtitle: 'A qualified contractor has been selected.',
+          title: AppLocalizations.of(context).text('Technician Assigned'),
+          subtitle: AppLocalizations.of(
+            context,
+          ).text('A qualified contractor has been selected.'),
           isCompleted: step >= 3,
           isLast: false,
         ),
         _buildTimelineStep(
-          title: 'Completed',
-          subtitle: 'The issue has been resolved.',
+          title: AppLocalizations.of(context).text('Completed'),
+          subtitle: AppLocalizations.of(
+            context,
+          ).text('The issue has been resolved.'),
           isCompleted: step >= 4,
           isLast: true,
         ),
@@ -322,11 +358,7 @@ class RequestDetailsScreen extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: isCompleted
-                    ? const Icon(
-                        Icons.check,
-                        size: 12,
-                        color: Colors.white,
-                      )
+                    ? const Icon(Icons.check, size: 12, color: Colors.white)
                     : null,
               ),
               if (!isLast)
@@ -349,14 +381,13 @@ class RequestDetailsScreen extends ConsumerWidget {
                     title,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: isCompleted ? AppColors.primaryText : AppColors.secondaryText,
+                      color: isCompleted
+                          ? AppColors.primaryText
+                          : AppColors.secondaryText,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: AppTextStyles.bodySmall,
-                  ),
+                  Text(subtitle, style: AppTextStyles.bodySmall),
                 ],
               ),
             ),
@@ -375,9 +406,7 @@ class RequestDetailsScreen extends ConsumerWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            InteractiveViewer(
-              child: Image.network(imageUrl),
-            ),
+            InteractiveViewer(child: Image.network(imageUrl)),
             Positioned(
               top: 40,
               right: 20,

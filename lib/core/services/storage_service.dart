@@ -16,8 +16,9 @@ class StorageService {
       try {
         final client = SupabaseClientHelper.client;
         final fileExtension = file.path.split('.').last;
-        final path = '$userId/avatar-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
-        
+        final path =
+            '$userId/avatar-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
         await client.storage.from('avatars').upload(path, file);
         final publicUrl = client.storage.from('avatars').getPublicUrl(path);
         return publicUrl;
@@ -29,6 +30,7 @@ class StorageService {
 
   Future<String> uploadMaintenanceAttachment({
     required File file,
+    required String userId,
     required String requestId,
   }) async {
     if (SupabaseClientHelper.isMockMode) {
@@ -39,10 +41,13 @@ class StorageService {
       try {
         final client = SupabaseClientHelper.client;
         final fileExtension = file.path.split('.').last;
-        final path = '$requestId/attachment-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+        final path =
+            '$userId/$requestId/attachment-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
         await client.storage.from('maintenance-attachments').upload(path, file);
-        final publicUrl = client.storage.from('maintenance-attachments').getPublicUrl(path);
+        final publicUrl = client.storage
+            .from('maintenance-attachments')
+            .getPublicUrl(path);
         return publicUrl;
       } catch (e) {
         throw Exception(e.toString());
@@ -61,14 +66,39 @@ class StorageService {
       try {
         final client = SupabaseClientHelper.client;
         final fileExtension = file.path.split('.').last;
-        final path = '$userId/policy-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+        final path =
+            '$userId/policy-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
         await client.storage.from('insurance-documents').upload(path, file);
-        final publicUrl = client.storage.from('insurance-documents').getPublicUrl(path);
+        final publicUrl = client.storage
+            .from('insurance-documents')
+            .getPublicUrl(path);
         return publicUrl;
       } catch (e) {
         throw Exception(e.toString());
       }
+    }
+  }
+
+  Future<String> uploadPaymentReceipt({
+    required File file,
+    required String userId,
+  }) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(seconds: 1));
+      return file.path;
+    }
+
+    try {
+      final client = SupabaseClientHelper.client;
+      final fileExtension = file.path.split('.').last;
+      final path =
+          '$userId/receipt-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
+      await client.storage.from('payment-receipts').upload(path, file);
+      return client.storage.from('payment-receipts').getPublicUrl(path);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 }

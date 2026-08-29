@@ -56,13 +56,17 @@ class _AppTextFieldState extends State<AppTextField> {
           maxLines: widget.isPassword ? 1 : widget.maxLines,
           readOnly: widget.readOnly,
           onTap: widget.onTap,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.primaryText,
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscureText
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: AppColors.secondaryText,
                       size: 20,
                     ),

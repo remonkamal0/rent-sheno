@@ -60,13 +60,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         setState(() {
           _avatarFile = File(image.path);
         });
-        
+
         // Upload immediately
         _uploadAvatar();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick avatar: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Failed to pick avatar: {}', e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -76,8 +82,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     try {
       final storage = ref.read(storageServiceProvider);
-      final userId = ref.read(authServiceProvider).currentUser?.id ?? 'temp-user';
-      
+      final userId =
+          ref.read(authServiceProvider).currentUser?.id ?? 'temp-user';
+
       final publicUrl = await storage.uploadAvatar(
         file: _avatarFile!,
         userId: userId,
@@ -88,7 +95,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to upload avatar: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Failed to upload avatar: {}', e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -110,15 +123,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              ).text('Profile updated successfully!'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving updates: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Error saving updates: {}', e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) {
@@ -134,7 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final localizations = AppLocalizations.of(context);
     final authState = ref.watch(authStateProvider);
     final residenceState = ref.watch(residenceDetailsProvider);
-    
+
     final user = authState.value;
     final residence = residenceState.value;
 
@@ -159,13 +182,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primaryNavy, width: 2),
+                          border: Border.all(
+                            color: AppColors.primaryNavy,
+                            width: 2,
+                          ),
                           image: DecorationImage(
                             image: _avatarFile != null
                                 ? FileImage(_avatarFile!)
-                                : NetworkImage(_avatarUrl ??
-                                        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150')
-                                    as ImageProvider,
+                                : NetworkImage(
+                                        _avatarUrl ??
+                                            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150',
+                                      )
+                                      as ImageProvider,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -195,7 +223,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 16),
                 Text(
                   user?.fullName ?? '',
-                  style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
@@ -215,11 +245,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(LucideIcons.user, color: AppColors.primaryNavy, size: 20),
+                            const Icon(
+                              LucideIcons.user,
+                              color: AppColors.primaryNavy,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Text(
-                              'Personal Information',
-                              style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                              AppLocalizations.of(
+                                context,
+                              ).text('Personal Information'),
+                              style: AppTextStyles.heading3.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -233,7 +271,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           controller: _nameController,
                           validator: (val) {
                             if (val == null || val.trim().isEmpty) {
-                              return 'Full name is required';
+                              return AppLocalizations.of(
+                                context,
+                              ).text('Full name is required');
                             }
                             return null;
                           },
@@ -247,7 +287,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           keyboardType: TextInputType.phone,
                           validator: (val) {
                             if (val == null || val.trim().isEmpty) {
-                              return 'Phone number is required';
+                              return AppLocalizations.of(
+                                context,
+                              ).text('Phone number is required');
                             }
                             return null;
                           },
@@ -275,24 +317,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           Row(
                             children: [
-                              const Icon(LucideIcons.home, color: AppColors.primaryNavy, size: 20),
+                              const Icon(
+                                LucideIcons.home,
+                                color: AppColors.primaryNavy,
+                                size: 20,
+                              ),
                               const SizedBox(width: 10),
                               Text(
-                                'Residence details',
-                                style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
+                                AppLocalizations.of(
+                                  context,
+                                ).text('Residence details'),
+                                style: AppTextStyles.heading3.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
                           const Divider(color: AppColors.border),
                           const SizedBox(height: 16),
-                          _buildProfileRow('Property', residence.property.name),
+                          _buildProfileRow(
+                            AppLocalizations.of(context).text('Property'),
+                            residence.property.name,
+                          ),
                           const Divider(height: 24),
-                          _buildProfileRow('Unit Number', residence.unit.unitNumber),
+                          _buildProfileRow(
+                            AppLocalizations.of(context).text('Unit Number'),
+                            residence.unit.unitNumber,
+                          ),
                           const Divider(height: 24),
-                          _buildProfileRow('Lease Start Date', DateFormatter.formatShortDate(residence.lease.startDate)),
+                          _buildProfileRow(
+                            'Lease Start Date',
+                            DateFormatter.formatShortDate(
+                              residence.lease.startDate,
+                            ),
+                          ),
                           const Divider(height: 24),
-                          _buildProfileRow('Lease End Date', DateFormatter.formatShortDate(residence.lease.endDate)),
+                          _buildProfileRow(
+                            'Lease End Date',
+                            DateFormatter.formatShortDate(
+                              residence.lease.endDate,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -321,13 +387,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
-        ),
-        Text(
-          value,
           style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryText,
+            color: AppColors.secondaryText,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryText,
+            ),
           ),
         ),
       ],

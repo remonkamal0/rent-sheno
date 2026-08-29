@@ -18,11 +18,13 @@ class MaintenanceListScreen extends ConsumerStatefulWidget {
   const MaintenanceListScreen({super.key});
 
   @override
-  ConsumerState<MaintenanceListScreen> createState() => _MaintenanceListScreenState();
+  ConsumerState<MaintenanceListScreen> createState() =>
+      _MaintenanceListScreenState();
 }
 
 class _MaintenanceListScreenState extends ConsumerState<MaintenanceListScreen> {
-  int _activeTab = 0; // 0: History, 1: New Request (which navigates to the form)
+  int _activeTab =
+      0; // 0: History, 1: New Request (which navigates to the form)
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +63,11 @@ class _MaintenanceListScreenState extends ConsumerState<MaintenanceListScreen> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () => context.push('/maintenance/new'),
-                      icon: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        LucideIcons.plus,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       label: Text(
                         localizations.translate('new_request'),
                         style: AppTextStyles.button,
@@ -121,8 +127,12 @@ class _MaintenanceListScreenState extends ConsumerState<MaintenanceListScreen> {
                   if (requests.isEmpty) {
                     return EmptyState(
                       icon: LucideIcons.wrench,
-                      title: 'No maintenance requests yet',
-                      description: 'Report issues regarding plumbing, electrical, and other appliances.',
+                      title: AppLocalizations.of(
+                        context,
+                      ).text('No maintenance requests yet'),
+                      description: AppLocalizations.of(context).text(
+                        'Report issues regarding plumbing, electrical, and other appliances.',
+                      ),
                       actionText: localizations.translate('new_request'),
                       onActionTap: () => context.push('/maintenance/new'),
                     );
@@ -197,10 +207,14 @@ class MaintenanceRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isClosed = request.status == 'closed' || request.status == 'cancelled';
-    final dateLabel = isClosed ? 'Resolved: ' : 'Submitted: ';
-    final displayDate = isClosed 
-        ? (request.resolvedAt ?? request.updatedAt) 
+    final bool isClosed =
+        request.status == 'closed' || request.status == 'cancelled';
+    final localizations = AppLocalizations.of(context);
+    final dateLabel = isClosed
+        ? localizations.text('Resolved: ')
+        : localizations.text('Submitted: ');
+    final displayDate = isClosed
+        ? (request.resolvedAt ?? request.updatedAt)
         : request.createdAt;
 
     return Card(

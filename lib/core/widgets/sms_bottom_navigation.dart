@@ -46,9 +46,7 @@ class SmsBottomNavigationLayout extends StatelessWidget {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 1),
-          ),
+          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
         ),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: SafeArea(
@@ -116,11 +114,7 @@ class SmsBottomNavigationLayout extends StatelessWidget {
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    icon,
-                    size: 20,
-                    color: Colors.white,
-                  ),
+                  Icon(icon, size: 20, color: Colors.white),
                   const SizedBox(width: 8),
                   Text(
                     label,
@@ -135,11 +129,7 @@ class SmsBottomNavigationLayout extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    icon,
-                    size: 20,
-                    color: AppColors.secondaryText,
-                  ),
+                  Icon(icon, size: 20, color: AppColors.secondaryText),
                   const SizedBox(height: 4),
                   Text(
                     label,

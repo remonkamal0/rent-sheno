@@ -102,7 +102,7 @@ class ResidenceDetails {
 
 class ResidenceService {
   final AuthService _authService;
-  
+
   final List<Property> _mockProperties = [];
   final List<Unit> _mockUnits = [];
   final List<Lease> _mockLeases = [];
@@ -113,7 +113,7 @@ class ResidenceService {
 
   void _initMockData() {
     final now = DateTime.now();
-    
+
     // Create 3 default buildings (Properties)
     for (int p = 1; p <= 3; p++) {
       final propId = 'prop-$p';
@@ -126,9 +126,9 @@ class ResidenceService {
           state: 'Egypt',
           postalCode: '11511',
           country: 'Egypt',
-          imageUrl: p == 1 
-            ? 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=600'
-            : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=600',
+          imageUrl: p == 1
+              ? 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=600'
+              : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=600',
         ),
       );
 
@@ -138,7 +138,7 @@ class ResidenceService {
           final aptNumber = floor * 100 + apt;
           final unitId = 'unit-$p-$floor-$apt';
           final unitNumber = 'Building $p - Floor $floor - Apt $aptNumber';
-          
+
           // Determine status based on our initial mock tenants
           String status = 'vacant';
           if (p == 1 && floor == 1 && apt == 1) {
@@ -210,7 +210,9 @@ class ResidenceService {
       if (residentId == null) return null;
 
       // Find active lease for current user
-      final leaseIndex = _mockLeases.indexWhere((l) => l.residentId == residentId && l.status == 'active');
+      final leaseIndex = _mockLeases.indexWhere(
+        (l) => l.residentId == residentId && l.status == 'active',
+      );
       if (leaseIndex == -1) return null;
       final lease = _mockLeases[leaseIndex];
 
@@ -218,20 +220,18 @@ class ResidenceService {
       if (unitIndex == -1) return null;
       final unit = _mockUnits[unitIndex];
 
-      final propIndex = _mockProperties.indexWhere((p) => p.id == unit.propertyId);
+      final propIndex = _mockProperties.indexWhere(
+        (p) => p.id == unit.propertyId,
+      );
       if (propIndex == -1) return null;
       final property = _mockProperties[propIndex];
 
-      return ResidenceDetails(
-        property: property,
-        unit: unit,
-        lease: lease,
-      );
+      return ResidenceDetails(property: property, unit: unit, lease: lease);
     } else {
       try {
         final client = SupabaseClientHelper.client;
         final residentId = _authService.currentUser?.id;
-        
+
         if (residentId == null) return null;
 
         // Fetch lease details
@@ -289,11 +289,7 @@ class ResidenceService {
           imageUrl: propRes['image_url'],
         );
 
-        return ResidenceDetails(
-          property: property,
-          unit: unit,
-          lease: lease,
-        );
+        return ResidenceDetails(property: property, unit: unit, lease: lease);
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -308,13 +304,17 @@ class ResidenceService {
       try {
         final client = SupabaseClientHelper.client;
         final res = await client.from('units').select();
-        return (res as List).map((u) => Unit(
-          id: u['id'],
-          propertyId: u['property_id'],
-          unitNumber: u['unit_number'],
-          floor: u['floor'] ?? 1,
-          status: u['status'] ?? 'vacant',
-        )).toList();
+        return (res as List)
+            .map(
+              (u) => Unit(
+                id: u['id'],
+                propertyId: u['property_id'],
+                unitNumber: u['unit_number'],
+                floor: u['floor'] ?? 1,
+                status: u['status'] ?? 'vacant',
+              ),
+            )
+            .toList();
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -329,17 +329,21 @@ class ResidenceService {
       try {
         final client = SupabaseClientHelper.client;
         final res = await client.from('properties').select();
-        return (res as List).map((p) => Property(
-          id: p['id'],
-          name: p['name'],
-          addressLine1: p['address_line_1'],
-          addressLine2: p['address_line_2'],
-          city: p['city'],
-          state: p['state'],
-          postalCode: p['postal_code'],
-          country: p['country'],
-          imageUrl: p['image_url'],
-        )).toList();
+        return (res as List)
+            .map(
+              (p) => Property(
+                id: p['id'],
+                name: p['name'],
+                addressLine1: p['address_line_1'],
+                addressLine2: p['address_line_2'],
+                city: p['city'],
+                state: p['state'],
+                postalCode: p['postal_code'],
+                country: p['country'],
+                imageUrl: p['image_url'],
+              ),
+            )
+            .toList();
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -355,7 +359,7 @@ class ResidenceService {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 500));
       final propId = 'prop-${DateTime.now().millisecondsSinceEpoch}';
-      
+
       _mockProperties.add(
         Property(
           id: propId,
@@ -389,15 +393,19 @@ class ResidenceService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
-        
-        final propRes = await client.from('properties').insert({
-          'name': buildingName,
-          'address_line_1': address,
-          'city': 'Cairo',
-          'state': 'Egypt',
-          'postal_code': '11511',
-          'country': 'Egypt',
-        }).select().single();
+
+        final propRes = await client
+            .from('properties')
+            .insert({
+              'name': buildingName,
+              'address_line_1': address,
+              'city': 'Cairo',
+              'state': 'Egypt',
+              'postal_code': '11511',
+              'country': 'Egypt',
+            })
+            .select()
+            .single();
 
         final propId = propRes['id'];
 
@@ -433,11 +441,11 @@ class ResidenceService {
   }) async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // 1. Check if unit exists in mock units list, update status to occupied
       final unitIdx = _mockUnits.indexWhere((u) => u.unitNumber == unitNumber);
       String unitId = 'unit-new-${DateTime.now().millisecondsSinceEpoch}';
-      
+
       if (unitIdx != -1) {
         unitId = _mockUnits[unitIdx].id;
         _mockUnits[unitIdx] = _mockUnits[unitIdx].copyWith(status: 'occupied');
@@ -472,7 +480,7 @@ class ResidenceService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
-        
+
         // Find unit ID by name first or insert new
         final existingUnit = await client
             .from('units')
@@ -484,14 +492,21 @@ class ResidenceService {
         if (existingUnit != null) {
           unitId = existingUnit['id'];
           // Update status to occupied
-          await client.from('units').update({'status': 'occupied'}).eq('id', unitId);
+          await client
+              .from('units')
+              .update({'status': 'occupied'})
+              .eq('id', unitId);
         } else {
-          final unitRes = await client.from('units').insert({
-            'property_id': 'prop-1',
-            'unit_number': unitNumber,
-            'floor': floor,
-            'status': 'occupied',
-          }).select().single();
+          final unitRes = await client
+              .from('units')
+              .insert({
+                'property_id': 'prop-1',
+                'unit_number': unitNumber,
+                'floor': floor,
+                'status': 'occupied',
+              })
+              .select()
+              .single();
           unitId = unitRes['id'];
         }
 
@@ -513,7 +528,9 @@ class ResidenceService {
   Future<Lease?> getActiveLeaseForUnit(String unitId) async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 300));
-      final idx = _mockLeases.indexWhere((l) => l.unitId == unitId && l.status == 'active');
+      final idx = _mockLeases.indexWhere(
+        (l) => l.unitId == unitId && l.status == 'active',
+      );
       return idx == -1 ? null : _mockLeases[idx];
     } else {
       try {

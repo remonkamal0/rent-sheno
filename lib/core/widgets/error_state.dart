@@ -44,7 +44,10 @@ class ErrorState extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onRetry,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.primaryNavy, width: 1.5),
+                  side: const BorderSide(
+                    color: AppColors.primaryNavy,
+                    width: 1.5,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

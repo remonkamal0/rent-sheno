@@ -29,7 +29,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
   DateTime? _selectedDate;
   final List<File> _attachedPhotos = [];
   final ImagePicker _picker = ImagePicker();
-  
+
   bool _isLoading = false;
   String? _successRequestNo;
 
@@ -84,7 +84,11 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
   Future<void> _pickImage() async {
     if (_attachedPhotos.length >= 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximum 3 photos allowed')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).text('Maximum 3 photos allowed'),
+          ),
+        ),
       );
       return;
     }
@@ -102,7 +106,13 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Failed to pick image: {}', e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -117,7 +127,13 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a preferred repair date')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Please select a preferred repair date'),
+          ),
+        ),
       );
       return;
     }
@@ -129,6 +145,10 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
     try {
       final notifier = ref.read(maintenanceRequestsProvider.notifier);
       final storage = ref.read(storageServiceProvider);
+      final user = ref.read(authStateProvider).value;
+      if (user == null) {
+        throw StateError('A signed-in user is required to upload attachments.');
+      }
 
       // 1. Upload photos if any
       final List<String> uploadedUrls = [];
@@ -136,6 +156,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
         final file = _attachedPhotos[i];
         final url = await storage.uploadMaintenanceAttachment(
           file: file,
+          userId: user.id,
           requestId: 'temp-req-${DateTime.now().millisecondsSinceEpoch}-$i',
         );
         uploadedUrls.add(url);
@@ -144,7 +165,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
       // 2. Submit request
       // We generate temporary title from first words of info or category name
       final title = '${_selectedCategory.toUpperCase()} request';
-      
+
       await notifier.addRequest(
         title: title,
         category: _selectedCategory,
@@ -155,14 +176,22 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
 
       // Find the last request we just added to fetch request number
       final updatedList = ref.read(maintenanceRequestsProvider).value ?? [];
-      final lastReq = updatedList.isNotEmpty ? updatedList.first.requestNumber : 'MR-2026-00000';
+      final lastReq = updatedList.isNotEmpty
+          ? updatedList.first.requestNumber
+          : 'MR-2026-00000';
 
       setState(() {
         _successRequestNo = lastReq;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting request: $e')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).text('Error submitting request: {}', e.toString()),
+          ),
+        ),
       );
     } finally {
       setState(() {
@@ -202,10 +231,14 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                   onTap: () => context.pop(),
                   child: Row(
                     children: [
-                      const Icon(LucideIcons.arrowLeft, size: 14, color: AppColors.primaryNavy),
+                      const Icon(
+                        LucideIcons.arrowLeft,
+                        size: 14,
+                        color: AppColors.primaryNavy,
+                      ),
                       const SizedBox(width: 4),
                       Text(
-                        'Back to Dashboard',
+                        AppLocalizations.of(context).text('Back to Dashboard'),
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.primaryNavy,
                           fontWeight: FontWeight.bold,
@@ -221,7 +254,9 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Please provide details about the issue.',
+                  AppLocalizations.of(
+                    context,
+                  ).text('Please provide details about the issue.'),
                   style: AppTextStyles.bodyMedium,
                 ),
                 const SizedBox(height: 24),
@@ -292,7 +327,10 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                         controller: _dateController,
                         readOnly: true,
                         hint: 'mm/dd/yyyy',
-                        suffixIcon: const Icon(LucideIcons.calendar, color: AppColors.secondaryText),
+                        suffixIcon: const Icon(
+                          LucideIcons.calendar,
+                          color: AppColors.secondaryText,
+                        ),
                         onTap: () => _selectDate(context),
                       ),
                       const SizedBox(height: 20),
@@ -305,10 +343,14 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                         hint: localizations.translate('describe_issue'),
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return 'Details are required';
+                            return AppLocalizations.of(
+                              context,
+                            ).text('Details are required');
                           }
                           if (val.trim().length < 10) {
-                            return 'Please describe the issue in at least 10 characters';
+                            return AppLocalizations.of(context).text(
+                              'Please describe the issue in at least 10 characters',
+                            );
                           }
                           return null;
                         },
@@ -324,11 +366,13 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Photos previews or Pick Area
                       if (_attachedPhotos.isNotEmpty) ...[
                         Row(
-                          children: List.generate(_attachedPhotos.length, (index) {
+                          children: List.generate(_attachedPhotos.length, (
+                            index,
+                          ) {
                             return Stack(
                               clipBehavior: Clip.none,
                               children: [
@@ -381,13 +425,20 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
                               color: AppColors.lightBlue.withOpacity(0.3),
-                              border: Border.all(color: AppColors.primaryNavy.withOpacity(0.3), width: 1),
+                              border: Border.all(
+                                color: AppColors.primaryNavy.withOpacity(0.3),
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(LucideIcons.uploadCloud, color: AppColors.primaryNavy, size: 20),
+                                const Icon(
+                                  LucideIcons.uploadCloud,
+                                  color: AppColors.primaryNavy,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   localizations.translate('upload_photos'),
@@ -433,7 +484,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
     required IconData icon,
   }) {
     final isSelected = _selectedCategory == id;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -443,7 +494,9 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.lightBlue.withOpacity(0.3) : Colors.white,
+          color: isSelected
+              ? AppColors.lightBlue.withOpacity(0.3)
+              : Colors.white,
           border: Border.all(
             color: isSelected ? AppColors.primaryNavy : AppColors.border,
             width: isSelected ? 2 : 1,
@@ -456,13 +509,17 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
             Icon(
               icon,
               size: 24,
-              color: isSelected ? AppColors.primaryNavy : AppColors.secondaryText,
+              color: isSelected
+                  ? AppColors.primaryNavy
+                  : AppColors.secondaryText,
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: AppTextStyles.label.copyWith(
-                color: isSelected ? AppColors.primaryNavy : AppColors.primaryText,
+                color: isSelected
+                    ? AppColors.primaryNavy
+                    : AppColors.primaryText,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
@@ -500,7 +557,9 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
               const SizedBox(height: 24),
               Text(
                 localizations.translate('req_success'),
-                style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.bold),
+                style: AppTextStyles.heading2.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),

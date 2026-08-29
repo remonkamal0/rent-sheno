@@ -25,7 +25,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _showLanguageSelector() {
     final currentLang = ref.read(localeProvider).languageCode;
-    
+
     showDialog(
       context: context,
       builder: (context) {
@@ -63,8 +63,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           color: context.primaryTextColor,
         ),
       ),
-      trailing: isSelected 
-          ? Icon(LucideIcons.check, color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, size: 18)
+      trailing: isSelected
+          ? Icon(
+              LucideIcons.check,
+              color: context.isDarkMode
+                  ? AppColors.lightBlue
+                  : AppColors.primaryNavy,
+              size: 18,
+            )
           : null,
       onTap: () {
         ref.read(localeProvider.notifier).state = Locale(code);
@@ -84,7 +90,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } else if (langCode == 'ar') {
       langName = 'العربية';
     }
-    final themeAccentIconColor = context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy;
+    final themeAccentIconColor = context.isDarkMode
+        ? AppColors.lightBlue
+        : AppColors.primaryNavy;
 
     return Scaffold(
       backgroundColor: context.backgroundColor,
@@ -92,7 +100,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         backgroundColor: context.cardColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Directionality.of(context) == TextDirection.rtl ? Icons.arrow_forward_ios_rounded : Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? Icons.arrow_forward_ios_rounded
+                : Icons.arrow_back_ios_new_rounded,
+            size: 20,
+          ),
           onPressed: () {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
@@ -110,7 +123,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         title: Text(
           localizations.translate('settings'),
-          style: AppTextStyles.heading3.copyWith(color: context.primaryTextColor),
+          style: AppTextStyles.heading3.copyWith(
+            color: context.primaryTextColor,
+          ),
         ),
       ),
       body: SafeArea(
@@ -118,11 +133,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           padding: const EdgeInsets.all(24.0),
           children: [
             // 1. Language preference
-            _buildSectionHeader('Preferences'),
+            _buildSectionHeader(
+              AppLocalizations.of(context).text('Preferences'),
+            ),
             Card(
               color: context.cardColor,
               child: ListTile(
-                leading: Icon(LucideIcons.languages, color: themeAccentIconColor),
+                leading: Icon(
+                  LucideIcons.languages,
+                  color: themeAccentIconColor,
+                ),
                 title: Text(
                   localizations.translate('lang_label'),
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -143,7 +163,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 16),
 
             // 3. Theme & Security
-            _buildSectionHeader('Theme & Security'),
+            _buildSectionHeader(
+              AppLocalizations.of(context).text('Theme & Security'),
+            ),
             Card(
               color: context.cardColor,
               child: Column(
@@ -158,7 +180,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   Divider(height: 1, color: context.borderColor),
                   ListTile(
-                    leading: Icon(LucideIcons.lock, color: themeAccentIconColor),
+                    leading: Icon(
+                      LucideIcons.lock,
+                      color: themeAccentIconColor,
+                    ),
                     title: Text(
                       localizations.translate('change_pw'),
                       style: AppTextStyles.bodyMedium.copyWith(
@@ -166,7 +191,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: context.primaryTextColor,
                       ),
                     ),
-                    trailing: Icon(LucideIcons.chevronRight, size: 18, color: context.secondaryTextColor),
+                    trailing: Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: context.secondaryTextColor,
+                    ),
                     onTap: () => context.push('/change-password'),
                   ),
                 ],
@@ -175,13 +204,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 16),
 
             // 4. Legal & About
-            _buildSectionHeader('Information'),
+            _buildSectionHeader(
+              AppLocalizations.of(context).text('Information'),
+            ),
             Card(
               color: context.cardColor,
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(LucideIcons.fileText, color: themeAccentIconColor),
+                    leading: Icon(
+                      LucideIcons.fileText,
+                      color: themeAccentIconColor,
+                    ),
                     title: Text(
                       localizations.translate('privacy_policy'),
                       style: AppTextStyles.bodyMedium.copyWith(
@@ -189,14 +223,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: context.primaryTextColor,
                       ),
                     ),
-                    trailing: Icon(LucideIcons.chevronRight, size: 18, color: context.secondaryTextColor),
+                    trailing: Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: context.secondaryTextColor,
+                    ),
                     onTap: () {
-                      _showDialogInfo('Privacy Policy', 'This app complies with privacy regulation standards.');
+                      _showDialogInfo(
+                        'Privacy Policy',
+                        AppLocalizations.of(context).text(
+                          'This app complies with privacy regulation standards.',
+                        ),
+                      );
                     },
                   ),
                   Divider(height: 1, color: context.borderColor),
                   ListTile(
-                    leading: Icon(LucideIcons.helpCircle, color: themeAccentIconColor),
+                    leading: Icon(
+                      LucideIcons.helpCircle,
+                      color: themeAccentIconColor,
+                    ),
                     title: Text(
                       localizations.translate('terms'),
                       style: AppTextStyles.bodyMedium.copyWith(
@@ -204,14 +250,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: context.primaryTextColor,
                       ),
                     ),
-                    trailing: Icon(LucideIcons.chevronRight, size: 18, color: context.secondaryTextColor),
+                    trailing: Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: context.secondaryTextColor,
+                    ),
                     onTap: () {
-                      _showDialogInfo('Terms & Conditions', 'SMS Services rules represent rental policy standards.');
+                      _showDialogInfo(
+                        AppLocalizations.of(context).text('Terms & Conditions'),
+                        'SMS Services rules represent rental policy standards.',
+                      );
                     },
                   ),
                   Divider(height: 1, color: context.borderColor),
                   ListTile(
-                    leading: Icon(LucideIcons.info, color: themeAccentIconColor),
+                    leading: Icon(
+                      LucideIcons.info,
+                      color: themeAccentIconColor,
+                    ),
                     title: Text(
                       localizations.translate('about'),
                       style: AppTextStyles.bodyMedium.copyWith(
@@ -219,9 +275,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: context.primaryTextColor,
                       ),
                     ),
-                    trailing: Icon(LucideIcons.chevronRight, size: 18, color: context.secondaryTextColor),
+                    trailing: Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: context.secondaryTextColor,
+                    ),
                     onTap: () {
-                      _showDialogInfo('About SMS Services', 'SMS Services Tenant Portal v1.0.0. Complete property management in your pocket.');
+                      _showDialogInfo(
+                        'About SMS Services',
+                        'SMS Services Tenant Portal v1.0.0. Complete property management in your pocket.',
+                      );
                     },
                   ),
                 ],
@@ -237,25 +300,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: ListTile(
                 leading: const Icon(LucideIcons.trash2, color: AppColors.error),
                 title: Text(
-                  'Delete Account',
+                  AppLocalizations.of(context).text('Delete Account'),
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.error,
                   ),
                 ),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18, color: AppColors.error),
+                trailing: const Icon(
+                  LucideIcons.chevronRight,
+                  size: 18,
+                  color: AppColors.error,
+                ),
                 onTap: () async {
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
                         backgroundColor: context.cardColor,
-                        title: const Text('Delete Account', style: TextStyle(color: AppColors.error)),
-                        content: const Text('Are you sure you want to permanently delete your account? This action is irreversible and all your data will be permanently deleted.'),
+                        title: Text(
+                          AppLocalizations.of(context).text('Delete Account'),
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                        content: Text(
+                          AppLocalizations.of(context).text(
+                            'Are you sure you want to permanently delete your account? This action is irreversible and all your data will be permanently deleted.',
+                          ),
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: Text('Cancel', style: TextStyle(color: context.secondaryTextColor)),
+                            child: Text(
+                              AppLocalizations.of(context).text('Cancel'),
+                              style: TextStyle(
+                                color: context.secondaryTextColor,
+                              ),
+                            ),
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -263,7 +342,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               foregroundColor: Colors.white,
                             ),
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text('Delete Permanently'),
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              ).text('Delete Permanently'),
+                            ),
                           ),
                         ],
                       );
@@ -276,13 +359,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       if (context.mounted) {
                         context.go('/login');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Account deleted successfully.'), backgroundColor: AppColors.success),
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(
+                                context,
+                              ).text('Account deleted successfully.'),
+                            ),
+                            backgroundColor: AppColors.success,
+                          ),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(
+                                context,
+                              ).text('Error: {}', e.toString()),
+                            ),
+                            backgroundColor: AppColors.error,
+                          ),
                         );
                       }
                     }
@@ -343,13 +440,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         content: Text(
           content,
-          style: AppTextStyles.bodyMedium.copyWith(color: context.secondaryTextColor),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: context.secondaryTextColor,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: TextStyle(color: context.isDarkMode ? AppColors.lightBlue : AppColors.primaryNavy, fontWeight: FontWeight.bold)),
-          )
+            child: Text(
+              AppLocalizations.of(context).text('OK'),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.lightBlue
+                    : AppColors.primaryNavy,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -23,7 +23,8 @@ class AppLocalizations {
       'invalid_auth': 'Invalid email or password',
       'current_residence': 'Current Residence',
       'maintenance_request': 'Maintenance Request',
-      'maintenance_request_desc': 'Report an issue or track an existing request.',
+      'maintenance_request_desc':
+          'Report an issue or track an existing request.',
       'upcoming_balance': 'Upcoming Balance',
       'due_in_days': 'Due in {} days',
       'recent_notifications': 'Recent Notifications',
@@ -38,7 +39,8 @@ class AppLocalizations {
       'unit': 'Unit {}',
       'lease_expires': 'Lease expires {}',
       'maintenance_center': 'Maintenance Center',
-      'maintenance_desc': 'Submit new requests or review your past maintenance history.',
+      'maintenance_desc':
+          'Submit new requests or review your past maintenance history.',
       'new_request': 'New Request',
       'history': 'Maintenance History',
       'category': 'Issue Category',
@@ -82,7 +84,8 @@ class AppLocalizations {
       'download_receipt': 'Download Receipt',
       'pay_now': 'Send Data',
       'confirm_payment': 'Confirm Submission',
-      'payment_method_desc': 'Select your submission method, enter transaction reference details, and upload proof.',
+      'payment_method_desc':
+          'Select your submission method, enter transaction reference details, and upload proof.',
       'select_payment_method': 'SELECT METHOD',
       'proof_of_payment': 'PROOF OF SUBMISSION',
       'attach_payment_receipt': 'Tap to Attach Receipt Proof (JPG, PNG, PDF)',
@@ -91,7 +94,8 @@ class AppLocalizations {
       'submission_failed': 'Submission failed: {}',
       'balance_charges': 'Balance & Charges',
       'payment_history': 'Submission History',
-      'submission_success_desc': 'Thank you. Your data has been submitted successfully for verification.',
+      'submission_success_desc':
+          'Thank you. Your data has been submitted successfully for verification.',
       'view_transaction': 'View History',
       'today': 'Today',
       'yesterday': 'Yesterday',
@@ -100,7 +104,8 @@ class AppLocalizations {
       'in_days': 'In {} days',
       'due_today': 'Due Today',
       'insurance_coverage': 'Insurance Coverage',
-      'insurance_desc': 'Manage your renter\'s insurance policy details and ensure continuous coverage for your unit.',
+      'insurance_desc':
+          'Manage your renter\'s insurance policy details and ensure continuous coverage for your unit.',
       'active_policy': 'Active Policy',
       'policy_no': 'Policy #',
       'coverage_amount': 'Coverage Amount',
@@ -115,9 +120,12 @@ class AppLocalizations {
       'save_updates': 'Save Updates',
       'lease_reqs': 'Lease Requirements',
       'min_coverage': 'Minimum \$50,000 liability coverage.',
-      'mgmt_listed': 'Property Management Company must be listed as an "Interested Party".',
-      'continuous_coverage': 'Continuous coverage required for the duration of the lease.',
-      'insurance_warning': 'Failure to maintain active insurance may result in a non-compliance fee.',
+      'mgmt_listed':
+          'Property Management Company must be listed as an "Interested Party".',
+      'continuous_coverage':
+          'Continuous coverage required for the duration of the lease.',
+      'insurance_warning':
+          'Failure to maintain active insurance may result in a non-compliance fee.',
       'lang_label': 'Language',
       'push_notif': 'Push Notifications',
       'email_notif': 'Email Notifications',
@@ -164,7 +172,8 @@ class AppLocalizations {
       'renters_insurance_status': 'RENTER\'S INSURANCE STATUS',
       'liability_coverage': 'Liability Coverage',
       'view_proof_document': 'View Proof Document',
-      'no_insurance_submitted': 'Tenant hasn\'t submitted insurance details yet.',
+      'no_insurance_submitted':
+          'Tenant hasn\'t submitted insurance details yet.',
       'mark_paid': 'Mark Paid',
       'monthly_rent': 'Monthly Rent',
       'security_deposit': 'Security Deposit',
@@ -188,7 +197,8 @@ class AppLocalizations {
       'building': 'Building',
       'resident': 'Resident',
       'create_rent_claim_bill': 'Create Rent Claim Bill',
-      'define_rent_bill_desc': 'Define the monthly rent bill for an apartment unit. The tenant will receive a bill alert in their dashboard to submit proof of payment.',
+      'define_rent_bill_desc':
+          'Define the monthly rent bill for an apartment unit. The tenant will receive a bill alert in their dashboard to submit proof of payment.',
       'target_apartment_resident': 'TARGET APARTMENT / RESIDENT',
       'rent_claim_title': 'Rent Claim Title',
       'rent_amount': 'Rent Amount (\$)',
@@ -201,7 +211,8 @@ class AppLocalizations {
       'hint_rent_desc': 'e.g. Monthly rent due by first of month.',
       'setup_apartment_lease': 'Setup Apartment Lease',
       'add_unit_assign_tenant': 'Add Unit & Assign Tenant',
-      'create_lease_desc': 'Create a new apartment unit, define the monthly rent price, and select a registered tenant user to link them.',
+      'create_lease_desc':
+          'Create a new apartment unit, define the monthly rent price, and select a registered tenant user to link them.',
       'select_registered_user': 'SELECT REGISTERED USER',
       'apartment_unit_number': 'Apartment Unit Number',
       'floor_number': 'Floor Number',
@@ -226,7 +237,8 @@ class AppLocalizations {
       'invalid_auth': 'Correo electrónico o contraseña incorrectos',
       'current_residence': 'Residencia actual',
       'maintenance_request': 'Solicitud de mantenimiento',
-      'maintenance_request_desc': 'Reportar un problema o realizar seguimiento.',
+      'maintenance_request_desc':
+          'Reportar un problema o realizar seguimiento.',
       'upcoming_balance': 'Saldo pendiente',
       'due_in_days': 'Vence en {} días',
       'recent_notifications': 'Notificaciones recientes',
@@ -285,16 +297,19 @@ class AppLocalizations {
       'download_receipt': 'Descargar recibo',
       'pay_now': 'Enviar datos',
       'confirm_payment': 'Confirmar envío',
-      'payment_method_desc': 'Seleccione el método de envío, ingrese los detalles de referencia de la transacción y cargue el comprobante.',
+      'payment_method_desc':
+          'Seleccione el método de envío, ingrese los detalles de referencia de la transacción y cargue el comprobante.',
       'select_payment_method': 'SELECCIONAR MÉTODO',
       'proof_of_payment': 'COMPROBANTE DE ENVÍO',
-      'attach_payment_receipt': 'Toque para adjuntar comprobante (JPG, PNG, PDF)',
+      'attach_payment_receipt':
+          'Toque para adjuntar comprobante (JPG, PNG, PDF)',
       'send_amount': 'Enviar {}',
       'submission_success': '¡Datos enviados con éxito!',
       'submission_failed': 'El envío falló: {}',
       'balance_charges': 'Saldo y cargos',
       'payment_history': 'Historial de envíos',
-      'submission_success_desc': 'Gracias. Sus datos han sido enviados con éxito para verificación.',
+      'submission_success_desc':
+          'Gracias. Sus datos han sido enviados con éxito para verificación.',
       'view_transaction': 'Ver historial',
       'today': 'Hoy',
       'yesterday': 'Ayer',
@@ -303,7 +318,8 @@ class AppLocalizations {
       'in_days': 'En {} días',
       'due_today': 'Vence hoy',
       'insurance_coverage': 'Cobertura de seguro',
-      'insurance_desc': 'Administre los detalles de su póliza de seguro de inquilino.',
+      'insurance_desc':
+          'Administre los detalles de su póliza de seguro de inquilino.',
       'active_policy': 'Póliza activa',
       'policy_no': 'Nº de póliza',
       'coverage_amount': 'Monto de cobertura',
@@ -318,9 +334,12 @@ class AppLocalizations {
       'save_updates': 'Guardar actualizaciones',
       'lease_reqs': 'Requisitos del contrato',
       'min_coverage': 'Cobertura mínima de responsabilidad de \$50,000.',
-      'mgmt_listed': 'La empresa de administración debe figurar como "Parte interesada".',
-      'continuous_coverage': 'Se requiere cobertura continua durante el contrato.',
-      'insurance_warning': 'El incumplimiento del seguro puede resultar en cargos adicionales.',
+      'mgmt_listed':
+          'La empresa de administración debe figurar como "Parte interesada".',
+      'continuous_coverage':
+          'Se requiere cobertura continua durante el contrato.',
+      'insurance_warning':
+          'El incumplimiento del seguro puede resultar en cargos adicionales.',
       'lang_label': 'Idioma',
       'push_notif': 'Notificaciones push',
       'email_notif': 'Notificaciones por correo',
@@ -367,7 +386,8 @@ class AppLocalizations {
       'renters_insurance_status': 'ESTADO DEL SEGURO DE INQUILINO',
       'liability_coverage': 'Cobertura de responsabilidad',
       'view_proof_document': 'Ver documento de prueba',
-      'no_insurance_submitted': 'El inquilino aún no ha enviado los detalles del seguro.',
+      'no_insurance_submitted':
+          'El inquilino aún no ha enviado los detalles del seguro.',
       'mark_paid': 'Marcar como pagado',
       'monthly_rent': 'Alquiler mensual',
       'security_deposit': 'Depósito de seguridad',
@@ -391,20 +411,23 @@ class AppLocalizations {
       'building': 'Edificio',
       'resident': 'Residente',
       'create_rent_claim_bill': 'Crear factura de alquiler',
-      'define_rent_bill_desc': 'Defina la factura de alquiler mensual para una unidad de apartamento. El inquilino recibirá una alerta de factura en su panel para enviar el comprobante de pago.',
+      'define_rent_bill_desc':
+          'Defina la factura de alquiler mensual para una unidad de apartamento. El inquilino recibirá una alerta de factura en su panel para enviar el comprobante de pago.',
       'target_apartment_resident': 'APARTAMENTO / RESIDENTE DESTINO',
       'rent_claim_title': 'Título de reclamo de alquiler',
       'rent_amount': 'Monto de alquiler (\$)',
       'payment_description': 'Descripción de pago',
       'payment_due_date': 'FECHA DE VENCIMIENTO DEL PAGO',
-      'issue_rent_claim_send_bill': 'Emitir reclamo de alquiler y enviar factura',
+      'issue_rent_claim_send_bill':
+          'Emitir reclamo de alquiler y enviar factura',
       'error_loading_tenants': 'Error al cargar el directorio de inquilinos',
       'hint_rent_title': 'p. ej. Factura de alquiler de septiembre de 2026',
       'hint_rent_amount': 'p. ej. 1500.00',
       'hint_rent_desc': 'p. ej. Alquiler mensual vencido el primero del mes.',
       'setup_apartment_lease': 'Configurar contrato de arrendamiento',
       'add_unit_assign_tenant': 'Agregar unidad y asignar inquilino',
-      'create_lease_desc': 'Cree una nueva unidad de apartamento, defina el precio del alquiler mensual y seleccione un usuario inquilino registrado para vincularlos.',
+      'create_lease_desc':
+          'Cree una nueva unidad de apartamento, defina el precio del alquiler mensual y seleccione un usuario inquilino registrado para vincularlos.',
       'select_registered_user': 'SELECCIONAR USUARIO REGISTRADO',
       'apartment_unit_number': 'Número de unidad del apartamento',
       'floor_number': 'Número de piso',
@@ -488,7 +511,8 @@ class AppLocalizations {
       'download_receipt': 'تحميل إيصال الإرسال',
       'pay_now': 'إرسال البيانات',
       'confirm_payment': 'تأكيد إرسال البيانات',
-      'payment_method_desc': 'اختر طريقة الإرسال، واكتب تفاصيل الحوالة/المرجع، ثم أرفق صورة الإثبات.',
+      'payment_method_desc':
+          'اختر طريقة الإرسال، واكتب تفاصيل الحوالة/المرجع، ثم أرفق صورة الإثبات.',
       'select_payment_method': 'طريقة الإرسال',
       'proof_of_payment': 'إثبات الإرسال',
       'attach_payment_receipt': 'انقر لإرفاق صورة الإثبات (JPG, PNG, PDF)',
@@ -497,7 +521,8 @@ class AppLocalizations {
       'submission_failed': 'فشل الإرسال: {}',
       'balance_charges': 'الرصيد والمستحقات',
       'payment_history': 'سجل الإرسال',
-      'submission_success_desc': 'شكرًا لك. تم إرسال البيانات بنجاح وجاري التحقق منها.',
+      'submission_success_desc':
+          'شكرًا لك. تم إرسال البيانات بنجاح وجاري التحقق منها.',
       'view_transaction': 'عرض السجل',
       'today': 'اليوم',
       'yesterday': 'أمس',
@@ -506,7 +531,8 @@ class AppLocalizations {
       'in_days': 'خلال {} أيام',
       'due_today': 'يستحق اليوم',
       'insurance_coverage': 'التغطية التأمينية',
-      'insurance_desc': 'إدارة تفاصيل وثيقة تأمين المستأجر وضمان التغطية المستمرة لوحدتك.',
+      'insurance_desc':
+          'إدارة تفاصيل وثيقة تأمين المستأجر وضمان التغطية المستمرة لوحدتك.',
       'active_policy': 'وثيقة تأمين نشطة',
       'policy_no': 'رقم الوثيقة',
       'coverage_amount': 'مبلغ التغطية',
@@ -522,8 +548,10 @@ class AppLocalizations {
       'lease_reqs': 'شروط العقد',
       'min_coverage': 'الحد الأدنى للتغطية ضد المسؤولية 50,000 دولار.',
       'mgmt_listed': 'يجب إدراج شركة إدارة العقارات كـ "طرف مهتم".',
-      'continuous_coverage': 'التغطية التأمينية المستمرة مطلوبة طوال مدة الإيجار.',
-      'insurance_warning': 'قد يؤدي عدم الحفاظ على تأمين نشط إلى فرض رسوم مخالفة.',
+      'continuous_coverage':
+          'التغطية التأمينية المستمرة مطلوبة طوال مدة الإيجار.',
+      'insurance_warning':
+          'قد يؤدي عدم الحفاظ على تأمين نشط إلى فرض رسوم مخالفة.',
       'lang_label': 'اللغة',
       'push_notif': 'الإشعارات الفورية',
       'email_notif': 'إشعارات البريد الإلكتروني',
@@ -594,7 +622,8 @@ class AppLocalizations {
       'building': 'المبنى',
       'resident': 'الساكن',
       'create_rent_claim_bill': 'إنشاء مطالبة قيمة الإيجار',
-      'define_rent_bill_desc': 'قم بتحديد فاتورة الإيجار الشهري للوحدة السكنية. سيتلقى المستأجر إخطاراً بالفاتورة في لوحة التحكم الخاصة به.',
+      'define_rent_bill_desc':
+          'قم بتحديد فاتورة الإيجار الشهري للوحدة السكنية. سيتلقى المستأجر إخطاراً بالفاتورة في لوحة التحكم الخاصة به.',
       'target_apartment_resident': 'الشقة المستهدفة / الساكن',
       'rent_claim_title': 'عنوان مطالبة الإيجار',
       'rent_amount': 'قيمة الإيجار (\$)',
@@ -607,7 +636,8 @@ class AppLocalizations {
       'hint_rent_desc': 'مثال: الإيجار الشهري مستحق في الأول من كل شهر.',
       'setup_apartment_lease': 'إعداد عقد إيجار شقة',
       'add_unit_assign_tenant': 'إضافة وحدة وتسكين مستأجر',
-      'create_lease_desc': 'قم بإنشاء وحدة سكنية جديدة، وتحديد سعر الإيجار الشهري، واختيار مستأجر مسجل لربطه بالوحدة.',
+      'create_lease_desc':
+          'قم بإنشاء وحدة سكنية جديدة، وتحديد سعر الإيجار الشهري، واختيار مستأجر مسجل لربطه بالوحدة.',
       'select_registered_user': 'اختر مستخدماً مسجلاً',
       'apartment_unit_number': 'رقم الوحدة السكنية',
       'floor_number': 'رقم الطابق',
@@ -619,24 +649,580 @@ class AppLocalizations {
       'error_loading_users': 'خطأ في تحميل قائمة المستخدمين',
       'hint_unit_number': 'مثال: وحدة 501 / شقة 304',
       'hint_floor': 'مثال: 5',
-    }
+    },
   };
 
   String translate(String key, [String? arg]) {
     final lang = locale.languageCode;
-    String value = _localizedValues[lang]?[key] ?? _localizedValues['en']?[key] ?? key;
+    String value =
+        _localizedValues[lang]?[key] ?? _localizedValues['en']?[key] ?? key;
     if (arg != null) {
       value = value.replaceFirst('{}', arg);
     }
     return value;
   }
+
+  /// Translates legacy UI copy while screens are migrated away from hard-coded
+  /// English strings. English copy is used as the stable lookup key so every
+  /// visible label, dialog, and message can share the same localization path.
+  String text(String english, [String? arg]) {
+    final value = _legacyText[locale.languageCode]?[english] ?? english;
+    return arg == null ? value : value.replaceFirst('{}', arg);
+  }
+
+  static const Map<String, Map<String, String>> _legacyText = {
+    'es': {
+      'Registration Submitted': 'Registro enviado',
+      'Your registration has been submitted successfully and is pending owner approval. You will be able to sign in once approved.':
+          'Su registro se envió correctamente y está pendiente de aprobación. Podrá iniciar sesión cuando sea aprobado.',
+      'OK': 'Aceptar',
+      'Error: {}': 'Error: {}',
+      'Email Address': 'Correo electrónico',
+      'Phone Number': 'Número de teléfono',
+      'Password': 'Contraseña',
+      'Enter a strong password': 'Ingrese una contraseña segura',
+      'Already have an account? ': '¿Ya tiene una cuenta? ',
+      'New resident? ': '¿Es un nuevo residente? ',
+      'Reset Password': 'Restablecer contraseña',
+      'New Password': 'Nueva contraseña',
+      'Confirm New Password': 'Confirmar nueva contraseña',
+      'Confirm Password': 'Confirmar contraseña',
+      'Password updated successfully!':
+          '¡Contraseña actualizada correctamente!',
+      'Checking profile approval status...':
+          'Comprobando el estado de aprobación del perfil...',
+      'Delete Account': 'Eliminar cuenta',
+      'Cancel': 'Cancelar',
+      'Delete Permanently': 'Eliminar permanentemente',
+      'Account deleted successfully.': 'Cuenta eliminada correctamente.',
+      'Are you sure you want to permanently delete your account? This action is irreversible and all your data will be permanently deleted.':
+          '¿Seguro que desea eliminar permanentemente su cuenta? Esta acción es irreversible y todos sus datos se eliminarán.',
+      'File size must be less than 5MB': 'El archivo debe pesar menos de 5 MB',
+      'Please select an expiration date': 'Seleccione una fecha de vencimiento',
+      'Policy information updated successfully!':
+          '¡Información de la póliza actualizada correctamente!',
+      'Coverage Amount (\$)': 'Monto de cobertura (\$)',
+      'Policy ID': 'ID de póliza',
+      'Maximum 3 photos allowed': 'Se permiten como máximo 3 fotos',
+      'Please select a preferred repair date':
+          'Seleccione una fecha de reparación preferida',
+      'No maintenance requests yet': 'Aún no hay solicitudes de mantenimiento',
+      'All Clear': 'Todo en orden',
+      'Request {}': 'Solicitud {}',
+      'Request Not Found': 'Solicitud no encontrada',
+      'Submitted Date': 'Fecha de envío',
+      'Preferred Date': 'Fecha preferida',
+      'Assigned Tech': 'Técnico asignado',
+      'Request Submitted': 'Solicitud enviada',
+      'We have received your request.': 'Hemos recibido su solicitud.',
+      'Request Reviewed': 'Solicitud revisada',
+      'Our management has verified the details.':
+          'La administración verificó los detalles.',
+      'Technician Assigned': 'Técnico asignado',
+      'A qualified contractor has been selected.':
+          'Se seleccionó un técnico cualificado.',
+      'Completed': 'Completado',
+      'The issue has been resolved.': 'El problema ha sido resuelto.',
+      'Request ticket not found.': 'No se encontró la solicitud.',
+      'Error loading ticket': 'Error al cargar la solicitud',
+      'No notifications found': 'No se encontraron notificaciones',
+      'Insurance': 'Seguro',
+      'No rent history found.': 'No se encontró historial de alquiler.',
+      'Receipt not found.': 'No se encontró el recibo.',
+      'Status': 'Estado',
+      'Receipt PDF saved to Downloads directory.':
+          'El PDF del recibo se guardó en Descargas.',
+      'No Matching Payments': 'No hay pagos coincidentes',
+      'Payment marked as paid successfully!': '¡Pago marcado como pagado!',
+      'Error loading payments history': 'Error al cargar el historial de pagos',
+      'Uploaded Receipt Attachment': 'Comprobante adjunto',
+      'Verified Receipt': 'Comprobante verificado',
+      'Secured Attachment Link': 'Enlace seguro del archivo',
+      'Secure Card Checkout': 'Pago seguro con tarjeta',
+      'Close': 'Cerrar',
+      'View Receipt': 'Ver recibo',
+      'Mark Paid': 'Marcar pagado',
+      'Please select a target apartment resident!':
+          'Seleccione un residente de destino.',
+      'Please enter a valid amount!': 'Ingrese un monto válido.',
+      'Rent claim issued and sent to tenant successfully!':
+          '¡La reclamación de alquiler se envió correctamente!',
+      'Unit': 'Unidad',
+      'No tenants found to broadcast to!':
+          'No se encontraron inquilinos para el envío.',
+      'Please select a target tenant!': 'Seleccione un inquilino.',
+      'Error loading tenants directory':
+          'Error al cargar el directorio de inquilinos',
+      'Subject Title': 'Asunto',
+      'Please select a tenant user!': 'Seleccione un usuario inquilino.',
+      'Please enter valid numeric details!': 'Ingrese datos numéricos válidos.',
+      'New unit created and tenant linked successfully!':
+          '¡Unidad creada e inquilino vinculado correctamente!',
+      'Buildings & Units': 'Edificios y unidades',
+      'Add Building Structure': 'Agregar estructura del edificio',
+      'Building Name': 'Nombre del edificio',
+      'Address': 'Dirección',
+      'Floors Count': 'Número de pisos',
+      'Apts Per Floor': 'Apartamentos por piso',
+      'Please fill all fields correctly!':
+          'Complete todos los campos correctamente.',
+      'Create Structure': 'Crear estructura',
+      'Building structure & units created successfully!':
+          '¡Edificio y unidades creados correctamente!',
+      'All Statuses': 'Todos los estados',
+      'Occupied Only': 'Solo ocupados',
+      'Vacant Only': 'Solo vacíos',
+      'Assign Tenant': 'Asignar inquilino',
+      'Error loading properties': 'Error al cargar propiedades',
+      'Error loading units': 'Error al cargar unidades',
+      'Pending Registrations': 'Registros pendientes',
+      'Approve & Assign': 'Aprobar y asignar',
+      'Reject': 'Rechazar',
+      'Reject Registration': 'Rechazar registro',
+      'Registration rejected and deleted.': 'Registro rechazado y eliminado.',
+      'Error loading pending users': 'Error al cargar usuarios pendientes',
+      '+ Add Lease': '+ Agregar contrato',
+      'Broadcast All': 'Enviar a todos',
+      'Send Direct Message': 'Enviar mensaje directo',
+      'Pending Repairs': 'Reparaciones pendientes',
+      'Total Revenue': 'Ingresos totales',
+      'Error loading issues': 'Error al cargar incidencias',
+      'Profile updated successfully!': '¡Perfil actualizado correctamente!',
+      'Full Name': 'Nombre completo',
+      'Floor Number': 'Número de piso',
+      'Monthly Rent (\$)': 'Alquiler mensual (\$)',
+      'Security Deposit (\$)': 'Depósito de seguridad (\$)',
+      'All Buildings': 'Todos los edificios',
+      'Invalid lease details!': '¡Datos del contrato no válidos!',
+      'Request status updated to {}': 'Estado de la solicitud actualizado a {}',
+      'Failed to pick avatar: {}': 'No se pudo seleccionar la foto: {}',
+      'Failed to upload avatar: {}': 'No se pudo subir la foto: {}',
+      'Error saving updates: {}': 'Error al guardar los cambios: {}',
+      'Failed to pick document: {}': 'No se pudo seleccionar el documento: {}',
+      'Error updating policy: {}': 'Error al actualizar la póliza: {}',
+      'Failed to pick image: {}': 'No se pudo seleccionar la imagen: {}',
+      'Error submitting request: {}': 'Error al enviar la solicitud: {}',
+      'Create Resident Account': 'Crear cuenta de residente',
+      'Register Account': 'Registrar cuenta',
+      'Sign In': 'Iniciar sesión',
+      'Approval Pending': 'Aprobación pendiente',
+      'Check Status / Refresh': 'Comprobar estado / Actualizar',
+      'Sign Out': 'Cerrar sesión',
+      'Password Reset Done': 'Contraseña restablecida',
+      'Go to Sign In': 'Ir a iniciar sesión',
+      'Create New Password': 'Crear nueva contraseña',
+      'Update Password': 'Actualizar contraseña',
+      'Change Password': 'Cambiar contraseña',
+      'Send Reset Link': 'Enviar enlace',
+      'Check Your Email': 'Revise su correo',
+      'Email is required': 'El correo es obligatorio',
+      'Password is required': 'La contraseña es obligatoria',
+      'Full name is required': 'El nombre es obligatorio',
+      'Phone number is required': 'El teléfono es obligatorio',
+      'Password must be at least 6 characters':
+          'La contraseña debe tener al menos 6 caracteres',
+      'Passwords do not match': 'Las contraseñas no coinciden',
+      'Confirm password is required': 'Debe confirmar la contraseña',
+      'Required': 'Obligatorio',
+      'Preferences': 'Preferencias',
+      'Theme & Security': 'Tema y seguridad',
+      'Information': 'Información',
+      'Personal Information': 'Información personal',
+      'Residence details': 'Datos de residencia',
+      'Unit Number': 'Número de unidad',
+      'Property': 'Propiedad',
+      'Active Issues': 'Incidencias activas',
+      'Closed / History': 'Cerradas / Historial',
+      'Back to Dashboard': 'Volver al panel',
+      'Issue Description': 'Descripción del problema',
+      'Apartment Unit': 'Unidad',
+      'Tenant Name': 'Nombre del inquilino',
+      'Preferred Visit': 'Visita preferida',
+      'Mark In Progress': 'Marcar en curso',
+      'Schedule Repair': 'Programar reparación',
+      'Mark as Completed / Resolved': 'Marcar completada / resuelta',
+      'Total Units': 'Total de unidades',
+      'Occupied': 'Ocupadas',
+      'Vacant': 'Vacías',
+      'BUILDING': 'EDIFICIO',
+      'STATUS': 'ESTADO',
+      'Not provided': 'No proporcionado',
+      'No Pending Registrations': 'No hay registros pendientes',
+      'START DATE': 'FECHA DE INICIO',
+      'END DATE': 'FECHA DE FIN',
+      'Dispatch Notification': 'Enviar notificación',
+      'Broadcast message to all apartments':
+          'Enviar mensaje a todos los apartamentos',
+      'TARGET TENANT / UNIT': 'INQUILINO / UNIDAD DESTINO',
+      'ALERT CATEGORY': 'CATEGORÍA DE ALERTA',
+      'MESSAGE BODY': 'MENSAJE',
+      'Dispatch Notification Alert': 'Enviar alerta',
+      'Loading...': 'Cargando...',
+      'Error': 'Error',
+      'APARTMENTS DIRECTORY': 'DIRECTORIO DE APARTAMENTOS',
+      'Verification Receipt': 'Comprobante de verificación',
+      'Ref Number': 'Número de referencia',
+      'Amount Paid': 'Monto pagado',
+      'Payment Channel': 'Canal de pago',
+      'Payment Date': 'Fecha de pago',
+      'Provider is required': 'El proveedor es obligatorio',
+      'Coverage amount is required': 'El monto de cobertura es obligatorio',
+      'Click to upload or drag and drop':
+          'Haga clic para subir o arrastre el archivo',
+      'No notifications yet.': 'Aún no hay notificaciones.',
+      'Please enter the message details': 'Ingrese los detalles del mensaje',
+      'Details are required': 'Los detalles son obligatorios',
+      'Please describe the issue in at least 10 characters':
+          'Describa el problema con al menos 10 caracteres',
+      'Please upload your renter\'s insurance policy to comply with your lease agreement.':
+          'Suba su póliza de seguro de inquilino para cumplir con el contrato.',
+      'If you have recently renewed or changed your provider, please update your details below.':
+          'Si renovó o cambió de proveedor, actualice sus datos a continuación.',
+      'Select a vacant unit to assign this resident and set lease details.':
+          'Seleccione una unidad vacía y establezca los datos del contrato.',
+      'VACANT APARTMENT UNIT': 'UNIDAD VACÍA',
+      'All registered tenants have been reviewed and approved.':
+          'Todos los inquilinos registrados han sido revisados y aprobados.',
+      'No units match your selected filters.':
+          'Ninguna unidad coincide con los filtros.',
+      'This occupied unit doesn\'t have an active lease record.':
+          'Esta unidad ocupada no tiene un contrato activo.',
+      'Your password has been reset successfully. You can now log in with your new password.':
+          'Su contraseña se restableció. Ya puede iniciar sesión.',
+      'Please enter your new password below.': 'Ingrese su nueva contraseña.',
+      'Confirm Password is required': 'Debe confirmar la contraseña',
+      'Enter your new password below. Make sure it is at least 6 characters long.':
+          'Ingrese una contraseña nueva de al menos 6 caracteres.',
+      'You\'re all caught up! There are no announcements or alerts in this category.':
+          'Está al día. No hay anuncios ni alertas en esta categoría.',
+      'Write a message and target it to a specific resident or broadcast it to everyone in the building. They will receive it in their app dashboard immediately.':
+          'Escriba un mensaje para un residente o para todo el edificio. Lo recibirán inmediatamente.',
+      'Enter announcement details here...':
+          'Ingrese aquí los detalles del anuncio...',
+      'Try adjusting your filters to find payment records.':
+          'Ajuste los filtros para encontrar pagos.',
+      'We couldn\'t find the requested maintenance details.':
+          'No pudimos encontrar los detalles de mantenimiento.',
+      'Report issues regarding plumbing, electrical, and other appliances.':
+          'Informe problemas de plomería, electricidad y electrodomésticos.',
+      'No active maintenance issues found.':
+          'No se encontraron problemas activos.',
+      'No registered tenants found.':
+          'No se encontraron inquilinos registrados.',
+      'No active maintenance issues! All systems running smoothly.':
+          'No hay problemas activos. Todo funciona correctamente.',
+      'No maintenance history records found.':
+          'No se encontró historial de mantenimiento.',
+      'Please provide details about the issue.':
+          'Proporcione detalles del problema.',
+      'This app complies with privacy regulation standards.':
+          'Esta aplicación cumple las normas de privacidad.',
+      'Terms & Conditions': 'Términos y condiciones',
+      'Your account registration was successful. Please wait for the landlord/manager to approve your access and assign your apartment unit before signing in.':
+          'Su registro fue exitoso. Espere a que el propietario apruebe el acceso y asigne su unidad antes de iniciar sesión.',
+      'Register your profile to access building maintenance, payment history, rent claims, and message the landlord. Access requires owner approval.':
+          'Registre su perfil para acceder a mantenimiento, pagos, reclamaciones y mensajes. Requiere aprobación del propietario.',
+      'Your resident profile has been registered and is currently under review by the property landlord.\n\nOnce the landlord approves your access and links your profile to an apartment lease, you will be able to access the full features of the app.':
+          'Su perfil está registrado y en revisión.\n\nCuando el propietario apruebe el acceso y lo vincule a un contrato, podrá usar todas las funciones.',
+      'Enter the email address associated with your account and we\'ll send you instructions to reset your password.':
+          'Ingrese el correo de su cuenta y le enviaremos instrucciones para restablecer la contraseña.',
+      'Cannot approve tenant: No vacant units available. Please create a building structure first!':
+          'No se puede aprobar: no hay unidades vacías. Cree primero la estructura del edificio.',
+      'Floor: {}': 'Piso: {}',
+      'Category: {}': 'Categoría: {}',
+      'Unit: {}': 'Unidad: {}',
+      'Resolved: ': 'Resuelto: ',
+      'Submitted: ': 'Enviado: ',
+      'Notification dispatched successfully!':
+          '¡Notificación enviada correctamente!',
+      'Monthly Rent Invoice': 'Factura de alquiler mensual',
+      'Standard monthly apartment unit rent.':
+          'Alquiler mensual estándar de la unidad.',
+      'Hello, {}!': '¡Hola, {}!',
+      'Approve & Assign: {}': 'Aprobar y asignar: {}',
+      'Approved and assigned {} successfully!':
+          '¡{} fue aprobado y asignado correctamente!',
+      'We have sent password recovery instructions to {}.':
+          'Hemos enviado instrucciones para recuperar la contraseña a {}.',
+      'Broadcast message sent to {} apartments successfully!':
+          '¡Mensaje enviado correctamente a {} apartamentos!',
+      'REF: {}': 'REF.: {}',
+      'Paid via: {}': 'Pagado mediante: {}',
+    },
+    'ar': {
+      'Registration Submitted': 'تم إرسال التسجيل',
+      'Your registration has been submitted successfully and is pending owner approval. You will be able to sign in once approved.':
+          'تم إرسال طلب التسجيل بنجاح وهو الآن بانتظار موافقة المالك. يمكنك تسجيل الدخول بعد الموافقة.',
+      'OK': 'حسنًا',
+      'Error: {}': 'خطأ: {}',
+      'Email Address': 'البريد الإلكتروني',
+      'Phone Number': 'رقم الهاتف',
+      'Password': 'كلمة المرور',
+      'Enter a strong password': 'أدخل كلمة مرور قوية',
+      'Already have an account? ': 'لديك حساب بالفعل؟ ',
+      'New resident? ': 'مقيم جديد؟ ',
+      'Reset Password': 'إعادة تعيين كلمة المرور',
+      'New Password': 'كلمة المرور الجديدة',
+      'Confirm New Password': 'تأكيد كلمة المرور الجديدة',
+      'Confirm Password': 'تأكيد كلمة المرور',
+      'Password updated successfully!': 'تم تحديث كلمة المرور بنجاح!',
+      'Checking profile approval status...': 'جاري التحقق من حالة الموافقة...',
+      'Delete Account': 'حذف الحساب',
+      'Cancel': 'إلغاء',
+      'Delete Permanently': 'حذف نهائي',
+      'Account deleted successfully.': 'تم حذف الحساب بنجاح.',
+      'Are you sure you want to permanently delete your account? This action is irreversible and all your data will be permanently deleted.':
+          'هل أنت متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف جميع بياناتك.',
+      'File size must be less than 5MB':
+          'يجب أن يكون حجم الملف أقل من 5 ميجابايت',
+      'Please select an expiration date': 'يرجى تحديد تاريخ الانتهاء',
+      'Policy information updated successfully!':
+          'تم تحديث بيانات الوثيقة بنجاح!',
+      'Coverage Amount (\$)': 'مبلغ التغطية (\$)',
+      'Policy ID': 'رقم الوثيقة',
+      'Maximum 3 photos allowed': 'الحد الأقصى المسموح 3 صور',
+      'Please select a preferred repair date': 'يرجى تحديد موعد الإصلاح المفضل',
+      'No maintenance requests yet': 'لا توجد طلبات صيانة حتى الآن',
+      'All Clear': 'كل شيء على ما يرام',
+      'Request {}': 'الطلب {}',
+      'Request Not Found': 'الطلب غير موجود',
+      'Submitted Date': 'تاريخ الإرسال',
+      'Preferred Date': 'التاريخ المفضل',
+      'Assigned Tech': 'الفني المعيّن',
+      'Request Submitted': 'تم إرسال الطلب',
+      'We have received your request.': 'لقد استلمنا طلبك.',
+      'Request Reviewed': 'تمت مراجعة الطلب',
+      'Our management has verified the details.': 'تحققت الإدارة من التفاصيل.',
+      'Technician Assigned': 'تم تعيين الفني',
+      'A qualified contractor has been selected.': 'تم اختيار فني مؤهل.',
+      'Completed': 'مكتمل',
+      'The issue has been resolved.': 'تم حل المشكلة.',
+      'Request ticket not found.': 'تذكرة الطلب غير موجودة.',
+      'Error loading ticket': 'خطأ في تحميل التذكرة',
+      'No notifications found': 'لا توجد إشعارات',
+      'Insurance': 'التأمين',
+      'No rent history found.': 'لا يوجد سجل إيجار.',
+      'Receipt not found.': 'الإيصال غير موجود.',
+      'Status': 'الحالة',
+      'Receipt PDF saved to Downloads directory.':
+          'تم حفظ ملف الإيصال في مجلد التنزيلات.',
+      'No Matching Payments': 'لا توجد مدفوعات مطابقة',
+      'Payment marked as paid successfully!': 'تم تسجيل الدفعة كمدفوعة بنجاح!',
+      'Error loading payments history': 'خطأ في تحميل سجل المدفوعات',
+      'Uploaded Receipt Attachment': 'مرفق إيصال الدفع',
+      'Verified Receipt': 'إيصال موثق',
+      'Secured Attachment Link': 'رابط المرفق الآمن',
+      'Secure Card Checkout': 'دفع آمن بالبطاقة',
+      'Close': 'إغلاق',
+      'View Receipt': 'عرض الإيصال',
+      'Mark Paid': 'تسجيل كمدفوع',
+      'Please select a target apartment resident!':
+          'يرجى اختيار الساكن المستهدف.',
+      'Please enter a valid amount!': 'يرجى إدخال مبلغ صحيح.',
+      'Rent claim issued and sent to tenant successfully!':
+          'تم إصدار مطالبة الإيجار وإرسالها بنجاح!',
+      'Unit': 'الوحدة',
+      'No tenants found to broadcast to!':
+          'لا يوجد مستأجرون لإرسال الإعلان إليهم.',
+      'Please select a target tenant!': 'يرجى اختيار المستأجر المستهدف.',
+      'Error loading tenants directory': 'خطأ في تحميل دليل السكان',
+      'Subject Title': 'عنوان الرسالة',
+      'Please select a tenant user!': 'يرجى اختيار مستخدم مستأجر.',
+      'Please enter valid numeric details!': 'يرجى إدخال بيانات رقمية صحيحة.',
+      'New unit created and tenant linked successfully!':
+          'تم إنشاء الوحدة وربط المستأجر بنجاح!',
+      'Buildings & Units': 'المباني والوحدات',
+      'Add Building Structure': 'إضافة هيكل مبنى',
+      'Building Name': 'اسم المبنى',
+      'Address': 'العنوان',
+      'Floors Count': 'عدد الطوابق',
+      'Apts Per Floor': 'الشقق بكل طابق',
+      'Please fill all fields correctly!': 'يرجى ملء جميع الحقول بصورة صحيحة.',
+      'Create Structure': 'إنشاء الهيكل',
+      'Building structure & units created successfully!':
+          'تم إنشاء المبنى والوحدات بنجاح!',
+      'All Statuses': 'كل الحالات',
+      'Occupied Only': 'المشغولة فقط',
+      'Vacant Only': 'الشاغرة فقط',
+      'Assign Tenant': 'تعيين مستأجر',
+      'Error loading properties': 'خطأ في تحميل العقارات',
+      'Error loading units': 'خطأ في تحميل الوحدات',
+      'Pending Registrations': 'التسجيلات المعلقة',
+      'Approve & Assign': 'موافقة وتعيين',
+      'Reject': 'رفض',
+      'Reject Registration': 'رفض التسجيل',
+      'Registration rejected and deleted.': 'تم رفض التسجيل وحذفه.',
+      'Error loading pending users': 'خطأ في تحميل المستخدمين المعلقين',
+      '+ Add Lease': '+ إضافة عقد',
+      'Broadcast All': 'إرسال للجميع',
+      'Send Direct Message': 'إرسال رسالة مباشرة',
+      'Pending Repairs': 'الإصلاحات المعلقة',
+      'Total Revenue': 'إجمالي الإيرادات',
+      'Error loading issues': 'خطأ في تحميل المشكلات',
+      'Profile updated successfully!': 'تم تحديث الملف الشخصي بنجاح!',
+      'Full Name': 'الاسم بالكامل',
+      'Floor Number': 'رقم الطابق',
+      'Monthly Rent (\$)': 'الإيجار الشهري (\$)',
+      'Security Deposit (\$)': 'مبلغ التأمين (\$)',
+      'All Buildings': 'كل المباني',
+      'Invalid lease details!': 'بيانات العقد غير صحيحة!',
+      'Request status updated to {}': 'تم تحديث حالة الطلب إلى {}',
+      'Failed to pick avatar: {}': 'تعذر اختيار الصورة: {}',
+      'Failed to upload avatar: {}': 'تعذر رفع الصورة: {}',
+      'Error saving updates: {}': 'خطأ في حفظ التحديثات: {}',
+      'Failed to pick document: {}': 'تعذر اختيار المستند: {}',
+      'Error updating policy: {}': 'خطأ في تحديث الوثيقة: {}',
+      'Failed to pick image: {}': 'تعذر اختيار الصورة: {}',
+      'Error submitting request: {}': 'خطأ في إرسال الطلب: {}',
+      'Create Resident Account': 'إنشاء حساب ساكن',
+      'Register Account': 'تسجيل الحساب',
+      'Sign In': 'تسجيل الدخول',
+      'Approval Pending': 'الموافقة معلقة',
+      'Check Status / Refresh': 'التحقق من الحالة / تحديث',
+      'Sign Out': 'تسجيل الخروج',
+      'Password Reset Done': 'تمت إعادة تعيين كلمة المرور',
+      'Go to Sign In': 'الذهاب لتسجيل الدخول',
+      'Create New Password': 'إنشاء كلمة مرور جديدة',
+      'Update Password': 'تحديث كلمة المرور',
+      'Change Password': 'تغيير كلمة المرور',
+      'Send Reset Link': 'إرسال رابط الاستعادة',
+      'Check Your Email': 'راجع بريدك الإلكتروني',
+      'Email is required': 'البريد الإلكتروني مطلوب',
+      'Password is required': 'كلمة المرور مطلوبة',
+      'Full name is required': 'الاسم بالكامل مطلوب',
+      'Phone number is required': 'رقم الهاتف مطلوب',
+      'Password must be at least 6 characters':
+          'يجب ألا تقل كلمة المرور عن 6 أحرف',
+      'Passwords do not match': 'كلمتا المرور غير متطابقتين',
+      'Confirm password is required': 'تأكيد كلمة المرور مطلوب',
+      'Required': 'مطلوب',
+      'Preferences': 'التفضيلات',
+      'Theme & Security': 'المظهر والأمان',
+      'Information': 'المعلومات',
+      'Personal Information': 'المعلومات الشخصية',
+      'Residence details': 'تفاصيل السكن',
+      'Unit Number': 'رقم الوحدة',
+      'Property': 'العقار',
+      'Active Issues': 'المشكلات النشطة',
+      'Closed / History': 'المغلقة / السجل',
+      'Back to Dashboard': 'العودة للوحة التحكم',
+      'Issue Description': 'وصف المشكلة',
+      'Apartment Unit': 'الوحدة السكنية',
+      'Tenant Name': 'اسم المستأجر',
+      'Preferred Visit': 'موعد الزيارة المفضل',
+      'Mark In Progress': 'بدء العمل',
+      'Schedule Repair': 'جدولة الإصلاح',
+      'Mark as Completed / Resolved': 'تسجيل كمكتمل / محلول',
+      'Total Units': 'إجمالي الوحدات',
+      'Occupied': 'مشغولة',
+      'Vacant': 'شاغرة',
+      'BUILDING': 'المبنى',
+      'STATUS': 'الحالة',
+      'Not provided': 'غير متوفر',
+      'No Pending Registrations': 'لا توجد تسجيلات معلقة',
+      'START DATE': 'تاريخ البداية',
+      'END DATE': 'تاريخ النهاية',
+      'Dispatch Notification': 'إرسال إشعار',
+      'Broadcast message to all apartments': 'إرسال رسالة إلى جميع الشقق',
+      'TARGET TENANT / UNIT': 'المستأجر / الوحدة المستهدفة',
+      'ALERT CATEGORY': 'فئة التنبيه',
+      'MESSAGE BODY': 'نص الرسالة',
+      'Dispatch Notification Alert': 'إرسال التنبيه',
+      'Loading...': 'جاري التحميل...',
+      'Error': 'خطأ',
+      'APARTMENTS DIRECTORY': 'دليل الشقق',
+      'Verification Receipt': 'إيصال التحقق',
+      'Ref Number': 'رقم المرجع',
+      'Amount Paid': 'المبلغ المدفوع',
+      'Payment Channel': 'قناة الدفع',
+      'Payment Date': 'تاريخ الدفع',
+      'Provider is required': 'شركة التأمين مطلوبة',
+      'Coverage amount is required': 'مبلغ التغطية مطلوب',
+      'Click to upload or drag and drop': 'اضغط للرفع أو اسحب الملف وأفلته',
+      'No notifications yet.': 'لا توجد إشعارات حتى الآن.',
+      'Please enter the message details': 'يرجى إدخال تفاصيل الرسالة',
+      'Details are required': 'التفاصيل مطلوبة',
+      'Please describe the issue in at least 10 characters':
+          'يرجى وصف المشكلة في 10 أحرف على الأقل',
+      'Please upload your renter\'s insurance policy to comply with your lease agreement.':
+          'يرجى رفع وثيقة تأمين المستأجر للالتزام بعقد الإيجار.',
+      'If you have recently renewed or changed your provider, please update your details below.':
+          'إذا جددت الوثيقة أو غيرت الشركة، حدّث بياناتك أدناه.',
+      'Select a vacant unit to assign this resident and set lease details.':
+          'اختر وحدة شاغرة لتعيين هذا الساكن وحدد تفاصيل العقد.',
+      'VACANT APARTMENT UNIT': 'الوحدة السكنية الشاغرة',
+      'All registered tenants have been reviewed and approved.':
+          'تمت مراجعة جميع المستأجرين المسجلين والموافقة عليهم.',
+      'No units match your selected filters.':
+          'لا توجد وحدات تطابق عوامل التصفية.',
+      'This occupied unit doesn\'t have an active lease record.':
+          'لا يوجد عقد إيجار نشط لهذه الوحدة المشغولة.',
+      'Your password has been reset successfully. You can now log in with your new password.':
+          'تمت إعادة تعيين كلمة المرور ويمكنك تسجيل الدخول الآن.',
+      'Please enter your new password below.':
+          'أدخل كلمة المرور الجديدة أدناه.',
+      'Confirm Password is required': 'تأكيد كلمة المرور مطلوب',
+      'Enter your new password below. Make sure it is at least 6 characters long.':
+          'أدخل كلمة مرور جديدة لا تقل عن 6 أحرف.',
+      'You\'re all caught up! There are no announcements or alerts in this category.':
+          'أنت مطّلع على كل شيء. لا توجد إعلانات أو تنبيهات في هذه الفئة.',
+      'Write a message and target it to a specific resident or broadcast it to everyone in the building. They will receive it in their app dashboard immediately.':
+          'اكتب رسالة لمقيم محدد أو أرسلها إلى جميع سكان المبنى وستصلهم فورًا.',
+      'Enter announcement details here...': 'أدخل تفاصيل الإعلان هنا...',
+      'Try adjusting your filters to find payment records.':
+          'جرّب تعديل عوامل التصفية للعثور على سجلات الدفع.',
+      'We couldn\'t find the requested maintenance details.':
+          'تعذر العثور على تفاصيل طلب الصيانة.',
+      'Report issues regarding plumbing, electrical, and other appliances.':
+          'أبلغ عن مشكلات السباكة والكهرباء والأجهزة الأخرى.',
+      'No active maintenance issues found.': 'لا توجد مشكلات صيانة نشطة.',
+      'No registered tenants found.': 'لا يوجد مستأجرون مسجلون.',
+      'No active maintenance issues! All systems running smoothly.':
+          'لا توجد مشكلات صيانة نشطة، وكل الأنظمة تعمل جيدًا.',
+      'No maintenance history records found.': 'لا توجد سجلات صيانة سابقة.',
+      'Please provide details about the issue.': 'يرجى تقديم تفاصيل المشكلة.',
+      'This app complies with privacy regulation standards.':
+          'يتوافق هذا التطبيق مع معايير حماية الخصوصية.',
+      'Terms & Conditions': 'الشروط والأحكام',
+      'Your account registration was successful. Please wait for the landlord/manager to approve your access and assign your apartment unit before signing in.':
+          'تم تسجيل حسابك بنجاح. انتظر موافقة المالك وتعيين وحدتك قبل تسجيل الدخول.',
+      'Register your profile to access building maintenance, payment history, rent claims, and message the landlord. Access requires owner approval.':
+          'سجّل ملفك للوصول إلى الصيانة وسجل الدفع ومطالبات الإيجار ومراسلة المالك. يتطلب الدخول موافقة المالك.',
+      'Your resident profile has been registered and is currently under review by the property landlord.\n\nOnce the landlord approves your access and links your profile to an apartment lease, you will be able to access the full features of the app.':
+          'تم تسجيل ملفك وهو قيد مراجعة المالك.\n\nبعد الموافقة وربط ملفك بعقد إيجار ستتمكن من استخدام جميع خصائص التطبيق.',
+      'Enter the email address associated with your account and we\'ll send you instructions to reset your password.':
+          'أدخل البريد المرتبط بحسابك وسنرسل إليك تعليمات إعادة تعيين كلمة المرور.',
+      'Cannot approve tenant: No vacant units available. Please create a building structure first!':
+          'لا يمكن الموافقة: لا توجد وحدات شاغرة. أنشئ هيكل المبنى أولًا.',
+      'Floor: {}': 'الطابق: {}',
+      'Category: {}': 'الفئة: {}',
+      'Unit: {}': 'الوحدة: {}',
+      'Resolved: ': 'تم الحل: ',
+      'Submitted: ': 'تم الإرسال: ',
+      'Notification dispatched successfully!': 'تم إرسال الإشعار بنجاح!',
+      'Monthly Rent Invoice': 'فاتورة الإيجار الشهري',
+      'Standard monthly apartment unit rent.':
+          'الإيجار الشهري المعتاد للوحدة السكنية.',
+      'Hello, {}!': 'مرحبًا، {}!',
+      'Approve & Assign: {}': 'موافقة وتعيين: {}',
+      'Approved and assigned {} successfully!':
+          'تمت الموافقة على {} وتعيينه بنجاح!',
+      'We have sent password recovery instructions to {}.':
+          'أرسلنا تعليمات استعادة كلمة المرور إلى {}.',
+      'Broadcast message sent to {} apartments successfully!':
+          'تم إرسال الرسالة إلى {} شقة بنجاح!',
+      'REF: {}': 'المرجع: {}',
+      'Paid via: {}': 'تم الدفع عبر: {}',
+    },
+  };
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) => ['en', 'es', 'ar'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      ['en', 'es', 'ar'].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) =>
