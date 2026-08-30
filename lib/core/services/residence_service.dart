@@ -32,6 +32,9 @@ class Unit {
   final String propertyId;
   final String unitNumber;
   final int floor;
+  final int bedrooms;
+  final int bathrooms;
+  final String? residentName;
   final String status; // 'vacant' or 'occupied'
 
   Unit({
@@ -39,6 +42,9 @@ class Unit {
     required this.propertyId,
     required this.unitNumber,
     required this.floor,
+    this.bedrooms = 1,
+    this.bathrooms = 1,
+    this.residentName,
     required this.status,
   });
 
@@ -47,6 +53,9 @@ class Unit {
     String? propertyId,
     String? unitNumber,
     int? floor,
+    int? bedrooms,
+    int? bathrooms,
+    String? residentName,
     String? status,
   }) {
     return Unit(
@@ -54,6 +63,9 @@ class Unit {
       propertyId: propertyId ?? this.propertyId,
       unitNumber: unitNumber ?? this.unitNumber,
       floor: floor ?? this.floor,
+      bedrooms: bedrooms ?? this.bedrooms,
+      bathrooms: bathrooms ?? this.bathrooms,
+      residentName: residentName ?? this.residentName,
       status: status ?? this.status,
     );
   }
@@ -155,6 +167,13 @@ class ResidenceService {
               propertyId: propId,
               unitNumber: unitNumber,
               floor: floor,
+              residentName: p == 1 && floor == 1 && apt == 1
+                  ? 'John Doe'
+                  : p == 1 && floor == 1 && apt == 2
+                  ? 'Sarah Jenkins'
+                  : p == 2 && floor == 2 && apt == 4
+                  ? 'Michael Chang'
+                  : null,
               status: status,
             ),
           );
@@ -267,6 +286,8 @@ class ResidenceService {
           propertyId: unitRes['property_id'],
           unitNumber: unitRes['unit_number'],
           floor: unitRes['floor'],
+          bedrooms: unitRes['bedrooms'] ?? 1,
+          bathrooms: unitRes['bathrooms'] ?? 1,
           status: unitRes['status'],
         );
 
@@ -304,16 +325,32 @@ class ResidenceService {
       try {
         final client = SupabaseClientHelper.client;
         final res = await client.from('units').select();
+        final activeLeaseRows = await client
+            .from('leases')
+            .select(
+              'unit_id, resident:profiles!leases_resident_id_fkey(full_name)',
+            )
+            .eq('status', 'active');
+        final residentNamesByUnit = <String, String>{};
+        for (final lease in activeLeaseRows as List) {
+          final residentName = lease['resident']?['full_name'] as String?;
+          if (residentName != null) {
+            residentNamesByUnit[lease['unit_id']] = residentName;
+          }
+        }
         return (res as List)
-            .map(
-              (u) => Unit(
+            .map((u) {
+              return Unit(
                 id: u['id'],
                 propertyId: u['property_id'],
                 unitNumber: u['unit_number'],
                 floor: u['floor'] ?? 1,
+                bedrooms: u['bedrooms'] ?? 1,
+                bathrooms: u['bathrooms'] ?? 1,
+                residentName: residentNamesByUnit[u['id']],
                 status: u['status'] ?? 'vacant',
-              ),
-            )
+              );
+            })
             .toList();
       } catch (e) {
         throw Exception(e.toString());
@@ -355,6 +392,8 @@ class ResidenceService {
     required String address,
     required int floorsCount,
     required int apartmentsPerFloor,
+    required int bedrooms,
+    required int bathrooms,
   }) async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 500));
@@ -385,6 +424,8 @@ class ResidenceService {
               propertyId: propId,
               unitNumber: unitNumber,
               floor: floor,
+              bedrooms: bedrooms,
+              bathrooms: bathrooms,
               status: 'vacant',
             ),
           );
@@ -419,6 +460,8 @@ class ResidenceService {
               'property_id': propId,
               'unit_number': unitNumber,
               'floor': floor,
+              'bedrooms': bedrooms,
+              'bathrooms': bathrooms,
               'status': 'vacant',
             });
           }
@@ -430,7 +473,53 @@ class ResidenceService {
     }
   }
 
-  Future<void> createUnitAndLease({
+  Future<void> updateUnitLayout({
+    required String unitId,
+    required int bedrooms,
+    required int bathrooms,
+  }) async {
+    if (bedrooms < 1 || bathrooms < 1) {
+      throw ArgumentError('Bedrooms and bathrooms must be at least 1.');
+    }
+    if (SupabaseClientHelper.isMockMode) {
+      final index = _mockUnits.indexWhere((unit) => unit.id == unitId);
+      if (index == -1) throw StateError('Unit not found.');
+      _mockUnits[index] = _mockUnits[index].copyWith(
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+      );
+      return;
+    }
+    await SupabaseClientHelper.client.from('units').update({
+      'bedrooms': bedrooms,
+      'bathrooms': bathrooms,
+    }).eq('id', unitId);
+  }
+
+  Future<void> deleteUnit(String unitId) async {
+    if (SupabaseClientHelper.isMockMode) {
+      final index = _mockUnits.indexWhere((unit) => unit.id == unitId);
+      if (index == -1) throw StateError('Unit not found.');
+      if (_mockUnits[index].status != 'vacant') {
+        throw StateError('Only vacant units can be deleted.');
+      }
+      _mockUnits.removeAt(index);
+      return;
+    }
+
+    final client = SupabaseClientHelper.client;
+    final unit = await client
+        .from('units')
+        .select('status')
+        .eq('id', unitId)
+        .single();
+    if (unit['status'] != 'vacant') {
+      throw StateError('Only vacant units can be deleted.');
+    }
+    await client.from('units').delete().eq('id', unitId);
+  }
+
+  Future<String> createUnitAndLease({
     required String unitNumber,
     required int floor,
     required String residentId,
@@ -477,9 +566,22 @@ class ResidenceService {
       );
 
       _authService.updateMockTenantUnit(residentId, unitNumber);
+      return unitId;
     } else {
       try {
         final client = SupabaseClientHelper.client;
+
+        final residentLease = await client
+            .from('leases')
+            .select('id')
+            .eq('resident_id', residentId)
+            .eq('status', 'active')
+            .maybeSingle();
+        if (residentLease != null) {
+          throw StateError(
+            'This tenant already has an active apartment lease. End it before creating another lease.',
+          );
+        }
 
         // Find unit ID by name first or insert new
         final existingUnit = await client
@@ -491,11 +593,11 @@ class ResidenceService {
         String unitId;
         if (existingUnit != null) {
           unitId = existingUnit['id'];
-          // Update status to occupied
-          await client
-              .from('units')
-              .update({'status': 'occupied'})
-              .eq('id', unitId);
+          if (existingUnit['status'] == 'occupied') {
+            throw StateError(
+              'This apartment already has an active tenant.',
+            );
+          }
         } else {
           final unitRes = await client
               .from('units')
@@ -519,6 +621,17 @@ class ResidenceService {
           'security_deposit': securityDeposit,
           'status': 'active',
         });
+        await client
+            .from('profiles')
+            .update({'role': 'tenant'})
+            .eq('id', residentId);
+        if (existingUnit != null) {
+          await client
+              .from('units')
+              .update({'status': 'occupied'})
+              .eq('id', unitId);
+        }
+        return unitId;
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -558,5 +671,49 @@ class ResidenceService {
         throw Exception(e.toString());
       }
     }
+  }
+
+  Future<void> endTenancy({
+    required String unitId,
+    required String residentId,
+  }) async {
+    if (SupabaseClientHelper.isMockMode) {
+      final leaseIndex = _mockLeases.indexWhere(
+        (lease) =>
+            lease.unitId == unitId &&
+            lease.residentId == residentId &&
+            lease.status == 'active',
+      );
+      if (leaseIndex == -1) throw StateError('No active lease found.');
+      final lease = _mockLeases[leaseIndex];
+      _mockLeases[leaseIndex] = Lease(
+        id: lease.id,
+        unitId: lease.unitId,
+        residentId: lease.residentId,
+        startDate: lease.startDate,
+        endDate: lease.endDate,
+        monthlyRent: lease.monthlyRent,
+        securityDeposit: lease.securityDeposit,
+        status: 'terminated',
+      );
+      final unitIndex = _mockUnits.indexWhere((unit) => unit.id == unitId);
+      if (unitIndex != -1) {
+        _mockUnits[unitIndex] = Unit(
+          id: _mockUnits[unitIndex].id,
+          propertyId: _mockUnits[unitIndex].propertyId,
+          unitNumber: _mockUnits[unitIndex].unitNumber,
+          floor: _mockUnits[unitIndex].floor,
+          bedrooms: _mockUnits[unitIndex].bedrooms,
+          bathrooms: _mockUnits[unitIndex].bathrooms,
+          status: 'vacant',
+        );
+      }
+      _authService.deactivateMockTenant(residentId);
+      return;
+    }
+    await SupabaseClientHelper.client.rpc('end_tenancy', params: {
+      'target_unit_id': unitId,
+      'target_resident_id': residentId,
+    });
   }
 }

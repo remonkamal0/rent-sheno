@@ -104,6 +104,15 @@ class _ManagerCreateChargeScreenState
         description: _descController.text.trim(),
       );
 
+      try {
+        await ref.read(notificationServiceProvider).sendNotification(
+          residentId: _selectedTenant!,
+          title: 'Rent Claim Bill: ${_titleController.text.trim()}',
+          message: 'A rent bill of \$$amount has been issued. Due date: ${DateFormatter.formatShortDate(_dueDate)}.',
+          type: 'payment',
+        );
+      } catch (_) {}
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

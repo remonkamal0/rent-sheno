@@ -91,11 +91,18 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
-          android: initializationSettingsAndroid,
-          iOS: DarwinInitializationSettings(),
-        );
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+    );
 
     await _localNotificationsPlugin.initialize(
       initializationSettings,
@@ -105,6 +112,25 @@ class NotificationService {
         }
       },
     );
+
+    // Create high-importance notification channel with sound & vibration on Android
+    final androidImplementation = _localNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImplementation != null) {
+      await androidImplementation.createNotificationChannel(
+        const AndroidNotificationChannel(
+          AppConstants.notificationChannelId,
+          AppConstants.notificationChannelName,
+          description: AppConstants.notificationChannelDescription,
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+        ),
+      );
+      await androidImplementation.requestNotificationsPermission();
+    }
   }
 
   Future<void> showLocalNotification({
@@ -115,17 +141,28 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          AppConstants.notificationChannelId,
-          AppConstants.notificationChannelName,
-          channelDescription: AppConstants.notificationChannelDescription,
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: 'ticker',
-        );
+      AppConstants.notificationChannelId,
+      AppConstants.notificationChannelName,
+      channelDescription: AppConstants.notificationChannelDescription,
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+      channelShowBadge: true,
+      ticker: 'ticker',
+    );
+
+    const DarwinNotificationDetails iosPlatformChannelSpecifics =
+        DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      sound: 'default',
+    );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
-      iOS: DarwinNotificationDetails(),
+      iOS: iosPlatformChannelSpecifics,
     );
 
     await _localNotificationsPlugin.show(
@@ -221,6 +258,18 @@ class NotificationService {
     required String message,
     required String type,
   }) async {
+    try {
+      await showLocalNotification(
+        id: (DateTime.now().millisecondsSinceEpoch ~/ 1000) % 100000,
+        title: title,
+        body: message,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error showing local notification: $e');
+      }
+    }
+
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 600));
       final newNotif = AppNotification(

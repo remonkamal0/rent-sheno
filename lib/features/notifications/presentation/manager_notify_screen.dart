@@ -181,13 +181,17 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                       },
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(
-                        context,
-                      ).text('Broadcast message to all apartments'),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).text('Broadcast message to all apartments'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],
@@ -219,6 +223,7 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                       }
 
                       return DropdownButtonFormField<String>(
+                        isExpanded: true,
                         value: containsSelected
                             ? _selectedTenant
                             : (tenants.isNotEmpty ? tenants.first.id : null),
@@ -233,6 +238,19 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                             value: t.id,
                             child: Text(
                               '${t.fullName} (${t.unitNumber ?? "Unit"})',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.bodyMedium,
+                            ),
+                          );
+                        }).toList(),
+                        selectedItemBuilder: (context) => tenants.map((t) {
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '${t.fullName} (${t.unitNumber ?? "Unit"})',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.bodyMedium,
                             ),
                           );
@@ -268,6 +286,7 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   value: _selectedType,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
@@ -278,7 +297,12 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
                   items: _typesList.map((t) {
                     return DropdownMenuItem<String>(
                       value: t['id'],
-                      child: Text(t['name']!, style: AppTextStyles.bodyMedium),
+                      child: Text(
+                        t['name']!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodyMedium,
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) {

@@ -231,6 +231,15 @@ class ManagerHomeScreen extends ConsumerWidget {
                   ),
                   _buildActionCard(
                     context,
+                    icon: LucideIcons.car,
+                    title: 'Parking Spaces',
+                    subtitle: 'Manage garage',
+                    color: AppColors.lightBlue,
+                    iconColor: AppColors.primaryNavy,
+                    onTap: () => context.push('/manager/parking'),
+                  ),
+                  _buildActionCard(
+                    context,
                     icon: LucideIcons.bellRing,
                     title: localizations.translate('notify_tenant'),
                     subtitle: localizations.translate('send_announcement'),

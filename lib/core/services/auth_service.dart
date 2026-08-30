@@ -12,7 +12,7 @@ class UserProfile {
   final String? phone;
   final String? avatarUrl;
   final String preferredLanguage;
-  final String role; // 'tenant' or 'manager'
+  final String role; // pending, tenant, manager, inactive
   final String? unitNumber;
 
   UserProfile({
@@ -33,6 +33,7 @@ class UserProfile {
     String? preferredLanguage,
     String? role,
     String? unitNumber,
+    bool clearUnitNumber = false,
   }) {
     return UserProfile(
       id: id,
@@ -42,7 +43,7 @@ class UserProfile {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       role: role ?? this.role,
-      unitNumber: unitNumber ?? this.unitNumber,
+      unitNumber: clearUnitNumber ? null : unitNumber ?? this.unitNumber,
     );
   }
 }
@@ -433,7 +434,22 @@ class AuthService {
   void updateMockTenantUnit(String residentId, String unitNumber) {
     for (int i = 0; i < _mockTenants.length; i++) {
       if (_mockTenants[i].id == residentId) {
-        _mockTenants[i] = _mockTenants[i].copyWith(unitNumber: unitNumber);
+        _mockTenants[i] = _mockTenants[i].copyWith(
+          unitNumber: unitNumber,
+          role: 'tenant',
+        );
+        break;
+      }
+    }
+  }
+
+  void deactivateMockTenant(String residentId) {
+    for (var index = 0; index < _mockTenants.length; index++) {
+      if (_mockTenants[index].id == residentId) {
+        _mockTenants[index] = _mockTenants[index].copyWith(
+          role: 'inactive',
+          clearUnitNumber: true,
+        );
         break;
       }
     }
@@ -448,16 +464,18 @@ class AuthService {
         final client = SupabaseClientHelper.client;
         final res = await client
             .from('profiles')
-            .select('*, leases(units(unit_number))')
-            .eq('role', 'tenant');
+            .select(
+              '*, leases!leases_resident_id_fkey(status, units(unit_number))',
+            )
+            .inFilter('role', ['tenant', 'inactive']);
 
         return (res as List).map((p) {
           String? unitNum;
-          if (p['leases'] != null && (p['leases'] as List).isNotEmpty) {
-            final firstLease = p['leases'][0];
-            if (firstLease['units'] != null) {
-              unitNum = firstLease['units']['unit_number'];
-            }
+          final activeLeases = (p['leases'] as List? ?? [])
+              .where((lease) => lease['status'] == 'active')
+              .toList();
+          if (activeLeases.isNotEmpty && activeLeases.first['units'] != null) {
+            unitNum = activeLeases.first['units']['unit_number'];
           }
           return UserProfile(
             id: p['id'],

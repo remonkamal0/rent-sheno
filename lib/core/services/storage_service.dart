@@ -15,9 +15,10 @@ class StorageService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
+        final uid = client.auth.currentUser?.id ?? userId;
         final fileExtension = file.path.split('.').last;
         final path =
-            '$userId/avatar-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+            '$uid/avatar-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
         await client.storage.from('avatars').upload(path, file);
         final publicUrl = client.storage.from('avatars').getPublicUrl(path);
@@ -40,9 +41,10 @@ class StorageService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
+        final uid = client.auth.currentUser?.id ?? userId;
         final fileExtension = file.path.split('.').last;
         final path =
-            '$userId/$requestId/attachment-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+            '$uid/$requestId/attachment-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
         await client.storage.from('maintenance-attachments').upload(path, file);
         final publicUrl = client.storage
@@ -65,9 +67,10 @@ class StorageService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
+        final uid = client.auth.currentUser?.id ?? userId;
         final fileExtension = file.path.split('.').last;
         final path =
-            '$userId/policy-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+            '$uid/policy-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
         await client.storage.from('insurance-documents').upload(path, file);
         final publicUrl = client.storage
@@ -91,9 +94,10 @@ class StorageService {
 
     try {
       final client = SupabaseClientHelper.client;
+      final uid = client.auth.currentUser?.id ?? userId;
       final fileExtension = file.path.split('.').last;
       final path =
-          '$userId/receipt-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+          '$uid/receipt-${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
 
       await client.storage.from('payment-receipts').upload(path, file);
       return client.storage.from('payment-receipts').getPublicUrl(path);

@@ -6,6 +6,7 @@ import 'payment_service.dart';
 import 'storage_service.dart';
 import 'notification_service.dart';
 import 'residence_service.dart';
+import 'parking_service.dart';
 import 'maintenance_service.dart';
 import 'insurance_service.dart';
 import '../database/secure_storage.dart';
@@ -46,6 +47,10 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 final residenceServiceProvider = Provider<ResidenceService>((ref) {
   final authService = ref.watch(authServiceProvider);
   return ResidenceService(authService);
+});
+
+final parkingServiceProvider = Provider<ParkingService>((ref) {
+  return ParkingService();
 });
 
 final maintenanceServiceProvider = Provider<MaintenanceService>((ref) {
@@ -332,6 +337,11 @@ final managerUnitsProvider = FutureProvider.autoDispose<List<Unit>>((
 ) async {
   return ref.watch(residenceServiceProvider).getAllUnits();
 });
+
+final managerParkingSpacesProvider =
+    FutureProvider.autoDispose<List<ParkingSpace>>((ref) async {
+      return ref.watch(parkingServiceProvider).getAllSpaces();
+    });
 
 // Theme Mode Provider for Dark Mode toggling and persistence
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {

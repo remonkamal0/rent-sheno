@@ -183,6 +183,14 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
       setState(() {
         _successRequestNo = lastReq;
       });
+
+      try {
+        await ref.read(notificationServiceProvider).showLocalNotification(
+          id: (DateTime.now().millisecondsSinceEpoch ~/ 1000) % 100000,
+          title: 'Maintenance Request: $lastReq',
+          body: 'Your ticket for "$title" has been submitted successfully.',
+        );
+      } catch (_) {}
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

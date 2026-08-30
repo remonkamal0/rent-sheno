@@ -8,12 +8,14 @@ import '../../core/services/providers.dart';
 import '../../features/authentication/presentation/login_screen.dart';
 import '../../features/authentication/presentation/signup_screen.dart';
 import '../../features/authentication/presentation/pending_approval_screen.dart';
+import '../../features/authentication/presentation/inactive_resident_screen.dart';
 import '../../features/authentication/presentation/forgot_password_screen.dart';
 import '../../features/authentication/presentation/reset_password_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/manager_home_screen.dart';
 import '../../features/home/presentation/manager_setup_lease_screen.dart';
 import '../../features/home/presentation/manager_properties_screen.dart';
+import '../../features/home/presentation/manager_parking_screen.dart';
 import '../../features/home/presentation/manager_approvals_screen.dart';
 import '../../features/maintenance/presentation/maintenance_list_screen.dart';
 import '../../features/maintenance/presentation/manager_maintenance_screen.dart';
@@ -73,6 +75,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLoggedIn) {
+        final isInactive = user.role == 'inactive';
+        if (isInactive) {
+          if (state.matchedLocation != '/inactive-resident') {
+            return '/inactive-resident';
+          }
+          return null;
+        }
         final isPending = user.role == 'pending';
         if (isPending) {
           if (state.matchedLocation != '/pending-approval') {
@@ -110,6 +119,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pending-approval',
         builder: (context, state) => const PendingApprovalScreen(),
+      ),
+      GoRoute(
+        path: '/inactive-resident',
+        builder: (context, state) => const InactiveResidentScreen(),
       ),
       GoRoute(
         path: '/forgot-password',
@@ -191,6 +204,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: '/manager/properties',
         builder: (context, state) => const ManagerPropertiesScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/manager/parking',
+        builder: (context, state) => const ManagerParkingScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

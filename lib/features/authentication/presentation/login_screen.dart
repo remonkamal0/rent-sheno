@@ -69,7 +69,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await sharedPrefs.setRememberMe(_rememberMe);
         if (mounted) {
           final user = authService.currentUser;
-          if (user?.role == 'pending') {
+          if (user?.role == 'inactive') {
+            context.go('/inactive-resident');
+          } else if (user?.role == 'pending') {
             context.go('/pending-approval');
           } else if (user?.role == 'manager') {
             context.go('/manager/home');

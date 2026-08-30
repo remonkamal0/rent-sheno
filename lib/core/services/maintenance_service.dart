@@ -7,6 +7,8 @@ class MaintenanceRequest {
   final String id;
   final String residentId;
   final String unitId;
+  final String? unitNumber;
+  final String? residentName;
   final String requestNumber;
   final String category; // plumbing, electrical, appliance, other
   final String title;
@@ -23,6 +25,8 @@ class MaintenanceRequest {
     required this.id,
     required this.residentId,
     required this.unitId,
+    this.unitNumber,
+    this.residentName,
     required this.requestNumber,
     required this.category,
     required this.title,
@@ -45,6 +49,8 @@ class MaintenanceRequest {
       id: id,
       residentId: residentId,
       unitId: unitId,
+      unitNumber: unitNumber,
+      residentName: residentName,
       requestNumber: requestNumber,
       category: category,
       title: title,
@@ -75,6 +81,8 @@ class MaintenanceService {
         id: 'MR-2023-00124',
         residentId: 'mock-user-123',
         unitId: 'unit-402',
+        unitNumber: 'Apt 402',
+        residentName: 'John Doe',
         requestNumber: 'MR-2023-00124',
         category: 'plumbing',
         title: 'Leaking Kitchen Faucet',
@@ -87,9 +95,43 @@ class MaintenanceService {
         attachmentUrls: [],
       ),
       MaintenanceRequest(
+        id: 'MR-2023-00130',
+        residentId: 'mock-user-201',
+        unitId: 'unit-201',
+        unitNumber: 'Apt 201',
+        residentName: 'Sarah Connor',
+        requestNumber: 'MR-2023-00130',
+        category: 'electrical',
+        title: 'Living Room Light Flickering',
+        description: 'Main chandelier lights flicker intermittently in the evening.',
+        preferredDate: now.add(const Duration(days: 1)),
+        status: 'in_progress',
+        createdAt: now.subtract(const Duration(hours: 12)),
+        updatedAt: now.subtract(const Duration(hours: 4)),
+        attachmentUrls: [],
+      ),
+      MaintenanceRequest(
+        id: 'MR-2023-00135',
+        residentId: 'mock-user-105',
+        unitId: 'unit-105',
+        unitNumber: 'Apt 105',
+        residentName: 'Ahmed Ali',
+        requestNumber: 'MR-2023-00135',
+        category: 'appliance',
+        title: 'Refrigerator Making Loud Noise',
+        description: 'Compressor sounds very loud and vibrates constantly.',
+        preferredDate: now.add(const Duration(days: 3)),
+        status: 'scheduled',
+        createdAt: now.subtract(const Duration(days: 2)),
+        updatedAt: now.subtract(const Duration(days: 1)),
+        attachmentUrls: [],
+      ),
+      MaintenanceRequest(
         id: 'MR-2023-00085',
         residentId: 'mock-user-123',
         unitId: 'unit-402',
+        unitNumber: 'Apt 402',
+        residentName: 'John Doe',
         requestNumber: 'MR-2023-00085',
         category: 'other',
         title: 'HVAC Filter Replacement',
@@ -105,6 +147,8 @@ class MaintenanceService {
         id: 'MR-2023-00052',
         residentId: 'mock-user-123',
         unitId: 'unit-402',
+        unitNumber: 'Apt 402',
+        residentName: 'John Doe',
         requestNumber: 'MR-2023-00052',
         category: 'other',
         title: 'Broken Window Blinds',
@@ -115,6 +159,23 @@ class MaintenanceService {
         createdAt: now.subtract(const Duration(days: 43)),
         updatedAt: now.subtract(const Duration(days: 40)),
         resolvedAt: now.subtract(const Duration(days: 40)),
+        attachmentUrls: [],
+      ),
+      MaintenanceRequest(
+        id: 'MR-2023-00041',
+        residentId: 'mock-user-304',
+        unitId: 'unit-304',
+        unitNumber: 'Apt 304',
+        residentName: 'Michael Scott',
+        requestNumber: 'MR-2023-00041',
+        category: 'plumbing',
+        title: 'Bathroom Drain Blocked',
+        description: 'Shower drain unclogging requested.',
+        preferredDate: now.subtract(const Duration(days: 60)),
+        status: 'closed',
+        createdAt: now.subtract(const Duration(days: 62)),
+        updatedAt: now.subtract(const Duration(days: 60)),
+        resolvedAt: now.subtract(const Duration(days: 60)),
         attachmentUrls: [],
       ),
     ];
@@ -129,7 +190,9 @@ class MaintenanceService {
         final client = SupabaseClientHelper.client;
         final res = await client
             .from('maintenance_requests')
-            .select('*, maintenance_attachments(file_url)')
+            .select(
+              '*, units(unit_number), resident:profiles!maintenance_requests_resident_id_fkey(full_name), maintenance_attachments(file_url)',
+            )
             .eq('resident_id', _authService.currentUser?.id ?? '')
             .order('created_at', ascending: false);
 
@@ -143,6 +206,8 @@ class MaintenanceService {
             id: r['id'],
             residentId: r['resident_id'],
             unitId: r['unit_id'],
+            unitNumber: r['units']?['unit_number'],
+            residentName: r['resident']?['full_name'],
             requestNumber: r['request_number'],
             category: r['category'],
             title: r['title'],
@@ -182,6 +247,8 @@ class MaintenanceService {
         id: reqNo,
         residentId: 'mock-user-123',
         unitId: 'unit-402',
+        unitNumber: 'Apt 402',
+        residentName: _authService.currentUser?.fullName,
         requestNumber: reqNo,
         category: category,
         title: title,
@@ -271,7 +338,9 @@ class MaintenanceService {
         final client = SupabaseClientHelper.client;
         final res = await client
             .from('maintenance_requests')
-            .select('*, maintenance_attachments(file_url)')
+            .select(
+              '*, units(unit_number), resident:profiles!maintenance_requests_resident_id_fkey(full_name), maintenance_attachments(file_url)',
+            )
             .order('created_at', ascending: false);
 
         return (res as List).map((r) {
@@ -284,6 +353,8 @@ class MaintenanceService {
             id: r['id'],
             residentId: r['resident_id'],
             unitId: r['unit_id'],
+            unitNumber: r['units']?['unit_number'],
+            residentName: r['resident']?['full_name'],
             requestNumber: r['request_number'],
             category: r['category'],
             title: r['title'],

@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
-import '../../../core/services/auth_service.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -131,21 +130,12 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                         _buildInfoRow(
                           AppLocalizations.of(context).text('Apartment Unit'),
-                          req.unitId.toUpperCase(),
+                          req.unitNumber ?? req.unitId.toUpperCase(),
                         ),
                         const SizedBox(height: 12),
-                        FutureBuilder<UserProfile?>(
-                          future: ref
-                              .read(authServiceProvider)
-                              .getUserProfileById(req.residentId),
-                          builder: (context, snapshot) {
-                            final name =
-                                snapshot.data?.fullName ?? req.residentId;
-                            return _buildInfoRow(
-                              AppLocalizations.of(context).text('Tenant Name'),
-                              name,
-                            );
-                          },
+                        _buildInfoRow(
+                          AppLocalizations.of(context).text('Tenant Name'),
+                          req.residentName ?? req.residentId,
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow(
