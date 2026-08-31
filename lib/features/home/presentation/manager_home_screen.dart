@@ -19,6 +19,9 @@ class ManagerHomeScreen extends ConsumerWidget {
     final paymentsState = ref.watch(managerPaymentsProvider);
 
     final tenantsState = ref.watch(managerTenantsProvider);
+    final unitsState = ref.watch(managerUnitsProvider);
+    final tenantsList = tenantsState.value ?? [];
+    final unitsList = unitsState.value ?? [];
 
     return Scaffold(
       backgroundColor: context.backgroundColor,
@@ -249,6 +252,16 @@ class ManagerHomeScreen extends ConsumerWidget {
                   ),
                   _buildActionCard(
                     context,
+                    icon: LucideIcons.history,
+                    title: localizations.translate('sent_messages_history'),
+                    subtitle: localizations.translate('view_all'),
+                    color: AppColors.lightBlue,
+                    iconColor: AppColors.primaryNavy,
+                    onTap: () =>
+                        context.push('/manager/notifications/sent'),
+                  ),
+                  _buildActionCard(
+                    context,
                     icon: LucideIcons.userCheck,
                     title: localizations.translate('approvals'),
                     subtitle: ref
@@ -326,10 +339,35 @@ class ManagerHomeScreen extends ConsumerWidget {
                   final recent = activeReqs.take(3).toList();
                   return Column(
                     children: recent.map((req) {
+                      final matchingTenant = tenantsList
+                          .where((t) => t.id == req.residentId)
+                          .firstOrNull;
+                      final matchingUnit = unitsList
+                          .where((u) => u.id == req.unitId)
+                          .firstOrNull;
+                      final unitText = req.unitNumber ??
+                          matchingUnit?.unitNumber ??
+                          matchingTenant?.unitNumber ??
+                          'Unit';
+                      final residentText = req.residentName ??
+                          matchingTenant?.fullName ??
+                          'Resident';
+
                       return Card(
                         color: context.cardColor,
                         margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: context.borderColor,
+                            width: 0.8,
+                          ),
+                        ),
                         child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           title: Text(
                             req.title,
                             style: AppTextStyles.bodyMedium.copyWith(
@@ -337,10 +375,64 @@ class ManagerHomeScreen extends ConsumerWidget {
                               color: context.primaryTextColor,
                             ),
                           ),
-                          subtitle: Text(
-                            'Unit: ${req.unitId.toUpperCase()} • ${req.category}',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: context.secondaryTextColor,
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 6.0),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      LucideIcons.home,
+                                      size: 13,
+                                      color: AppColors.primaryNavy,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      unitText,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryNavy,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Text(
+                                  '•',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      LucideIcons.user,
+                                      size: 13,
+                                      color: AppColors.secondaryText,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      residentText,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: context.primaryTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Text(
+                                  '•',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                Text(
+                                  req.category,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: context.secondaryTextColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           trailing: StatusBadge(status: req.status),

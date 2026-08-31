@@ -123,10 +123,48 @@ class _ManagerMaintenanceScreenState
       ),
       body: SafeArea(
         child: requestsState.when(
-          data: (requests) {
+          data: (rawRequests) {
+            final tenantsState = ref.watch(managerTenantsProvider);
+            final unitsState = ref.watch(managerUnitsProvider);
+            final tenantsList = tenantsState.value ?? [];
+            final unitsList = unitsState.value ?? [];
+
+            final requests = rawRequests.map((r) {
+              final matchingTenant = tenantsList
+                  .where((t) => t.id == r.residentId)
+                  .firstOrNull;
+              final matchingUnit = unitsList
+                  .where((u) => u.id == r.unitId)
+                  .firstOrNull;
+              final resolvedUnitNumber = r.unitNumber ??
+                  matchingUnit?.unitNumber ??
+                  matchingTenant?.unitNumber;
+              final resolvedResidentName = r.residentName ??
+                  matchingTenant?.fullName;
+
+              return MaintenanceRequest(
+                id: r.id,
+                residentId: r.residentId,
+                unitId: r.unitId,
+                unitNumber: resolvedUnitNumber,
+                residentName: resolvedResidentName,
+                requestNumber: r.requestNumber,
+                category: r.category,
+                title: r.title,
+                description: r.description,
+                preferredDate: r.preferredDate,
+                status: r.status,
+                assignedTo: r.assignedTo,
+                createdAt: r.createdAt,
+                updatedAt: r.updatedAt,
+                resolvedAt: r.resolvedAt,
+                attachmentUrls: r.attachmentUrls,
+              );
+            }).toList();
+
             // Extract distinct units and resident names from the loaded requests
             final units = requests
-                .map((r) => r.unitNumber ?? r.unitId)
+                .map((r) => r.unitNumber ?? (r.unitId.length > 8 ? 'Unit' : r.unitId))
                 .where((u) => u.isNotEmpty)
                 .toSet()
                 .toList()

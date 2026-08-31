@@ -29,6 +29,7 @@ import '../../features/payments/presentation/manager_create_charge_screen.dart';
 import '../../features/insurance/presentation/insurance_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/notifications/presentation/manager_notify_screen.dart';
+import '../../features/notifications/presentation/manager_sent_notifications_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/settings/presentation/change_password_screen.dart';
@@ -222,6 +223,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           final tenantId = state.uri.queryParameters['tenantId'];
           return ManagerNotifyScreen(preSelectedTenantId: tenantId);
         },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/manager/notifications/sent',
+        builder: (context, state) =>
+            const ManagerSentNotificationsScreen(),
       ),
 
       // Standalone nested routes (Shared/Tenant)

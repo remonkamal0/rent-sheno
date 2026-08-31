@@ -62,7 +62,11 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final requestsState = ref.watch(managerMaintenanceProvider);
+    final tenantsState = ref.watch(managerTenantsProvider);
+    final unitsState = ref.watch(managerUnitsProvider);
     final localizations = AppLocalizations.of(context);
+    final tenantsList = tenantsState.value ?? [];
+    final unitsList = unitsState.value ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -85,6 +89,20 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                 ),
               );
             }
+
+            final matchingTenant = tenantsList
+                .where((t) => t.id == req.residentId)
+                .firstOrNull;
+            final matchingUnit = unitsList
+                .where((u) => u.id == req.unitId)
+                .firstOrNull;
+            final unitText = req.unitNumber ??
+                matchingUnit?.unitNumber ??
+                matchingTenant?.unitNumber ??
+                'Unit';
+            final residentText = req.residentName ??
+                matchingTenant?.fullName ??
+                'Resident';
 
             return ListView(
               padding: const EdgeInsets.all(24),
@@ -130,12 +148,12 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
                         _buildInfoRow(
                           AppLocalizations.of(context).text('Apartment Unit'),
-                          req.unitNumber ?? req.unitId.toUpperCase(),
+                          unitText,
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow(
                           AppLocalizations.of(context).text('Tenant Name'),
-                          req.residentName ?? req.residentId,
+                          residentText,
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow(

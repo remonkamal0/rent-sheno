@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
 import 'payment_service.dart';
 import 'storage_service.dart';
@@ -341,6 +340,11 @@ final managerUnitsProvider = FutureProvider.autoDispose<List<Unit>>((
 final managerParkingSpacesProvider =
     FutureProvider.autoDispose<List<ParkingSpace>>((ref) async {
       return ref.watch(parkingServiceProvider).getAllSpaces();
+    });
+
+final managerSentNotificationsProvider =
+    FutureProvider.autoDispose<List<AppNotification>>((ref) async {
+      return ref.watch(notificationServiceProvider).getAllSentNotifications();
     });
 
 // Theme Mode Provider for Dark Mode toggling and persistence

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../api/supabase_client.dart';
 import 'auth_service.dart';
 
@@ -191,7 +190,7 @@ class MaintenanceService {
         final res = await client
             .from('maintenance_requests')
             .select(
-              '*, units(unit_number), resident:profiles!maintenance_requests_resident_id_fkey(full_name), maintenance_attachments(file_url)',
+              '*, units(unit_number), profiles:resident_id(full_name), maintenance_attachments(file_url)',
             )
             .eq('resident_id', _authService.currentUser?.id ?? '')
             .order('created_at', ascending: false);
@@ -202,12 +201,17 @@ class MaintenanceService {
                   ?.map((a) => a['file_url'] as String)
                   .toList() ??
               [];
+          final unitMap = r['units'] is Map ? r['units'] : null;
+          final profileMap = r['profiles'] is Map
+              ? r['profiles']
+              : (r['resident'] is Map ? r['resident'] : null);
+
           return MaintenanceRequest(
             id: r['id'],
             residentId: r['resident_id'],
             unitId: r['unit_id'],
-            unitNumber: r['units']?['unit_number'],
-            residentName: r['resident']?['full_name'],
+            unitNumber: unitMap?['unit_number'],
+            residentName: profileMap?['full_name'],
             requestNumber: r['request_number'],
             category: r['category'],
             title: r['title'],
@@ -339,7 +343,7 @@ class MaintenanceService {
         final res = await client
             .from('maintenance_requests')
             .select(
-              '*, units(unit_number), resident:profiles!maintenance_requests_resident_id_fkey(full_name), maintenance_attachments(file_url)',
+              '*, units(unit_number), profiles:resident_id(full_name), maintenance_attachments(file_url)',
             )
             .order('created_at', ascending: false);
 
@@ -349,12 +353,17 @@ class MaintenanceService {
                   ?.map((a) => a['file_url'] as String)
                   .toList() ??
               [];
+          final unitMap = r['units'] is Map ? r['units'] : null;
+          final profileMap = r['profiles'] is Map
+              ? r['profiles']
+              : (r['resident'] is Map ? r['resident'] : null);
+
           return MaintenanceRequest(
             id: r['id'],
             residentId: r['resident_id'],
             unitId: r['unit_id'],
-            unitNumber: r['units']?['unit_number'],
-            residentName: r['resident']?['full_name'],
+            unitNumber: unitMap?['unit_number'],
+            residentName: profileMap?['full_name'],
             requestNumber: r['request_number'],
             category: r['category'],
             title: r['title'],

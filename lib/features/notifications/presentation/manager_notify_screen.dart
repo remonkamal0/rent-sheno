@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
@@ -146,6 +147,13 @@ class _ManagerNotifyScreenState extends ConsumerState<ManagerNotifyScreen> {
       appBar: AppBar(
         leading: const SmsBackButton(),
         title: Text(localizations.translate('send_alert_to_apartment')),
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.history),
+            tooltip: localizations.translate('sent_messages_history'),
+            onPressed: () => context.push('/manager/notifications/sent'),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -70,17 +70,47 @@ class NotificationService {
         title: 'Fire Alarm Testing',
         message:
             'Annual fire alarm testing will take place tomorrow between 10 AM and 2 PM. Please expect loud noises.',
-        isRead: false,
-        createdAt: now.subtract(const Duration(hours: 3)),
+        isRead: true,
+        createdAt: now.subtract(const Duration(hours: 2, minutes: 15)),
       ),
       AppNotification(
         id: 'notify-2',
+        residentId: 'mock-user-456',
+        type: 'payment',
+        title: 'Rent Claim Bill: September 2026',
+        message:
+            'A rent bill of \$1900.00 has been issued. Due date: 09/01/2026.',
+        isRead: false,
+        createdAt: now.subtract(const Duration(hours: 5, minutes: 40)),
+      ),
+      AppNotification(
+        id: 'notify-3',
+        residentId: 'mock-user-789',
+        type: 'maintenance',
+        title: 'Maintenance Schedule Confirmation',
+        message:
+            'Technician visit has been scheduled for tomorrow at 11:00 AM.',
+        isRead: false,
+        createdAt: now.subtract(const Duration(days: 1, hours: 3)),
+      ),
+      AppNotification(
+        id: 'notify-4',
         residentId: 'mock-user-123',
         type: 'general',
         title: 'Water Shutoff Notice',
         message:
             'Water will be temporarily shut off in building B for emergency pipe repairs from 1 PM to 3 PM.',
-        isRead: false,
+        isRead: true,
+        createdAt: now.subtract(const Duration(days: 3, hours: 6)),
+      ),
+      AppNotification(
+        id: 'notify-5',
+        residentId: 'mock-user-456',
+        type: 'general',
+        title: 'Building Pest Control',
+        message:
+            'Quarterly pest control services will be conducted on Friday morning. Please keep pets inside.',
+        isRead: true,
         createdAt: now.subtract(const Duration(days: 5)),
       ),
     ];
@@ -202,6 +232,39 @@ class NotificationService {
         }).toList();
 
         _notificationsStreamController.add(list);
+        return list;
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<List<AppNotification>> getAllSentNotifications() async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return List<AppNotification>.from(_mockNotifications);
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('notifications')
+            .select()
+            .order('created_at', ascending: false);
+
+        final list = (res as List).map((n) {
+          return AppNotification(
+            id: n['id'],
+            residentId: n['resident_id'],
+            type: n['type'],
+            title: n['title'],
+            message: n['message'],
+            isRead: n['is_read'],
+            relatedEntityType: n['related_entity_type'],
+            relatedEntityId: n['related_entity_id'],
+            createdAt: DateTime.parse(n['created_at']),
+          );
+        }).toList();
+
         return list;
       } catch (e) {
         throw Exception(e.toString());
