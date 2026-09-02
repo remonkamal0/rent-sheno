@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
+import '../../../core/services/maintenance_service.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -50,6 +51,107 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
             content: Text(
               AppLocalizations.of(context).text('Error: {}', e.toString()),
             ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUpdating = false);
+    }
+  }
+
+  Future<void> _scheduleRepair(MaintenanceRequest request) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 730)),
+    );
+    if (date == null || !mounted) return;
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 10, minute: 0),
+    );
+    if (time == null || !mounted) return;
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    if (!mounted) return;
+
+    var visitPerson = 'Maintenance technician';
+    final confirmedPerson = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Who will attend?'),
+        content: TextFormField(
+          initialValue: visitPerson,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Name or role',
+            hintText: 'e.g. Ahmed / Plumbing technician',
+          ),
+          onChanged: (value) => visitPerson = value,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (visitPerson.trim().isNotEmpty) {
+                Navigator.pop(dialogContext, visitPerson.trim());
+              }
+            },
+            child: const Text('Schedule'),
+          ),
+        ],
+      ),
+    );
+    if (confirmedPerson == null || !mounted) return;
+
+    final scheduledFor = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    final formattedDate = DateFormatter.formatShortDate(scheduledFor);
+    final formattedTime = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(time);
+
+    setState(() => _isUpdating = true);
+    try {
+      await ref.read(maintenanceServiceProvider).scheduleVisit(
+        requestId: request.id,
+        scheduledFor: scheduledFor,
+        visitPerson: confirmedPerson,
+      );
+      await ref.read(notificationServiceProvider).sendNotification(
+        residentId: request.residentId,
+        title: 'Maintenance visit scheduled',
+        message:
+            '$confirmedPerson will visit on $formattedDate at $formattedTime for: ${request.title}.',
+        type: 'maintenance',
+      );
+      ref.invalidate(managerMaintenanceProvider);
+      ref.invalidate(notificationsProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Visit scheduled and tenant notified.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not schedule visit: $error'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -115,14 +217,18 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              req.requestNumber,
-                              style: AppTextStyles.label.copyWith(
-                                color: AppColors.secondaryText,
+                            Expanded(
+                              child: Text(
+                                req.requestNumber,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.label.copyWith(
+                                  color: AppColors.secondaryText,
+                                ),
                               ),
                             ),
+                            const SizedBox(width: 12),
                             StatusBadge(status: req.status),
                           ],
                         ),
@@ -165,6 +271,18 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                           AppLocalizations.of(context).text('Preferred Visit'),
                           DateFormatter.formatRelative(req.preferredDate),
                         ),
+                        if (req.scheduledFor != null) ...[
+                          const SizedBox(height: 12),
+                          _buildInfoRow(
+                            'Scheduled Visit',
+                            '${DateFormatter.formatShortDate(req.scheduledFor!)} ${TimeOfDay.fromDateTime(req.scheduledFor!).format(context)}',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildInfoRow(
+                            'Coming To Repair',
+                            req.visitPerson ?? 'Maintenance technician',
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -266,7 +384,7 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         text: AppLocalizations.of(
                           context,
                         ).text('Schedule Repair'),
-                        onTap: () => _updateStatus('scheduled'),
+                        onTap: () => _scheduleRepair(req),
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -316,16 +434,22 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
 
   Widget _buildInfoRow(String label, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.secondaryText,
+        Expanded(
+          flex: 4,
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.secondaryText,
+            ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
+          flex: 6,
           child: Text(
             value,
             textAlign: TextAlign.end,

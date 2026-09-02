@@ -56,18 +56,28 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
           Expanded(
             child: chargesState.when(
               data: (charges) {
-                if (charges.isEmpty) {
+                final paidByMonth = <String, Charge>{};
+                for (final charge in charges.where(
+                  (item) => item.status == 'paid' && item.chargeType == 'rent',
+                )) {
+                  final monthKey =
+                      '${charge.leaseId}-${charge.dueDate.year}-${charge.dueDate.month}';
+                  paidByMonth[monthKey] = charge;
+                }
+                final paidCharges = paidByMonth.values.toList();
+
+                if (paidCharges.isEmpty) {
                   return Center(
                     child: Text(
                       AppLocalizations.of(
                         context,
-                      ).text('No rent history found.'),
+                      ).text('No confirmed rent payments yet.'),
                     ),
                   );
                 }
 
-                // Sort by due date descending (latest first)
-                final sortedCharges = List<Charge>.from(charges)
+                // Only owner-confirmed rent months are visible to the tenant.
+                final sortedCharges = List<Charge>.from(paidCharges)
                   ..sort((a, b) => b.dueDate.compareTo(a.dueDate));
 
                 return ListView.builder(
@@ -75,75 +85,67 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   itemCount: sortedCharges.length,
                   itemBuilder: (context, index) {
                     final charge = sortedCharges[index];
-                    final isLate = charge.calculatedStatus == 'past_due';
-
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: charge.status == 'paid'
-                                    ? AppColors.successBg
-                                    : (isLate
-                                          ? AppColors.errorBg
-                                          : AppColors.warningBg),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                charge.status == 'paid'
-                                    ? LucideIcons.check
-                                    : (isLate
-                                          ? LucideIcons.alertTriangle
-                                          : LucideIcons.calendar),
-                                color: charge.status == 'paid'
-                                    ? AppColors.success
-                                    : (isLate
-                                          ? AppColors.error
-                                          : AppColors.warning),
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    charge.title,
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${localizations.translate('due')}: ${DateFormatter.formatOverdueDate(charge.dueDate, localizations)}',
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: AppColors.secondaryText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            Row(
                               children: [
-                                Text(
-                                  '\$${charge.amount.toStringAsFixed(2)}',
-                                  style: AppTextStyles.bodyLarge.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryNavy,
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.successBg,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    LucideIcons.check,
+                                    color: AppColors.success,
+                                    size: 20,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
-                                StatusBadge(
-                                  status: charge.status == 'paid'
-                                      ? 'paid'
-                                      : charge.calculatedStatus,
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        charge.title,
+                                        style: AppTextStyles.bodyLarge.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryText,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${localizations.translate('due')}: ${DateFormatter.formatOverdueDate(charge.dueDate, localizations)}',
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          color: AppColors.secondaryText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '\$${charge.amount.toStringAsFixed(2)}',
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryNavy,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    StatusBadge(
+                                      status: charge.status == 'paid'
+                                          ? 'paid'
+                                          : charge.calculatedStatus,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -167,4 +169,5 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       ),
     );
   }
+
 }

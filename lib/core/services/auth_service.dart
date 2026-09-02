@@ -219,6 +219,9 @@ class AuthService {
     required String password,
     required String phone,
   }) async {
+    if (phone.trim().isEmpty) {
+      throw ArgumentError('Phone number is required.');
+    }
     final cleanEmail = email.trim().toLowerCase();
     if (cleanEmail.isEmpty || fullName.isEmpty || password.isEmpty) {
       throw Exception('All registration fields are required.');

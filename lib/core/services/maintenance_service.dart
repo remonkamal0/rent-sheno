@@ -18,6 +18,8 @@ class MaintenanceRequest {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? resolvedAt;
+  final DateTime? scheduledFor;
+  final String? visitPerson;
   final List<String> attachmentUrls;
 
   MaintenanceRequest({
@@ -36,12 +38,16 @@ class MaintenanceRequest {
     required this.createdAt,
     required this.updatedAt,
     this.resolvedAt,
+    this.scheduledFor,
+    this.visitPerson,
     required this.attachmentUrls,
   });
 
   MaintenanceRequest copyWith({
     String? status,
     DateTime? resolvedAt,
+    DateTime? scheduledFor,
+    String? visitPerson,
     List<String>? attachmentUrls,
   }) {
     return MaintenanceRequest(
@@ -60,6 +66,8 @@ class MaintenanceRequest {
       createdAt: createdAt,
       updatedAt: DateTime.now(),
       resolvedAt: resolvedAt ?? this.resolvedAt,
+      scheduledFor: scheduledFor ?? this.scheduledFor,
+      visitPerson: visitPerson ?? this.visitPerson,
       attachmentUrls: attachmentUrls ?? this.attachmentUrls,
     );
   }
@@ -224,6 +232,10 @@ class MaintenanceService {
             resolvedAt: r['resolved_at'] != null
                 ? DateTime.parse(r['resolved_at'])
                 : null,
+            scheduledFor: r['scheduled_for'] != null
+                ? DateTime.parse(r['scheduled_for'])
+                : null,
+            visitPerson: r['visit_person'],
             attachmentUrls: attachments,
           );
         }).toList();
@@ -376,6 +388,10 @@ class MaintenanceService {
             resolvedAt: r['resolved_at'] != null
                 ? DateTime.parse(r['resolved_at'])
                 : null,
+            scheduledFor: r['scheduled_for'] != null
+                ? DateTime.parse(r['scheduled_for'])
+                : null,
+            visitPerson: r['visit_person'],
             attachmentUrls: attachments,
           );
         }).toList();
@@ -414,5 +430,34 @@ class MaintenanceService {
         throw Exception(e.toString());
       }
     }
+  }
+
+  Future<void> scheduleVisit({
+    required String requestId,
+    required DateTime scheduledFor,
+    required String visitPerson,
+  }) async {
+    if (visitPerson.trim().isEmpty) {
+      throw ArgumentError('Visitor or technician name is required.');
+    }
+    if (SupabaseClientHelper.isMockMode) {
+      final index = _mockRequests.indexWhere((request) => request.id == requestId);
+      if (index == -1) throw StateError('Maintenance request not found.');
+      _mockRequests[index] = _mockRequests[index].copyWith(
+        status: 'scheduled',
+        scheduledFor: scheduledFor,
+        visitPerson: visitPerson.trim(),
+      );
+      return;
+    }
+    await SupabaseClientHelper.client
+        .from('maintenance_requests')
+        .update({
+          'status': 'scheduled',
+          'scheduled_for': scheduledFor.toUtc().toIso8601String(),
+          'visit_person': visitPerson.trim(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('id', requestId);
   }
 }

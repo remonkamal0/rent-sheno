@@ -232,9 +232,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ref.read(notificationsProvider.notifier).readSingle(notification.id);
 
           if (notification.type == 'maintenance') {
-            context.go('/maintenance');
+            final user = ref.read(authStateProvider).value;
+            final requestId = notification.relatedEntityId;
+            if (user?.role == 'manager') {
+              context.go(
+                requestId == null
+                    ? '/manager/maintenance'
+                    : '/manager/maintenance/$requestId',
+              );
+            } else {
+              context.go(
+                requestId == null ? '/maintenance' : '/maintenance/$requestId',
+              );
+            }
           } else if (notification.type == 'payment') {
-            context.go('/payments');
+            final user = ref.read(authStateProvider).value;
+            context.go(
+              user?.role == 'manager' ? '/manager/payments' : '/payments',
+            );
           } else if (notification.type == 'insurance') {
             context.go('/insurance');
           }

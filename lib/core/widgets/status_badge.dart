@@ -19,9 +19,12 @@ class StatusBadge extends StatelessWidget {
 
     switch (cleanStatus) {
       case 'pending':
+      case 'payment_submitted':
         bgColor = AppColors.warningBg;
         textColor = AppColors.warning;
-        label = localizations.translate('pending');
+        label = cleanStatus == 'payment_submitted'
+            ? 'Awaiting review'
+            : localizations.translate('pending');
         break;
       case 'in_progress':
       case 'in progress':
@@ -70,9 +73,12 @@ class StatusBadge extends StatelessWidget {
         label = localizations.translate('upcoming');
         break;
       case 'due':
+      case 'claim_due':
         bgColor = AppColors.warningBg;
         textColor = AppColors.warning;
-        label = localizations.translate('due');
+        label = cleanStatus == 'claim_due'
+            ? 'Awaiting tenant'
+            : localizations.translate('due');
         break;
       default:
         bgColor = AppColors.border.withOpacity(0.3);

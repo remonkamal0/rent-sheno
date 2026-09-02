@@ -314,6 +314,10 @@ final managerPaymentsProvider = FutureProvider.autoDispose<List<Payment>>((
   return ref.watch(paymentServiceProvider).getAllPayments();
 });
 
+final managerRentChargesProvider = FutureProvider.autoDispose<List<Charge>>((ref) async {
+  return ref.watch(paymentServiceProvider).getAllRentCharges();
+});
+
 final managerTenantsProvider = FutureProvider.autoDispose<List<UserProfile>>((
   ref,
 ) async {

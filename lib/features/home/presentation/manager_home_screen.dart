@@ -377,13 +377,10 @@ class ManagerHomeScreen extends ConsumerWidget {
                           ),
                           subtitle: Padding(
                             padding: const EdgeInsets.only(top: 6.0),
-                            child: Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
-                              crossAxisAlignment: WrapCrossAlignment.center,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     const Icon(
                                       LucideIcons.home,
@@ -391,21 +388,21 @@ class ManagerHomeScreen extends ConsumerWidget {
                                       color: AppColors.primaryNavy,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      unitText,
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryNavy,
+                                    Expanded(
+                                      child: Text(
+                                        unitText,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryNavy,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const Text(
-                                  '•',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
+                                const SizedBox(height: 3),
                                 Row(
-                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     const Icon(
                                       LucideIcons.user,
@@ -413,24 +410,30 @@ class ManagerHomeScreen extends ConsumerWidget {
                                       color: AppColors.secondaryText,
                                     ),
                                     const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        residentText,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: context.primaryTextColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      '•',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    const SizedBox(width: 6),
                                     Text(
-                                      residentText,
+                                      req.category,
                                       style: AppTextStyles.bodySmall.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: context.primaryTextColor,
+                                        color: context.secondaryTextColor,
                                       ),
                                     ),
                                   ],
-                                ),
-                                const Text(
-                                  '•',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                Text(
-                                  req.category,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: context.secondaryTextColor,
-                                  ),
                                 ),
                               ],
                             ),

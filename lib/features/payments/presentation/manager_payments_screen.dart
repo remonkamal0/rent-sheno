@@ -2,605 +2,166 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
-import '../../../core/services/providers.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/utils/date_formatter.dart';
-import '../../../core/utils/localizations.dart';
-import '../../../core/widgets/sms_back_button.dart';
-import '../../../core/widgets/status_badge.dart';
-import '../../../core/widgets/skeleton_loading.dart';
+import '../../../core/services/payment_service.dart';
+import '../../../core/services/providers.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/skeleton_loading.dart';
+import '../../../core/widgets/sms_back_button.dart';
 
 class ManagerPaymentsScreen extends ConsumerStatefulWidget {
   const ManagerPaymentsScreen({super.key});
-
   @override
-  ConsumerState<ManagerPaymentsScreen> createState() =>
-      _ManagerPaymentsScreenState();
+  ConsumerState<ManagerPaymentsScreen> createState() => _ManagerPaymentsScreenState();
 }
 
 class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
-  String _selectedYear = 'All';
-  String _selectedBuilding = 'All';
-  String _selectedResident = 'All';
-
-  String? getBuildingName(String? unit) {
-    if (unit == null) return null;
-    final parts = unit.split(' - ');
-    return parts.isNotEmpty ? parts[0].trim() : null;
-  }
+  String _resident = 'All';
+  String _year = 'All';
+  final Set<String> _expanded = {};
+  final Set<String> _saving = {};
 
   @override
   Widget build(BuildContext context) {
-    final paymentsState = ref.watch(managerPaymentsProvider);
-    final tenantsState = ref.watch(managerTenantsProvider);
-    final localizations = AppLocalizations.of(context);
-
-    final tenantsList = tenantsState.value ?? [];
-    final buildingsList = tenantsList
-        .map((t) => getBuildingName(t.unitNumber))
-        .whereType<String>()
-        .toSet()
-        .toList();
-
+    final rents = ref.watch(managerRentChargesProvider);
+    final tenants = ref.watch(managerTenantsProvider).value ?? <UserProfile>[];
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: const SmsBackButton(),
-        title: Text(localizations.translate('review_tenant_payments')),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              LucideIcons.plusCircle,
-              color: AppColors.primaryNavy,
-            ),
-            tooltip: localizations.translate('issue_rent_claim'),
-            onPressed: () => context.push('/manager/payments/create'),
+        leading: const SmsBackButton(), title: const Text('Tenant rent payments'),
+        actions: [IconButton(tooltip: 'Create another charge', onPressed: () => context.push('/manager/payments/create'), icon: const Icon(LucideIcons.plusCircle, color: AppColors.primaryNavy))],
+      ),
+      body: Column(children: [
+        _filters(tenants, rents.value ?? const []),
+        const Divider(height: 1),
+        Expanded(child: RefreshIndicator(
+          onRefresh: () async { ref.invalidate(managerRentChargesProvider); ref.invalidate(managerTenantsProvider); },
+          child: rents.when(
+            loading: () => ListView.builder(padding: const EdgeInsets.all(16), itemCount: 4, itemBuilder: (_, __) => const SkeletonCard()),
+            error: (error, _) => ListView(children: [SizedBox(height: 420, child: Center(child: Text('Could not load rent months: $error')))]),
+            data: (items) => _rentList(items, tenants),
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Interactive Filters Section
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        LucideIcons.slidersHorizontal,
-                        size: 16,
-                        color: AppColors.primaryNavy,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        localizations.translate('filter_by'),
-                        style: AppTextStyles.label.copyWith(
-                          color: AppColors.primaryNavy,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildDropdown(
-                          label: localizations.translate('year'),
-                          value: _selectedYear,
-                          items: ['All', '2026', '2025', '2024'],
-                          itemLabel: (val) => val == 'All'
-                              ? localizations.translate('all_years')
-                              : val,
-                          onChanged: (val) {
-                            setState(() => _selectedYear = val!);
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                        _buildDropdown(
-                          label: localizations.translate('building'),
-                          value: _selectedBuilding,
-                          items: ['All', ...buildingsList],
-                          itemLabel: (val) => val == 'All'
-                              ? localizations.translate('all_buildings')
-                              : val,
-                          onChanged: (val) {
-                            setState(() => _selectedBuilding = val!);
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                        _buildDropdown(
-                          label: localizations.translate('resident'),
-                          value: _selectedResident,
-                          items: ['All', ...tenantsList.map((t) => t.id)],
-                          itemLabel: (val) {
-                            if (val == 'All')
-                              return localizations.translate('all_residents');
-                            final tenant = tenantsList.firstWhere(
-                              (t) => t.id == val,
-                              orElse: () => UserProfile(
-                                id: '',
-                                fullName: val,
-                                email: '',
-                                role: 'tenant',
-                                preferredLanguage: 'en',
-                              ),
-                            );
-                            return tenant.fullName;
-                          },
-                          onChanged: (val) {
-                            setState(() => _selectedResident = val!);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(managerPaymentsProvider);
-                  ref.invalidate(managerTenantsProvider);
-                },
-                child: paymentsState.when(
-                  data: (payments) {
-                    final filteredPayments = payments.where((pay) {
-                      if (_selectedYear != 'All') {
-                        if (pay.paymentDate.year.toString() != _selectedYear) {
-                          return false;
-                        }
-                      }
-                      if (_selectedResident != 'All') {
-                        if (pay.residentId != _selectedResident) {
-                          return false;
-                        }
-                      }
-                      if (_selectedBuilding != 'All') {
-                        final tenant = tenantsList.firstWhere(
-                          (t) => t.id == pay.residentId,
-                          orElse: () => UserProfile(
-                            id: '',
-                            fullName: '',
-                            email: '',
-                            role: 'tenant',
-                            preferredLanguage: 'en',
-                          ),
-                        );
-                        final bldg = getBuildingName(tenant.unitNumber);
-                        if (bldg != _selectedBuilding) {
-                          return false;
-                        }
-                      }
-                      return true;
-                    }).toList();
-
-                    if (filteredPayments.isEmpty) {
-                      return ListView(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.5,
-                            child: Center(
-                              child: EmptyState(
-                                icon: LucideIcons.filter,
-                                title: AppLocalizations.of(
-                                  context,
-                                ).text('No Matching Payments'),
-                                description: AppLocalizations.of(context).text(
-                                  'Try adjusting your filters to find payment records.',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(24),
-                      itemCount: filteredPayments.length,
-                      itemBuilder: (context, index) {
-                        final pay = filteredPayments[index];
-
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        AppLocalizations.of(context).text(
-                                          'REF: {}',
-                                          pay.transactionReference ?? pay.id,
-                                        ),
-                                        style: AppTextStyles.label.copyWith(
-                                          color: AppColors.secondaryText,
-                                          fontSize: 10,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    StatusBadge(status: pay.status),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '\$${pay.amount.toStringAsFixed(2)}',
-                                            style: AppTextStyles.heading2
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.success,
-                                                ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            AppLocalizations.of(context).text(
-                                              'Paid via: {}',
-                                              pay.paymentMethod,
-                                            ),
-                                            style: AppTextStyles.bodySmall,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: pay.status == 'paid'
-                                            ? AppColors.lightBlue
-                                            : AppColors.primaryNavy,
-                                        foregroundColor: pay.status == 'paid'
-                                            ? AppColors.primaryNavy
-                                            : Colors.white,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 6,
-                                        ),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        if (pay.status == 'paid') {
-                                          _showReceiptProofDialog(context, pay);
-                                        } else {
-                                          await ref
-                                              .read(paymentServiceProvider)
-                                              .updateChargeStatus(
-                                                pay.id,
-                                                'paid',
-                                              );
-                                          ref.invalidate(
-                                            managerPaymentsProvider,
-                                          );
-                                          ref.invalidate(chargesProvider);
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  AppLocalizations.of(
-                                                    context,
-                                                  ).text(
-                                                    'Payment marked as paid successfully!',
-                                                  ),
-                                                ),
-                                                backgroundColor:
-                                                    AppColors.success,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(
-                                        pay.status == 'paid'
-                                            ? LucideIcons.fileSearch
-                                            : LucideIcons.checkCircle,
-                                        size: 14,
-                                      ),
-                                      label: Text(
-                                        pay.status == 'paid'
-                                            ? AppLocalizations.of(
-                                                context,
-                                              ).text('View Receipt')
-                                            : AppLocalizations.of(
-                                                context,
-                                              ).text('Mark Paid'),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(height: 24),
-                                FutureBuilder<UserProfile?>(
-                                  future: ref
-                                      .read(authServiceProvider)
-                                      .getUserProfileById(pay.residentId),
-                                  builder: (context, snapshot) {
-                                    final name =
-                                        snapshot.data?.fullName ??
-                                        pay.residentId;
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Tenant: $name',
-                                            style: AppTextStyles.bodySmall
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          DateFormatter.formatRelative(
-                                            pay.paymentDate,
-                                            localizations,
-                                          ),
-                                          style: AppTextStyles.bodySmall
-                                              .copyWith(
-                                                color: AppColors.secondaryText,
-                                              ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  loading: () => ListView.builder(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: 4,
-                    itemBuilder: (context, index) => const SkeletonCard(),
-                  ),
-                  error: (err, _) => Center(
-                    child: Text(
-                      AppLocalizations.of(
-                        context,
-                      ).text('Error loading payments history'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+        )),
+      ]),
     );
   }
 
-  Widget _buildDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required String Function(String) itemLabel,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+  Widget _filters(List<UserProfile> tenants, List<Charge> charges) {
+    final years = charges.map((c) => c.dueDate.year.toString()).toSet().toList()..sort();
+    return Container(color: Colors.white, padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Row(children: [Icon(LucideIcons.slidersHorizontal, size: 16, color: AppColors.primaryNavy), SizedBox(width: 8), Text('Filter by', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryNavy))]),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: _dropdown(value: _year, label: 'Year', items: ['All', ...years], names: const {'All': 'All years'}, onChanged: (v) => setState(() => _year = v!))),
+        const SizedBox(width: 10),
+        Expanded(child: _dropdown(value: _resident, label: 'Tenant', items: ['All', ...tenants.map((t) => t.id)], names: {'All': 'All tenants', for (final t in tenants) t.id: t.fullName}, onChanged: (v) => setState(() => _resident = v!))),
+      ]),
+    ]));
+  }
+
+  Widget _dropdown({required String value, required String label, required List<String> items, required Map<String, String> names, required ValueChanged<String?> onChanged}) => DropdownButtonFormField<String>(
+    initialValue: items.contains(value) ? value : 'All', isExpanded: true,
+    decoration: InputDecoration(labelText: label, isDense: true, border: const OutlineInputBorder()),
+    items: items.map((item) => DropdownMenuItem(value: item, child: Text(names[item] ?? item, overflow: TextOverflow.ellipsis))).toList(), onChanged: onChanged,
+  );
+
+  Widget _rentList(List<Charge> all, List<UserProfile> tenants) {
+    final filtered = all.where((c) => (_resident == 'All' || c.residentId == _resident) && (_year == 'All' || c.dueDate.year.toString() == _year)).toList();
+    final byTenant = <String, List<Charge>>{};
+    for (final charge in filtered) { byTenant.putIfAbsent(charge.residentId, () => []).add(charge); }
+    if (byTenant.isEmpty) {
+      return ListView(
         children: [
-          Text(
-            '$label: ',
-            style: AppTextStyles.bodySmall.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondaryText,
-            ),
-          ),
-          DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isDense: true,
-              style: AppTextStyles.bodySmall.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryNavy,
-              ),
-              onChanged: onChanged,
-              items: items.map((val) {
-                return DropdownMenuItem<String>(
-                  value: val,
-                  child: Text(itemLabel(val)),
-                );
-              }).toList(),
+          SizedBox(
+            height: 420,
+            child: EmptyState(
+              icon: LucideIcons.calendarX,
+              title: 'No rent months found',
+              description: 'Create a lease first or change the selected filters.',
             ),
           ),
         ],
+      );
+    }
+    final ids = byTenant.keys.toList();
+    return ListView.builder(padding: const EdgeInsets.all(16), itemCount: ids.length, itemBuilder: (_, index) {
+      final id = ids[index];
+      final months = byTenant[id]!..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+      final tenant = tenants.where((t) => t.id == id).firstOrNull;
+      final first = months.first;
+      final paid = months.where((c) => c.status == 'paid').length;
+      return Card(margin: const EdgeInsets.only(bottom: 14), child: Column(children: [
+        InkWell(borderRadius: BorderRadius.circular(12), onTap: () => setState(() => _expanded.contains(id) ? _expanded.remove(id) : _expanded.add(id)), child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
+          _tenantAvatar(tenant),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(tenant?.fullName ?? id, style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4), Text(tenant?.unitNumber ?? 'No unit', style: AppTextStyles.bodySmall), const SizedBox(height: 4),
+            Text('${_date(first.leaseStartDate ?? months.first.dueDate)} – ${_date(first.leaseEndDate ?? months.last.dueDate)}  •  $paid/${months.length} paid', style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText)),
+          ])),
+          Icon(_expanded.contains(id) ? LucideIcons.chevronUp : LucideIcons.chevronDown),
+        ]))),
+        if (_expanded.contains(id)) ...[const Divider(height: 1), for (final month in months) _monthRow(month)],
+      ]));
+    });
+  }
+
+  Widget _monthRow(Charge charge) {
+    final paid = charge.status == 'paid';
+    final submitted = charge.status == 'payment_submitted';
+    return Padding(padding: const EdgeInsets.fromLTRB(16, 12, 12, 12), child: Row(children: [
+      Icon(paid ? LucideIcons.checkCircle2 : LucideIcons.calendar, color: paid ? AppColors.success : submitted ? AppColors.warning : AppColors.secondaryText),
+      const SizedBox(width: 10),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_month(charge.dueDate), style: const TextStyle(fontWeight: FontWeight.w700)), Text('\$${charge.amount.toStringAsFixed(2)}${submitted ? ' • receipt submitted' : ''}', style: AppTextStyles.bodySmall)])),
+      if (paid) const Chip(label: Text('Paid'), backgroundColor: AppColors.successBg, labelStyle: TextStyle(color: AppColors.success)) else FilledButton(
+        onPressed: _saving.contains(charge.id) ? null : () => _confirmPaid(charge),
+        style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)), child: Text(_saving.contains(charge.id) ? 'Saving…' : 'Confirm paid'),
+      ),
+    ]));
+  }
+
+  Widget _tenantAvatar(UserProfile? tenant) {
+    final avatarUrl = tenant?.avatarUrl?.trim();
+    final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
+    final initial = (tenant?.fullName.isNotEmpty ?? false)
+        ? tenant!.fullName[0].toUpperCase()
+        : '?';
+
+    return CircleAvatar(
+      radius: 22,
+      backgroundColor: AppColors.lightBlue,
+      foregroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
+      onForegroundImageError: hasAvatar ? (_, __) {} : null,
+      child: Text(
+        initial,
+        style: const TextStyle(
+          color: AppColors.primaryNavy,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
 
-  void _showReceiptProofDialog(BuildContext context, dynamic payment) {
-    final localizations = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          AppLocalizations.of(context).text('Verification Receipt'),
-          style: AppTextStyles.heading3.copyWith(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              height: 180,
-              decoration: BoxDecoration(
-                color: AppColors.border.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
-              ),
-              child:
-                  payment.receiptUrl != null &&
-                      !payment.receiptUrl!.startsWith('http')
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          LucideIcons.fileText,
-                          color: AppColors.primaryNavy,
-                          size: 40,
-                        ),
-                        const SizedBox(height: 12),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Text(
-                            payment.receiptUrl!.split('/').last,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppLocalizations.of(
-                            context,
-                          ).text('Uploaded Receipt Attachment'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.secondaryText,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          LucideIcons.shieldCheck,
-                          color: AppColors.success,
-                          size: 40,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context).text('Verified Receipt'),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          payment.receiptUrl != null
-                              ? AppLocalizations.of(
-                                  context,
-                                ).text('Secured Attachment Link')
-                              : AppLocalizations.of(
-                                  context,
-                                ).text('Secure Card Checkout'),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.secondaryText,
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-            const SizedBox(height: 16),
-            _buildDialogRow(
-              AppLocalizations.of(context).text('Ref Number'),
-              payment.transactionReference ?? payment.id,
-            ),
-            const SizedBox(height: 8),
-            _buildDialogRow(
-              AppLocalizations.of(context).text('Amount Paid'),
-              '\$${payment.amount.toStringAsFixed(2)}',
-            ),
-            const SizedBox(height: 8),
-            _buildDialogRow(
-              AppLocalizations.of(context).text('Payment Channel'),
-              payment.paymentMethod,
-            ),
-            const SizedBox(height: 8),
-            _buildDialogRow(
-              AppLocalizations.of(context).text('Payment Date'),
-              DateFormatter.formatRelative(payment.paymentDate, localizations),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              AppLocalizations.of(context).text('Close'),
-              style: TextStyle(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  Future<void> _confirmPaid(Charge charge) async {
+    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+      title: const Text('Confirm rent payment'), content: Text('Mark ${_month(charge.dueDate)} as paid? The tenant will see it as paid immediately.'),
+      actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')), FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirm paid'))],
+    ));
+    if (confirmed != true || !mounted) return;
+    setState(() => _saving.add(charge.id));
+    try {
+      await ref.read(paymentServiceProvider).confirmRentMonthPaid(charge);
+      ref.invalidate(managerRentChargesProvider); ref.invalidate(chargesProvider); ref.invalidate(paymentsHistoryProvider);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${_month(charge.dueDate)} marked as paid.')));
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not confirm payment: $error')));
+    } finally { if (mounted) setState(() => _saving.remove(charge.id)); }
   }
 
-  Widget _buildDialogRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: AppColors.secondaryText),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    );
-  }
+  String _month(DateTime date) => '${_months[date.month - 1]} ${date.year}';
+  String _date(DateTime date) => '${date.day}/${date.month}/${date.year}';
+  static const _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 }

@@ -157,6 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final localizations = AppLocalizations.of(context);
     final authState = ref.watch(authStateProvider);
     final residenceState = ref.watch(residenceDetailsProvider);
+    final parkingState = ref.watch(managerParkingSpacesProvider);
 
     final user = authState.value;
     final residence = residenceState.value;
@@ -344,6 +345,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _buildProfileRow(
                             AppLocalizations.of(context).text('Unit Number'),
                             residence.unit.unitNumber,
+                          ),
+                          const Divider(height: 24),
+                          _buildProfileRow(
+                            'Floor',
+                            '${residence.unit.floor}',
+                          ),
+                          const Divider(height: 24),
+                          _buildProfileRow(
+                            'Bedrooms',
+                            '${residence.unit.bedrooms}',
+                          ),
+                          const Divider(height: 24),
+                          _buildProfileRow(
+                            'Bathrooms',
+                            '${residence.unit.bathrooms}',
+                          ),
+                          const Divider(height: 24),
+                          parkingState.when(
+                            loading: () => const LinearProgressIndicator(),
+                            error: (_, __) => _buildProfileRow(
+                              'Parking Spaces',
+                              'Unable to load',
+                            ),
+                            data: (spaces) {
+                              final assignedSpaces = spaces
+                                  .where(
+                                    (space) =>
+                                        space.residentId == user?.id &&
+                                        space.unitId == residence.unit.id,
+                                  )
+                                  .map((space) => space.spaceNumber)
+                                  .toList()
+                                ..sort();
+                              return _buildProfileRow(
+                                'Parking Spaces',
+                                assignedSpaces.isEmpty
+                                    ? 'None'
+                                    : assignedSpaces.join(', '),
+                              );
+                            },
                           ),
                           const Divider(height: 24),
                           _buildProfileRow(

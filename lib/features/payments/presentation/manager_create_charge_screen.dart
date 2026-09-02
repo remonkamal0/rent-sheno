@@ -195,6 +195,7 @@ class _ManagerCreateChargeScreenState
                     }
 
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       value: containsSelected
                           ? _selectedTenant
                           : (tenants.isNotEmpty ? tenants.first.id : null),

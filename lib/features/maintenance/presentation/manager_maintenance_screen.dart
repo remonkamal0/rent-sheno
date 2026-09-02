@@ -550,14 +550,11 @@ class _ManagerMaintenanceScreenState
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Unit Badge / Label
                             Row(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
                                   LucideIcons.home,
@@ -565,11 +562,15 @@ class _ManagerMaintenanceScreenState
                                   color: AppColors.secondaryText,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  unitText,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryNavy,
+                                Expanded(
+                                  child: Text(
+                                    unitText,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryNavy,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -578,8 +579,8 @@ class _ManagerMaintenanceScreenState
                             // Resident Badge / Label
                             if (residentText != null &&
                                 residentText.trim().isNotEmpty) ...[
+                              const SizedBox(height: 3),
                               Row(
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(
                                     LucideIcons.user,
@@ -587,23 +588,34 @@ class _ManagerMaintenanceScreenState
                                     color: AppColors.secondaryText,
                                   ),
                                   const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      residentText,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
                                   Text(
-                                    residentText,
+                                    '• ${req.requestNumber}',
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.secondaryText,
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
-
-                            // Request Number
-                            Text(
-                              '• ${req.requestNumber}',
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.secondaryText,
+                            ] else ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                req.requestNumber,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.secondaryText,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ],

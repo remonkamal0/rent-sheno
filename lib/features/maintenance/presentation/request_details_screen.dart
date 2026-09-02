@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/services/providers.dart';
@@ -65,24 +66,31 @@ class RequestDetailsScreen extends ConsumerWidget {
                 children: [
                   // Categories and Status Badges
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.lightBlue,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          request.category.toUpperCase(),
-                          style: AppTextStyles.label.copyWith(
-                            color: AppColors.primaryNavy,
+                      Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightBlue,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              request.category.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.label.copyWith(
+                                color: AppColors.primaryNavy,
+                              ),
+                            ),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
                       StatusBadge(status: request.status),
                     ],
                   ),
@@ -136,8 +144,56 @@ class RequestDetailsScreen extends ConsumerWidget {
                           title: AppLocalizations.of(
                             context,
                           ).text('Assigned Tech'),
-                          value: request.assignedTo ?? 'TBD',
+                          value: request.visitPerson ?? 'TBD',
                         ),
+                        if (request.scheduledFor != null) ...[
+                          const SizedBox(height: 16),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.successBg,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppColors.success.withValues(alpha: .3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Maintenance visit confirmed',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.success,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                _buildDetailRow(
+                                  icon: LucideIcons.calendarClock,
+                                  title: 'Date & Time',
+                                  value:
+                                      '${DateFormatter.formatShortDate(request.scheduledFor!)} ${TimeOfDay.fromDateTime(request.scheduledFor!).format(context)}',
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _addToCalendar(
+                                      context,
+                                      request,
+                                    ),
+                                    icon: const Icon(
+                                      LucideIcons.calendarPlus,
+                                      size: 18,
+                                    ),
+                                    label: const Text('Add to Phone Calendar'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
 
                         const SizedBox(height: 20),
                         Text(
@@ -263,16 +319,49 @@ class RequestDetailsScreen extends ConsumerWidget {
             color: AppColors.secondaryText,
           ),
         ),
-        const Spacer(),
-        Text(
-          value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.primaryText,
-            fontWeight: FontWeight.w600,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.primaryText,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _addToCalendar(
+    BuildContext context,
+    MaintenanceRequest request,
+  ) async {
+    final start = request.scheduledFor;
+    if (start == null) return;
+    final end = start.add(const Duration(hours: 1));
+    String calendarDate(DateTime value) => value
+        .toUtc()
+        .toIso8601String()
+        .replaceAll(RegExp(r'[-:]'), '')
+        .split('.').first
+        .replaceFirst(RegExp(r'$'), 'Z');
+    final uri = Uri.https('calendar.google.com', '/calendar/render', {
+      'action': 'TEMPLATE',
+      'text': 'Maintenance visit - ${request.title}',
+      'dates': '${calendarDate(start)}/${calendarDate(end)}',
+      'details':
+          '${request.visitPerson ?? 'Maintenance technician'} will visit to repair: ${request.description}',
+    });
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the calendar app.')),
+      );
+    }
   }
 
   Widget _buildTimeline(BuildContext context, String status) {
