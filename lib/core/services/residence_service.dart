@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../api/supabase_client.dart';
 import 'auth_service.dart';
 
@@ -634,6 +633,41 @@ class ResidenceService {
         return unitId;
       } catch (e) {
         throw Exception(e.toString());
+      }
+    }
+  }
+
+  Future<Lease?> getActiveLeaseForResident(String residentId) async {
+    if (SupabaseClientHelper.isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      final idx = _mockLeases.indexWhere(
+        (l) => l.residentId == residentId && l.status == 'active',
+      );
+      return idx == -1 ? null : _mockLeases[idx];
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('leases')
+            .select()
+            .eq('resident_id', residentId)
+            .eq('status', 'active')
+            .maybeSingle();
+
+        if (res == null) return null;
+
+        return Lease(
+          id: res['id'],
+          unitId: res['unit_id'],
+          residentId: res['resident_id'],
+          startDate: DateTime.parse(res['start_date']),
+          endDate: DateTime.parse(res['end_date']),
+          monthlyRent: (res['monthly_rent'] as num).toDouble(),
+          securityDeposit: (res['security_deposit'] as num).toDouble(),
+          status: res['status'],
+        );
+      } catch (e) {
+        return null;
       }
     }
   }

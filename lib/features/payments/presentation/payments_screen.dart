@@ -61,7 +61,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   (item) => item.status == 'paid' && item.chargeType == 'rent',
                 )) {
                   final monthKey =
-                      '${charge.leaseId}-${charge.dueDate.year}-${charge.dueDate.month}';
+                      '${charge.dueDate.year}-${charge.dueDate.month}';
                   paidByMonth[monthKey] = charge;
                 }
                 final paidCharges = paidByMonth.values.toList();
@@ -113,7 +113,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        charge.title,
+                                        _displayTitle(charge, localizations),
                                         style: AppTextStyles.bodyLarge.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primaryText,
@@ -121,7 +121,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        '${localizations.translate('due')}: ${DateFormatter.formatOverdueDate(charge.dueDate, localizations)}',
+                                        _displaySubtitle(charge, localizations),
                                         style: AppTextStyles.bodySmall.copyWith(
                                           color: AppColors.secondaryText,
                                         ),
@@ -170,4 +170,22 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     );
   }
 
+  String _displayTitle(Charge charge, AppLocalizations localizations) {
+    if (charge.chargeType == 'rent') {
+      final monthStr = DateFormatter.formatMonthYear(charge.dueDate);
+      return localizations.locale.languageCode == 'ar'
+          ? 'إيجار $monthStr'
+          : '$monthStr Rent';
+    }
+    return charge.title;
+  }
+
+  String _displaySubtitle(Charge charge, AppLocalizations localizations) {
+    if (charge.status == 'paid') {
+      return localizations.locale.languageCode == 'ar'
+          ? 'تم تأكيد الدفع من المالك'
+          : 'Payment confirmed by owner';
+    }
+    return '${localizations.translate('due')}: ${DateFormatter.formatOverdueDate(charge.dueDate, localizations)}';
+  }
 }

@@ -25,8 +25,8 @@ class _ManagerSetupLeaseScreenState
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _unitController;
   final _floorController = TextEditingController(text: '1');
-  final _rentController = TextEditingController(text: '1500.0');
-  final _depositController = TextEditingController(text: '1000.0');
+  final _rentController = TextEditingController();
+  final _depositController = TextEditingController();
 
   String? _selectedTenant;
   String? _selectedUnitId;

@@ -133,7 +133,7 @@ class _ManagerPaymentsScreenState extends ConsumerState<ManagerPaymentsScreen> {
     return CircleAvatar(
       radius: 22,
       backgroundColor: AppColors.lightBlue,
-      foregroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
+      foregroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
       onForegroundImageError: hasAvatar ? (_, __) {} : null,
       child: Text(
         initial,

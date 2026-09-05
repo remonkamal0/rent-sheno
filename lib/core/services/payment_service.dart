@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../api/supabase_client.dart';
 import 'auth_service.dart';
 
@@ -55,16 +54,22 @@ class Charge {
     }
   }
 
-  Charge copyWith({String? status}) {
+  Charge copyWith({
+    String? status,
+    double? amount,
+    String? title,
+    String? description,
+    DateTime? dueDate,
+  }) {
     return Charge(
       id: id,
       residentId: residentId,
       leaseId: leaseId,
       chargeType: chargeType,
-      title: title,
-      description: description,
-      amount: amount,
-      dueDate: dueDate,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      amount: amount ?? this.amount,
+      dueDate: dueDate ?? this.dueDate,
       status: status ?? this.status,
       createdAt: createdAt,
       leaseStartDate: leaseStartDate,
@@ -181,25 +186,63 @@ class PaymentService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
+        final residentId = _authService.currentUser?.id ?? '';
+
+        final activeLeaseRes = await client
+            .from('leases')
+            .select('monthly_rent, start_date, end_date')
+            .eq('resident_id', residentId)
+            .eq('status', 'active')
+            .maybeSingle();
+        final activeRent = (activeLeaseRes?['monthly_rent'] as num?)?.toDouble();
+
         final res = await client
             .from('charges')
-            .select()
-            .eq('resident_id', _authService.currentUser?.id ?? '');
+            .select('*, lease:leases!charges_lease_id_fkey(status,monthly_rent)')
+            .eq('resident_id', residentId);
 
-        return (res as List).map((c) {
-          return Charge(
-            id: c['id'],
-            residentId: c['resident_id'],
-            leaseId: c['lease_id'],
-            chargeType: c['charge_type'],
-            title: c['title'],
-            description: c['description'],
-            amount: (c['amount'] as num).toDouble(),
-            dueDate: DateTime.parse(c['due_date']),
-            status: c['status'],
-            createdAt: DateTime.parse(c['created_at']),
+        final rawList = (res as List).map((c) {
+          final lease = c['lease'] as Map<String, dynamic>?;
+          final leaseStatus = lease?['status'] as String?;
+          final leaseRent = (lease?['monthly_rent'] as num?)?.toDouble();
+          final resolvedAmount = c['charge_type'] == 'rent'
+              ? (activeRent ?? leaseRent ?? (c['amount'] as num).toDouble())
+              : (c['amount'] as num).toDouble();
+
+          return (
+            charge: Charge(
+              id: c['id'],
+              residentId: c['resident_id'],
+              leaseId: c['lease_id'] ?? '',
+              chargeType: c['charge_type'],
+              title: c['title'],
+              description: c['description'],
+              amount: resolvedAmount,
+              dueDate: DateTime.parse(c['due_date']),
+              status: c['status'],
+              createdAt: DateTime.parse(c['created_at']),
+            ),
+            isActiveLease: leaseStatus == null || leaseStatus == 'active',
           );
         }).toList();
+
+        final Map<String, Charge> uniqueMap = {};
+        for (final item in rawList) {
+          if (!item.isActiveLease && item.charge.status != 'paid') continue;
+          final key =
+              '${item.charge.chargeType}-${item.charge.dueDate.year}-${item.charge.dueDate.month}-${item.charge.title}';
+          final normalizedCharge = item.charge.chargeType == 'rent' && activeRent != null
+              ? item.charge.copyWith(amount: activeRent)
+              : item.charge;
+
+          if (!uniqueMap.containsKey(key)) {
+            uniqueMap[key] = normalizedCharge;
+          } else if (item.charge.status == 'paid') {
+            uniqueMap[key] = normalizedCharge;
+          }
+        }
+
+        return uniqueMap.values.toList();
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -281,7 +324,7 @@ class PaymentService {
         if (residentId == null) return false;
 
         // Insert payment details
-        final paymentRes = await client
+        await client
             .from('payments')
             .insert({
               'resident_id': residentId,
@@ -293,9 +336,7 @@ class PaymentService {
               'payment_date': now,
               'receipt_url': receiptUrl,
               'charge_id': chargeIds.length == 1 ? chargeIds.first : null,
-            })
-            .select()
-            .single();
+            });
 
         // Update charge statuses
         for (var chargeId in chargeIds) {
@@ -513,26 +554,103 @@ class PaymentService {
       )).toList();
     }
 
-    final rows = await SupabaseClientHelper.client
+    final client = SupabaseClientHelper.client;
+
+    // Pre-fetch active leases for all residents to get the authoritative monthly_rent & lease dates
+    final activeLeasesRes = await client
+        .from('leases')
+        .select('resident_id, monthly_rent, start_date, end_date')
+        .eq('status', 'active');
+
+    final Map<String, double> activeRentByResident = {};
+    final Map<String, DateTime> leaseStartByResident = {};
+    final Map<String, DateTime> leaseEndByResident = {};
+    for (final l in (activeLeasesRes as List)) {
+      final rId = l['resident_id'] as String?;
+      if (rId != null) {
+        if (l['monthly_rent'] != null) {
+          activeRentByResident[rId] = (l['monthly_rent'] as num).toDouble();
+        }
+        if (l['start_date'] != null) {
+          leaseStartByResident[rId] = DateTime.parse(l['start_date']);
+        }
+        if (l['end_date'] != null) {
+          leaseEndByResident[rId] = DateTime.parse(l['end_date']);
+        }
+      }
+    }
+
+    final rows = await client
         .from('charges')
-        .select('*, lease:leases!charges_lease_id_fkey(start_date,end_date)')
+        .select('*, lease:leases!charges_lease_id_fkey(start_date,end_date,status,monthly_rent)')
         .eq('charge_type', 'rent')
         .order('due_date', ascending: false);
-    return (rows as List).map((c) {
+
+    final rawList = (rows as List).map((c) {
+      final rId = c['resident_id'] as String;
       final lease = c['lease'] as Map<String, dynamic>?;
-      return Charge(
-        id: c['id'], residentId: c['resident_id'], leaseId: c['lease_id'],
-        chargeType: c['charge_type'], title: c['title'],
-        description: c['description'], amount: (c['amount'] as num).toDouble(),
-        dueDate: DateTime.parse(c['due_date']), status: c['status'],
-        createdAt: DateTime.parse(c['created_at']),
-        leaseStartDate: lease == null ? null : DateTime.parse(lease['start_date']),
-        leaseEndDate: lease == null ? null : DateTime.parse(lease['end_date']),
+      final leaseStatus = lease?['status'] as String?;
+      final leaseRent = (lease?['monthly_rent'] as num?)?.toDouble();
+      final resolvedAmount = activeRentByResident[rId] ?? leaseRent ?? (c['amount'] as num).toDouble();
+
+      final sDate = leaseStartByResident[rId] ?? (lease != null && lease['start_date'] != null ? DateTime.parse(lease['start_date']) : null);
+      final eDate = leaseEndByResident[rId] ?? (lease != null && lease['end_date'] != null ? DateTime.parse(lease['end_date']) : null);
+
+      return (
+        charge: Charge(
+          id: c['id'],
+          residentId: rId,
+          leaseId: c['lease_id'] ?? '',
+          chargeType: c['charge_type'],
+          title: c['title'],
+          description: c['description'],
+          amount: resolvedAmount,
+          dueDate: DateTime.parse(c['due_date']),
+          status: c['status'],
+          createdAt: DateTime.parse(c['created_at']),
+          leaseStartDate: sDate,
+          leaseEndDate: eDate,
+        ),
+        isActiveLease: leaseStatus == null || leaseStatus == 'active',
       );
     }).toList();
+
+    // Deduplicate charges per tenant and month:
+    // Only keep active lease charges and avoid duplicate entries for the same month
+    final Map<String, Charge> uniqueMap = {};
+    for (final item in rawList) {
+      if (!item.isActiveLease && item.charge.status != 'paid') continue;
+      final key =
+          '${item.charge.residentId}-${item.charge.dueDate.year}-${item.charge.dueDate.month}';
+      
+      final activeRent = activeRentByResident[item.charge.residentId];
+      final normalizedCharge = activeRent != null
+          ? item.charge.copyWith(amount: activeRent)
+          : item.charge;
+
+      if (!uniqueMap.containsKey(key)) {
+        uniqueMap[key] = normalizedCharge;
+      } else {
+        // If one is paid, keep the paid one (with the correct active rent amount)
+        if (item.charge.status == 'paid') {
+          uniqueMap[key] = normalizedCharge;
+        }
+      }
+    }
+
+    final result = uniqueMap.values.toList()
+      ..sort((a, b) => b.dueDate.compareTo(a.dueDate));
+    return result;
   }
 
   Future<void> confirmRentMonthPaid(Charge charge) async {
+    final monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    final monthTitle = '${monthNames[charge.dueDate.month - 1]} ${charge.dueDate.year} Rent';
+    final rentAmount = charge.amount.toStringAsFixed(2);
+
     if (SupabaseClientHelper.isMockMode) {
       final exists = _mockCharges.any((c) => c.id == charge.id);
       if (!exists) _mockCharges.add(charge);
@@ -540,13 +658,13 @@ class PaymentService {
       return;
     }
     final client = SupabaseClientHelper.client;
-    await client.from('charges').update({'status': 'paid'}).eq('id', charge.id);
+    await client.from('charges').update({'status': 'paid', 'title': monthTitle}).eq('id', charge.id);
     await client.from('payments').update({'status': 'paid'}).eq('charge_id', charge.id).eq('status', 'pending');
     await client.from('notifications').insert({
       'resident_id': charge.residentId,
       'type': 'payment',
       'title': 'Rent payment confirmed',
-      'message': '${charge.title} was marked as paid by the owner.',
+      'message': 'Payment for $monthTitle (\$$rentAmount) was confirmed and approved by the owner.',
       'related_entity_type': 'charge',
       'related_entity_id': charge.id,
     });

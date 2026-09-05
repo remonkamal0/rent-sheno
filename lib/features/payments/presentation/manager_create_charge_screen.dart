@@ -22,12 +22,25 @@ class _ManagerCreateChargeScreenState
     extends ConsumerState<ManagerCreateChargeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  final _amountController = TextEditingController(text: '1500.0');
+  final _amountController = TextEditingController();
   final _descController = TextEditingController();
 
   String? _selectedTenant;
   DateTime _dueDate = DateTime.now().add(const Duration(days: 10));
   bool _isSaving = false;
+
+  Future<void> _updateAmountForTenant(String tenantId) async {
+    try {
+      final lease = await ref
+          .read(residenceServiceProvider)
+          .getActiveLeaseForResident(tenantId);
+      if (lease != null && mounted) {
+        setState(() {
+          _amountController.text = lease.monthlyRent.toStringAsFixed(0);
+        });
+      }
+    } catch (_) {}
+  }
 
   @override
   void dispose() {
@@ -190,7 +203,9 @@ class _ManagerCreateChargeScreenState
                     );
                     if (!containsSelected && tenants.isNotEmpty) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        setState(() => _selectedTenant = tenants.first.id);
+                        final initialId = tenants.first.id;
+                        setState(() => _selectedTenant = initialId);
+                        _updateAmountForTenant(initialId);
                       });
                     }
 
@@ -217,6 +232,7 @@ class _ManagerCreateChargeScreenState
                       onChanged: (val) {
                         if (val != null) {
                           setState(() => _selectedTenant = val);
+                          _updateAmountForTenant(val);
                         }
                       },
                     );

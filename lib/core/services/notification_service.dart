@@ -77,9 +77,9 @@ class NotificationService {
         id: 'notify-2',
         residentId: 'mock-user-456',
         type: 'payment',
-        title: 'Rent Claim Bill: September 2026',
+        title: 'Rent Payment Confirmed: September 2026',
         message:
-            'A rent bill of \$1900.00 has been issued. Due date: 09/01/2026.',
+            'Payment for September 2026 rent (\$500.00) was approved and confirmed.',
         isRead: false,
         createdAt: now.subtract(const Duration(hours: 5, minutes: 40)),
       ),
@@ -211,25 +211,80 @@ class NotificationService {
     } else {
       try {
         final client = SupabaseClientHelper.client;
+        final residentId = _authService.currentUser?.id ?? '';
         final res = await client
             .from('notifications')
             .select()
-            .eq('resident_id', _authService.currentUser?.id ?? '')
+            .eq('resident_id', residentId)
             .order('created_at', ascending: false);
 
-        final list = (res as List).map((n) {
-          return AppNotification(
-            id: n['id'],
-            residentId: n['resident_id'],
-            type: n['type'],
-            title: n['title'],
-            message: n['message'],
-            isRead: n['is_read'],
-            relatedEntityType: n['related_entity_type'],
-            relatedEntityId: n['related_entity_id'],
-            createdAt: DateTime.parse(n['created_at']),
-          );
-        }).toList();
+        final list = (res as List)
+            .map((n) {
+              return AppNotification(
+                id: n['id'],
+                residentId: n['resident_id'],
+                type: n['type'],
+                title: n['title'],
+                message: n['message'],
+                isRead: n['is_read'],
+                relatedEntityType: n['related_entity_type'],
+                relatedEntityId: n['related_entity_id'],
+                createdAt: DateTime.parse(n['created_at']),
+              );
+            })
+            .where((n) {
+              // Hide automatic payment claim notices; only show payments when confirmed/approved by landlord
+              final t = n.title.toLowerCase();
+              if (t.contains('claim') || t.contains('مطالبة')) {
+                return false;
+              }
+              return true;
+            })
+            .toList();
+
+        // Also ensure that all confirmed paid charges have a notification present
+        try {
+          final paidChargesRes = await client
+              .from('charges')
+              .select('id, resident_id, title, amount, due_date, status, created_at, lease:leases!charges_lease_id_fkey(monthly_rent)')
+              .eq('resident_id', residentId)
+              .eq('status', 'paid');
+
+          const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+
+          for (final c in (paidChargesRes as List)) {
+            final chargeId = c['id']?.toString() ?? '';
+            final dueDate = DateTime.parse(c['due_date']);
+            final monthTitle = '${monthNames[dueDate.month - 1]} ${dueDate.year} Rent';
+
+            final alreadyPresent = list.any((n) =>
+                n.relatedEntityId == chargeId ||
+                (n.type == 'payment' && (n.message.contains(monthTitle) || n.message.contains(c['title'] ?? ''))));
+
+            if (!alreadyPresent) {
+              final lease = c['lease'] as Map<String, dynamic>?;
+              final leaseRent = (lease?['monthly_rent'] as num?)?.toDouble();
+              final resolvedAmount = leaseRent ?? (c['amount'] as num).toDouble();
+
+              list.add(AppNotification(
+                id: 'paid-charge-$chargeId',
+                residentId: residentId,
+                type: 'payment',
+                title: 'Rent payment confirmed',
+                message: 'Payment for $monthTitle (\$${resolvedAmount.toStringAsFixed(2)}) was confirmed and approved by the owner.',
+                isRead: false,
+                relatedEntityType: 'charge',
+                relatedEntityId: chargeId,
+                createdAt: DateTime.parse(c['created_at']),
+              ));
+            }
+          }
+        } catch (_) {}
+
+        list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
         _notificationsStreamController.add(list);
         return list;
@@ -251,19 +306,28 @@ class NotificationService {
             .select()
             .order('created_at', ascending: false);
 
-        final list = (res as List).map((n) {
-          return AppNotification(
-            id: n['id'],
-            residentId: n['resident_id'],
-            type: n['type'],
-            title: n['title'],
-            message: n['message'],
-            isRead: n['is_read'],
-            relatedEntityType: n['related_entity_type'],
-            relatedEntityId: n['related_entity_id'],
-            createdAt: DateTime.parse(n['created_at']),
-          );
-        }).toList();
+        final list = (res as List)
+            .map((n) {
+              return AppNotification(
+                id: n['id'],
+                residentId: n['resident_id'],
+                type: n['type'],
+                title: n['title'],
+                message: n['message'],
+                isRead: n['is_read'],
+                relatedEntityType: n['related_entity_type'],
+                relatedEntityId: n['related_entity_id'],
+                createdAt: DateTime.parse(n['created_at']),
+              );
+            })
+            .where((n) {
+              final t = n.title.toLowerCase();
+              if (t.contains('claim') || t.contains('مطالبة')) {
+                return false;
+              }
+              return true;
+            })
+            .toList();
 
         return list;
       } catch (e) {
