@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/providers.dart';
 import '../../features/authentication/presentation/login_screen.dart';
+import '../../features/authentication/presentation/splash_screen.dart';
 import '../../features/authentication/presentation/signup_screen.dart';
 import '../../features/authentication/presentation/pending_approval_screen.dart';
 import '../../features/authentication/presentation/inactive_resident_screen.dart';
@@ -60,9 +61,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
+    initialLocation: '/splash',
     refreshListenable: refresh,
     redirect: (context, state) {
+      if (state.matchedLocation == '/splash') {
+        return null;
+      }
+
       final user = authService.currentUser;
       final isLoggedIn = user != null;
       final isAuthRoute =
@@ -111,6 +116,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       // Authentication Routes
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
