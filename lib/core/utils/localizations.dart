@@ -1291,6 +1291,11 @@ class AppLocalizations {
           'تم إرسال الرسالة إلى {} شقة بنجاح!',
       'REF: {}': 'المرجع: {}',
       'Paid via: {}': 'تم الدفع عبر: {}',
+      'Add Unit': 'إضافة شقة',
+      'Add New Unit': 'إضافة شقة جديدة',
+      'Add New Apartment': 'إضافة شقة جديدة',
+      'Add Unit to Building': 'إضافة شقة إلى المبنى',
+      'Apartment Number': 'رقم الشقة',
     },
   };
 }

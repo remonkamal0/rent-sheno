@@ -13,6 +13,7 @@ class AppTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final bool readOnly;
   final VoidCallback? onTap;
+  final ValueChanged<String>? onChanged;
 
   const AppTextField({
     required this.label,
@@ -25,6 +26,7 @@ class AppTextField extends StatefulWidget {
     this.suffixIcon,
     this.readOnly = false,
     this.onTap,
+    this.onChanged,
     super.key,
   });
 
@@ -56,6 +58,7 @@ class _AppTextFieldState extends State<AppTextField> {
           maxLines: widget.isPassword ? 1 : widget.maxLines,
           readOnly: widget.readOnly,
           onTap: widget.onTap,
+          onChanged: widget.onChanged,
           style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.primaryText,
           ),

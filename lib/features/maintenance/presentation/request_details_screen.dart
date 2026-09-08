@@ -124,7 +124,7 @@ class RequestDetailsScreen extends ConsumerWidget {
                           title: AppLocalizations.of(
                             context,
                           ).text('Submitted Date'),
-                          value: DateFormatter.formatShortDate(
+                          value: DateFormatter.formatDateTime(
                             request.createdAt,
                           ),
                         ),
@@ -173,7 +173,7 @@ class RequestDetailsScreen extends ConsumerWidget {
                                   icon: LucideIcons.calendarClock,
                                   title: 'Date & Time',
                                   value:
-                                      '${DateFormatter.formatShortDate(request.scheduledFor!)} ${TimeOfDay.fromDateTime(request.scheduledFor!).format(context)}',
+                                      '${DateFormatter.formatShortDate(request.scheduledFor!)} ${TimeOfDay(hour: request.scheduledFor!.hour, minute: request.scheduledFor!.minute).format(context)}',
                                 ),
                                 const SizedBox(height: 10),
                                 SizedBox(

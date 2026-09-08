@@ -472,6 +472,71 @@ class ResidenceService {
     }
   }
 
+  Future<Unit> addUnit({
+    required String propertyId,
+    required String unitNumber,
+    required int floor,
+    int bedrooms = 1,
+    int bathrooms = 1,
+    String status = 'vacant',
+  }) async {
+    if (bedrooms < 1 || bathrooms < 1) {
+      throw ArgumentError('Bedrooms and bathrooms must be at least 1.');
+    }
+    final trimmedUnit = unitNumber.trim();
+    if (trimmedUnit.isEmpty) {
+      throw ArgumentError('Apartment number cannot be empty.');
+    }
+
+    if (SupabaseClientHelper.isMockMode) {
+      final exists = _mockUnits.any((u) =>
+          u.propertyId == propertyId &&
+          u.unitNumber.toLowerCase() == trimmedUnit.toLowerCase());
+      if (exists) {
+        throw StateError('Unit $trimmedUnit already exists in this building.');
+      }
+      final newUnit = Unit(
+        id: 'unit-${DateTime.now().millisecondsSinceEpoch}',
+        propertyId: propertyId,
+        unitNumber: trimmedUnit,
+        floor: floor,
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        status: status,
+      );
+      _mockUnits.add(newUnit);
+      return newUnit;
+    } else {
+      try {
+        final client = SupabaseClientHelper.client;
+        final res = await client
+            .from('units')
+            .insert({
+              'property_id': propertyId,
+              'unit_number': trimmedUnit,
+              'floor': floor,
+              'bedrooms': bedrooms,
+              'bathrooms': bathrooms,
+              'status': status,
+            })
+            .select()
+            .single();
+
+        return Unit(
+          id: res['id'],
+          propertyId: res['property_id'],
+          unitNumber: res['unit_number'],
+          floor: res['floor'],
+          bedrooms: res['bedrooms'] ?? bedrooms,
+          bathrooms: res['bathrooms'] ?? bathrooms,
+          status: res['status'],
+        );
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
+
   Future<void> updateUnitLayout({
     required String unitId,
     required int bedrooms,

@@ -264,18 +264,18 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                         const SizedBox(height: 12),
                         _buildInfoRow(
                           AppLocalizations.of(context).text('Submitted Date'),
-                          DateFormatter.formatRelative(req.createdAt),
+                          DateFormatter.formatDateTime(req.createdAt),
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow(
                           AppLocalizations.of(context).text('Preferred Visit'),
-                          DateFormatter.formatRelative(req.preferredDate),
+                          DateFormatter.formatShortDate(req.preferredDate),
                         ),
                         if (req.scheduledFor != null) ...[
                           const SizedBox(height: 12),
                           _buildInfoRow(
                             'Scheduled Visit',
-                            '${DateFormatter.formatShortDate(req.scheduledFor!)} ${TimeOfDay.fromDateTime(req.scheduledFor!).format(context)}',
+                            '${DateFormatter.formatShortDate(req.scheduledFor!)} ${TimeOfDay(hour: req.scheduledFor!.hour, minute: req.scheduledFor!.minute).format(context)}',
                           ),
                           const SizedBox(height: 12),
                           _buildInfoRow(

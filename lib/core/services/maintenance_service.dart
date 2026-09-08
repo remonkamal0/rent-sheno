@@ -188,6 +188,25 @@ class MaintenanceService {
     ];
   }
 
+  static DateTime? _parseScheduledFor(dynamic val) {
+    if (val == null) return null;
+    final str = val.toString().trim();
+    if (str.isEmpty) return null;
+
+    final match =
+        RegExp(r'(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})').firstMatch(str);
+    if (match != null) {
+      return DateTime(
+        int.parse(match.group(1)!),
+        int.parse(match.group(2)!),
+        int.parse(match.group(3)!),
+        int.parse(match.group(4)!),
+        int.parse(match.group(5)!),
+      );
+    }
+    return DateTime.tryParse(str);
+  }
+
   Future<List<MaintenanceRequest>> getRequests() async {
     if (SupabaseClientHelper.isMockMode) {
       await Future.delayed(const Duration(milliseconds: 600));
@@ -224,17 +243,15 @@ class MaintenanceService {
             category: r['category'],
             title: r['title'],
             description: r['description'],
-            preferredDate: DateTime.parse(r['preferred_date']),
+            preferredDate: DateTime.parse(r['preferred_date']).toLocal(),
             status: r['status'],
             assignedTo: r['assigned_to'],
-            createdAt: DateTime.parse(r['created_at']),
-            updatedAt: DateTime.parse(r['updated_at']),
+            createdAt: DateTime.parse(r['created_at']).toLocal(),
+            updatedAt: DateTime.parse(r['updated_at']).toLocal(),
             resolvedAt: r['resolved_at'] != null
-                ? DateTime.parse(r['resolved_at'])
+                ? DateTime.parse(r['resolved_at']).toLocal()
                 : null,
-            scheduledFor: r['scheduled_for'] != null
-                ? DateTime.parse(r['scheduled_for'])
-                : null,
+            scheduledFor: _parseScheduledFor(r['scheduled_for']),
             visitPerson: r['visit_person'],
             attachmentUrls: attachments,
           );
@@ -308,6 +325,8 @@ class MaintenanceService {
               'description': description,
               'preferred_date': preferredDate.toIso8601String().split('T')[0],
               'status': 'pending',
+              'created_at': DateTime.now().toUtc().toIso8601String(),
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
             })
             .select()
             .single();
@@ -380,17 +399,15 @@ class MaintenanceService {
             category: r['category'],
             title: r['title'],
             description: r['description'],
-            preferredDate: DateTime.parse(r['preferred_date']),
+            preferredDate: DateTime.parse(r['preferred_date']).toLocal(),
             status: r['status'],
             assignedTo: r['assigned_to'],
-            createdAt: DateTime.parse(r['created_at']),
-            updatedAt: DateTime.parse(r['updated_at']),
+            createdAt: DateTime.parse(r['created_at']).toLocal(),
+            updatedAt: DateTime.parse(r['updated_at']).toLocal(),
             resolvedAt: r['resolved_at'] != null
-                ? DateTime.parse(r['resolved_at'])
+                ? DateTime.parse(r['resolved_at']).toLocal()
                 : null,
-            scheduledFor: r['scheduled_for'] != null
-                ? DateTime.parse(r['scheduled_for'])
-                : null,
+            scheduledFor: _parseScheduledFor(r['scheduled_for']),
             visitPerson: r['visit_person'],
             attachmentUrls: attachments,
           );
@@ -450,11 +467,19 @@ class MaintenanceService {
       );
       return;
     }
+
+    // Save exact wall-clock date and time (without UTC shifting):
+    final isoString = '${scheduledFor.year.toString().padLeft(4, '0')}-'
+        '${scheduledFor.month.toString().padLeft(2, '0')}-'
+        '${scheduledFor.day.toString().padLeft(2, '0')}T'
+        '${scheduledFor.hour.toString().padLeft(2, '0')}:'
+        '${scheduledFor.minute.toString().padLeft(2, '0')}:00';
+
     await SupabaseClientHelper.client
         .from('maintenance_requests')
         .update({
           'status': 'scheduled',
-          'scheduled_for': scheduledFor.toUtc().toIso8601String(),
+          'scheduled_for': isoString,
           'visit_person': visitPerson.trim(),
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         })

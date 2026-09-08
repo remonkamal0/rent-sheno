@@ -175,15 +175,190 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // 3. Upcoming Balance Card
+            // 3. Upcoming / Current Balance Card
             chargesState.when(
               data: (charges) {
-                // Filter outstanding charges
+                final now = DateTime.now();
+                final today = DateTime(now.year, now.month, now.day);
+
+                // Outstanding charges (not paid)
                 final outstanding = charges
                     .where((c) => c.status != 'paid')
-                    .toList();
-                if (outstanding.isEmpty) {
-                  return Card(
+                    .toList()
+                  ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
+                // 1. Unpaid charges due in current month or prior
+                final currentAndPastUnpaid = outstanding.where((c) {
+                  final due = DateTime(c.dueDate.year, c.dueDate.month, c.dueDate.day);
+                  final isPriorOrCurrentMonth = c.dueDate.year < now.year ||
+                      (c.dueDate.year == now.year && c.dueDate.month <= now.month);
+                  return isPriorOrCurrentMonth || due.isBefore(today) || due.isAtSameMomentAs(today);
+                }).toList();
+
+                // 2. Future upcoming charges (next month and beyond)
+                final futureCharges = outstanding.where((c) {
+                  return !currentAndPastUnpaid.contains(c);
+                }).toList();
+
+                final nextUpcomingCharge = futureCharges.isNotEmpty ? futureCharges.first : null;
+
+                // Case A: Tenant owes money for current or past months
+                if (currentAndPastUnpaid.isNotEmpty) {
+                  final activeCharge = currentAndPastUnpaid.first;
+                  final totalDue = currentAndPastUnpaid.fold<double>(
+                    0.0,
+                    (sum, item) => sum + item.totalAmount,
+                  );
+                  final isPastDue = currentAndPastUnpaid.any((c) => c.calculatedStatus == 'past_due');
+                  final daysText = DateFormatter.formatOverdueDate(
+                    activeCharge.dueDate,
+                    localizations,
+                  );
+
+                  return GestureDetector(
+                    onTap: () => context.go('/payments'),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.lightBlue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    LucideIcons.creditCard,
+                                    color: AppColors.primaryNavy,
+                                    size: 24,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isPastDue ? AppColors.errorBg : AppColors.warningBg,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    daysText.toUpperCase(),
+                                    style: AppTextStyles.label.copyWith(
+                                      color: isPastDue ? AppColors.error : AppColors.warning,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              isPastDue
+                                  ? (localizations.locale.languageCode == 'ar' ? 'رصيد متأخر' : 'Past Due Balance')
+                                  : localizations.translate('current_balance'),
+                              style: AppTextStyles.bodyMedium,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '\$${totalDue.toStringAsFixed(2)}',
+                              style: AppTextStyles.display.copyWith(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: isPastDue ? AppColors.error : AppColors.primaryNavy,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Case B: Current month is paid!
+                // Only show upcoming month's balance on or after the 27th of the month.
+                // Before the 27th, show Current Balance: $0.00 (All caught up).
+                final showUpcoming = now.day >= 27 && nextUpcomingCharge != null;
+
+                if (showUpcoming) {
+                  final daysText = DateFormatter.formatOverdueDate(
+                    nextUpcomingCharge.dueDate,
+                    localizations,
+                  );
+
+                  return GestureDetector(
+                    onTap: () => context.go('/payments'),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.lightBlue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    LucideIcons.creditCard,
+                                    color: AppColors.primaryNavy,
+                                    size: 24,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.warningBg,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    daysText.toUpperCase(),
+                                    style: AppTextStyles.label.copyWith(
+                                      color: AppColors.warning,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              localizations.translate('upcoming_balance'),
+                              style: AppTextStyles.bodyMedium,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '\$${nextUpcomingCharge.totalAmount.toStringAsFixed(2)}',
+                              style: AppTextStyles.display.copyWith(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Case C: Current month paid & before 27th of the month -> $0.00 Current Balance
+                return GestureDetector(
+                  onTap: () => context.go('/payments'),
+                  child: Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
@@ -216,92 +391,19 @@ class HomeScreen extends ConsumerWidget {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                // Sum amounts
-                final totalAmount = outstanding.fold<double>(
-                  0.0,
-                  (sum, element) => sum + element.amount,
-                );
-
-                // Find closest due date
-                outstanding.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-                final nearestCharge = outstanding.first;
-                final daysText = DateFormatter.formatOverdueDate(
-                  nearestCharge.dueDate,
-                  localizations,
-                );
-
-                return GestureDetector(
-                  onTap: () => context.go('/payments'),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.lightBlue,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  LucideIcons.creditCard,
-                                  color: AppColors.primaryNavy,
-                                  size: 24,
-                                ),
-                              ),
-                              // Due Badge
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      nearestCharge.calculatedStatus ==
-                                          'past_due'
-                                      ? AppColors.errorBg
-                                      : AppColors.warningBg,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  daysText.toUpperCase(),
-                                  style: AppTextStyles.label.copyWith(
-                                    color:
-                                        nearestCharge.calculatedStatus ==
-                                            'past_due'
-                                        ? AppColors.error
-                                        : AppColors.warning,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                                if (nextUpcomingCharge != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    localizations.locale.languageCode == 'ar'
+                                        ? 'الإيجار القادم: \$${nextUpcomingCharge.totalAmount.toStringAsFixed(2)} مستحق في ${DateFormatter.formatShortDate(nextUpcomingCharge.dueDate)}'
+                                        : 'Next: \$${nextUpcomingCharge.totalAmount.toStringAsFixed(2)} due on ${DateFormatter.formatShortDate(nextUpcomingCharge.dueDate)}',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.secondaryText,
+                                      fontSize: 11,
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            localizations.translate('upcoming_balance'),
-                            style: AppTextStyles.bodyMedium,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '\$${totalAmount.toStringAsFixed(2)}',
-                            style: AppTextStyles.display.copyWith(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
+                                ],
+                              ],
                             ),
                           ),
                         ],

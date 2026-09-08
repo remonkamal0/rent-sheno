@@ -133,12 +133,26 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '\$${charge.amount.toStringAsFixed(2)}',
+                                      '\$${charge.totalAmount.toStringAsFixed(2)}',
                                       style: AppTextStyles.bodyLarge.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primaryNavy,
                                       ),
                                     ),
+                                    if (charge.lateFee > 0)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 2),
+                                        child: Text(
+                                          localizations.locale.languageCode == 'ar'
+                                              ? '(يشمل \$${charge.lateFee.toStringAsFixed(2)} غرامة تأخير)'
+                                              : '(Incl. \$${charge.lateFee.toStringAsFixed(2)} late fee)',
+                                          style: AppTextStyles.bodySmall.copyWith(
+                                            fontSize: 10,
+                                            color: AppColors.error,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
                                     const SizedBox(height: 6),
                                     StatusBadge(
                                       status: charge.status == 'paid'

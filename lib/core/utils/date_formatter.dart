@@ -5,67 +5,69 @@ class DateFormatter {
   DateFormatter._();
 
   static String formatShortDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy').format(date);
+    return DateFormat('MMM dd, yyyy').format(date.toLocal());
   }
 
   static String formatMonthYear(DateTime date) {
-    return DateFormat('MMMM yyyy').format(date);
+    return DateFormat('MMMM yyyy').format(date.toLocal());
   }
 
   static String formatDateTime(DateTime date) {
-    return DateFormat('MMM dd, yyyy hh:mm a').format(date);
+    return DateFormat('MMM dd, yyyy h:mm a').format(date.toLocal());
   }
 
   static String formatTime(DateTime date) {
-    return DateFormat('h:mm a').format(date);
+    return DateFormat('h:mm a').format(date.toLocal());
   }
 
   static String formatRelative(
     DateTime date, [
     AppLocalizations? localizations,
   ]) {
+    final localDate = date.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final tomorrow = today.add(const Duration(days: 1));
 
-    final compareDate = DateTime(date.year, date.month, date.day);
+    final compareDate = DateTime(localDate.year, localDate.month, localDate.day);
 
     if (compareDate == today) {
       return localizations != null
-          ? '${localizations.translate('today')}, ${formatTime(date)}'
-          : 'Today, ${formatTime(date)}';
+          ? '${localizations.translate('today')}, ${formatTime(localDate)}'
+          : 'Today, ${formatTime(localDate)}';
     } else if (compareDate == yesterday) {
       return localizations != null
-          ? '${localizations.translate('yesterday')}, ${formatTime(date)}'
-          : 'Yesterday, ${formatTime(date)}';
+          ? '${localizations.translate('yesterday')}, ${formatTime(localDate)}'
+          : 'Yesterday, ${formatTime(localDate)}';
     } else if (compareDate == tomorrow) {
       return localizations != null
-          ? '${localizations.translate('tomorrow')}, ${formatTime(date)}'
-          : 'Tomorrow, ${formatTime(date)}';
+          ? '${localizations.translate('tomorrow')}, ${formatTime(localDate)}'
+          : 'Tomorrow, ${formatTime(localDate)}';
     }
 
-    final difference = now.difference(date).inDays;
-    if (difference > 0 && difference < 7) {
+    final diffDays = today.difference(compareDate).inDays;
+    if (diffDays > 0 && diffDays < 7) {
       return localizations != null
-          ? localizations.translate('days_ago', difference.toString())
-          : '$difference days ago';
-    } else if (difference < 0 && difference.abs() < 7) {
+          ? '${localizations.translate('days_ago', diffDays.toString())}, ${formatTime(localDate)}'
+          : '$diffDays days ago, ${formatTime(localDate)}';
+    } else if (diffDays < 0 && diffDays.abs() < 7) {
       return localizations != null
-          ? localizations.translate('in_days', difference.abs().toString())
-          : 'In ${difference.abs()} days';
+          ? '${localizations.translate('in_days', diffDays.abs().toString())}, ${formatTime(localDate)}'
+          : 'In ${diffDays.abs()} days, ${formatTime(localDate)}';
     }
 
-    return formatShortDate(date);
+    return formatDateTime(localDate);
   }
 
   static String formatOverdueDate(
     DateTime dueDate, [
     AppLocalizations? localizations,
   ]) {
+    final localDue = dueDate.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final due = DateTime(dueDate.year, dueDate.month, dueDate.day);
+    final due = DateTime(localDue.year, localDue.month, localDue.day);
 
     if (due.isBefore(today)) {
       final difference = today.difference(due).inDays;
@@ -85,9 +87,10 @@ class DateFormatter {
   }
 
   static String formatExpiryDate(DateTime expiryDate) {
+    final localExpiry = expiryDate.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final expiry = DateTime(expiryDate.year, expiryDate.month, expiryDate.day);
+    final expiry = DateTime(localExpiry.year, localExpiry.month, localExpiry.day);
 
     if (expiry.isBefore(today)) {
       return 'Expired';

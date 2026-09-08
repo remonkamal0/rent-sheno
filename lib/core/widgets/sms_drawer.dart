@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../services/providers.dart';
-import '../utils/date_formatter.dart';
 import '../utils/localizations.dart';
 
 class SmsDrawer extends ConsumerWidget {
@@ -22,12 +21,6 @@ class SmsDrawer extends ConsumerWidget {
     final name = user?.fullName ?? localizations.translate('profile');
     final unitText = residence != null
         ? localizations.translate('unit', residence.unit.unitNumber)
-        : '';
-    final leaseExpiryText = residence != null
-        ? localizations.translate(
-            'lease_expires',
-            DateFormatter.formatShortDate(residence.lease.endDate),
-          )
         : '';
 
     return Drawer(
@@ -100,16 +93,6 @@ class SmsDrawer extends ConsumerWidget {
                                 unitText,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.secondaryText,
-                                ),
-                              ),
-                            ],
-                            if (leaseExpiryText.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                leaseExpiryText,
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.primaryNavy,
-                                  fontSize: 10,
                                 ),
                               ),
                             ],

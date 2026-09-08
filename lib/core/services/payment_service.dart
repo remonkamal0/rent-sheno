@@ -10,6 +10,7 @@ class Charge {
   final String title;
   final String? description;
   final double amount;
+  final double lateFee;
   final DateTime dueDate;
   final String status; // paid, upcoming, due, past_due
   final DateTime createdAt;
@@ -24,12 +25,15 @@ class Charge {
     required this.title,
     this.description,
     required this.amount,
+    this.lateFee = 0.0,
     required this.dueDate,
     required this.status,
     required this.createdAt,
     this.leaseStartDate,
     this.leaseEndDate,
   });
+
+  double get totalAmount => amount + lateFee;
 
   int get daysRemaining {
     final now = DateTime.now();
@@ -57,6 +61,7 @@ class Charge {
   Charge copyWith({
     String? status,
     double? amount,
+    double? lateFee,
     String? title,
     String? description,
     DateTime? dueDate,
@@ -69,6 +74,7 @@ class Charge {
       title: title ?? this.title,
       description: description ?? this.description,
       amount: amount ?? this.amount,
+      lateFee: lateFee ?? this.lateFee,
       dueDate: dueDate ?? this.dueDate,
       status: status ?? this.status,
       createdAt: createdAt,
@@ -208,6 +214,7 @@ class PaymentService {
           final resolvedAmount = c['charge_type'] == 'rent'
               ? (activeRent ?? leaseRent ?? (c['amount'] as num).toDouble())
               : (c['amount'] as num).toDouble();
+          final lateFee = (c['late_fee'] as num?)?.toDouble() ?? 0.0;
 
           return (
             charge: Charge(
@@ -218,6 +225,7 @@ class PaymentService {
               title: c['title'],
               description: c['description'],
               amount: resolvedAmount,
+              lateFee: lateFee,
               dueDate: DateTime.parse(c['due_date']),
               status: c['status'],
               createdAt: DateTime.parse(c['created_at']),
@@ -486,23 +494,64 @@ class PaymentService {
         final client = SupabaseClientHelper.client;
         final res = await client
             .from('charges')
-            .select()
-            .eq('resident_id', residentId);
+            .select('*, lease:leases!charges_lease_id_fkey(status,monthly_rent)')
+            .eq('resident_id', residentId)
+            .order('due_date', ascending: true);
 
-        return (res as List).map((c) {
-          return Charge(
-            id: c['id'],
-            residentId: c['resident_id'],
-            leaseId: c['lease_id'],
-            chargeType: c['charge_type'],
-            title: c['title'],
-            description: c['description'],
-            amount: (c['amount'] as num).toDouble(),
-            dueDate: DateTime.parse(c['due_date']),
-            status: c['status'],
-            createdAt: DateTime.parse(c['created_at']),
+        final activeLeaseRes = await client
+            .from('leases')
+            .select('monthly_rent, start_date, end_date')
+            .eq('resident_id', residentId)
+            .eq('status', 'active')
+            .maybeSingle();
+        final activeRent = (activeLeaseRes?['monthly_rent'] as num?)?.toDouble();
+
+        final rawList = (res as List).map((c) {
+          final lease = c['lease'] as Map<String, dynamic>?;
+          final leaseStatus = lease?['status'] as String?;
+          final leaseRent = (lease?['monthly_rent'] as num?)?.toDouble();
+          final resolvedAmount = c['charge_type'] == 'rent'
+              ? (activeRent ?? leaseRent ?? (c['amount'] as num).toDouble())
+              : (c['amount'] as num).toDouble();
+          final lateFee = (c['late_fee'] as num?)?.toDouble() ?? 0.0;
+
+          return (
+            charge: Charge(
+              id: c['id'],
+              residentId: c['resident_id'],
+              leaseId: c['lease_id'] ?? '',
+              chargeType: c['charge_type'],
+              title: c['title'],
+              description: c['description'],
+              amount: resolvedAmount,
+              lateFee: lateFee,
+              dueDate: DateTime.parse(c['due_date']),
+              status: c['status'],
+              createdAt: DateTime.parse(c['created_at']),
+            ),
+            isActiveLease: leaseStatus == null || leaseStatus == 'active',
           );
         }).toList();
+
+        final Map<String, Charge> uniqueMap = {};
+        for (final item in rawList) {
+          if (!item.isActiveLease && item.charge.status != 'paid') continue;
+          final key =
+              '${item.charge.chargeType}-${item.charge.dueDate.year}-${item.charge.dueDate.month}';
+
+          if (!uniqueMap.containsKey(key)) {
+            uniqueMap[key] = item.charge;
+          } else {
+            // If one is paid, ALWAYS keep the paid one
+            if (item.charge.status == 'paid') {
+              uniqueMap[key] = item.charge;
+            }
+          }
+        }
+
+        final result = uniqueMap.values.toList()
+          ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+        return result;
       } catch (e) {
         throw Exception(e.toString());
       }
@@ -592,6 +641,7 @@ class PaymentService {
       final leaseStatus = lease?['status'] as String?;
       final leaseRent = (lease?['monthly_rent'] as num?)?.toDouble();
       final resolvedAmount = activeRentByResident[rId] ?? leaseRent ?? (c['amount'] as num).toDouble();
+      final lateFee = (c['late_fee'] as num?)?.toDouble() ?? 0.0;
 
       final sDate = leaseStartByResident[rId] ?? (lease != null && lease['start_date'] != null ? DateTime.parse(lease['start_date']) : null);
       final eDate = leaseEndByResident[rId] ?? (lease != null && lease['end_date'] != null ? DateTime.parse(lease['end_date']) : null);
@@ -605,6 +655,7 @@ class PaymentService {
           title: c['title'],
           description: c['description'],
           amount: resolvedAmount,
+          lateFee: lateFee,
           dueDate: DateTime.parse(c['due_date']),
           status: c['status'],
           createdAt: DateTime.parse(c['created_at']),
@@ -625,13 +676,13 @@ class PaymentService {
       
       final activeRent = activeRentByResident[item.charge.residentId];
       final normalizedCharge = activeRent != null
-          ? item.charge.copyWith(amount: activeRent)
+          ? item.charge.copyWith(amount: activeRent, lateFee: item.charge.lateFee)
           : item.charge;
 
       if (!uniqueMap.containsKey(key)) {
         uniqueMap[key] = normalizedCharge;
       } else {
-        // If one is paid, keep the paid one (with the correct active rent amount)
+        // If one is paid, keep the paid one (with the correct active rent amount and late fee)
         if (item.charge.status == 'paid') {
           uniqueMap[key] = normalizedCharge;
         }
@@ -668,6 +719,73 @@ class PaymentService {
       'related_entity_type': 'charge',
       'related_entity_id': charge.id,
     });
+  }
+
+  Future<void> cancelRentMonthPaid(Charge charge) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final due = DateTime(charge.dueDate.year, charge.dueDate.month, charge.dueDate.day);
+    final revertedStatus = due.isBefore(today) ? 'past_due' : 'upcoming';
+
+    if (SupabaseClientHelper.isMockMode) {
+      _mockCharges = _mockCharges.map((c) {
+        if (c.id == charge.id) {
+          return c.copyWith(status: revertedStatus);
+        }
+        return c;
+      }).toList();
+      _mockPayments.removeWhere((p) => p.chargeId == charge.id);
+      return;
+    }
+
+    final client = SupabaseClientHelper.client;
+    await client.from('charges').update({'status': revertedStatus}).eq('id', charge.id);
+    await client.from('payments').update({'status': 'refunded'}).eq('charge_id', charge.id);
+    try {
+      await client
+          .from('notifications')
+          .delete()
+          .eq('related_entity_id', charge.id)
+          .eq('related_entity_type', 'charge');
+    } catch (_) {}
+  }
+
+  Future<void> updateLateFee(
+    String chargeId,
+    double lateFee, {
+    String? residentId,
+    String? monthTitle,
+    double? baseAmount,
+    bool notifyResident = true,
+  }) async {
+    final fee = lateFee < 0 ? 0.0 : lateFee;
+    if (SupabaseClientHelper.isMockMode) {
+      _mockCharges = _mockCharges.map((c) {
+        if (c.id == chargeId) {
+          return c.copyWith(lateFee: fee);
+        }
+        return c;
+      }).toList();
+      return;
+    }
+    final client = SupabaseClientHelper.client;
+    await client.from('charges').update({'late_fee': fee}).eq('id', chargeId);
+
+    if (fee > 0 && notifyResident && residentId != null && residentId.isNotEmpty) {
+      final total = (baseAmount ?? 0) + fee;
+      final titleStr = monthTitle != null && monthTitle.isNotEmpty ? monthTitle : 'Rent';
+      final totalStr = total > fee ? ' New total due: \$${total.toStringAsFixed(2)}.' : '';
+      try {
+        await client.from('notifications').insert({
+          'resident_id': residentId,
+          'type': 'payment',
+          'title': 'Late payment fee notice',
+          'message': 'A late fee of \$${fee.toStringAsFixed(2)} was applied for $titleStr.$totalStr',
+          'related_entity_type': 'charge',
+          'related_entity_id': chargeId,
+        });
+      } catch (_) {}
+    }
   }
 
   Future<void> updateChargeStatus(String chargeId, String status) async {
@@ -749,5 +867,23 @@ class PaymentService {
       'related_entity_type': 'payment',
       'related_entity_id': payment.id,
     });
+  }
+
+  Future<void> extendLease({
+    required String leaseId,
+    required DateTime newEndDate,
+    double? newMonthlyRent,
+  }) async {
+    if (SupabaseClientHelper.isMockMode) {
+      return;
+    }
+    final client = SupabaseClientHelper.client;
+    final updateData = <String, dynamic>{
+      'end_date': newEndDate.toIso8601String().split('T')[0],
+    };
+    if (newMonthlyRent != null && newMonthlyRent > 0) {
+      updateData['monthly_rent'] = newMonthlyRent;
+    }
+    await client.from('leases').update(updateData).eq('id', leaseId);
   }
 }

@@ -393,13 +393,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               residence.lease.startDate,
                             ),
                           ),
-                          const Divider(height: 24),
-                          _buildProfileRow(
-                            'Lease End Date',
-                            DateFormatter.formatShortDate(
-                              residence.lease.endDate,
-                            ),
-                          ),
                         ],
                       ),
                     ),
