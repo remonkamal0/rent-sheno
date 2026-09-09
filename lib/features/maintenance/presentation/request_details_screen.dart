@@ -10,6 +10,7 @@ import '../../../core/services/maintenance_service.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/app_image_viewer_dialog.dart';
 
 class RequestDetailsScreen extends ConsumerWidget {
   final String requestId;
@@ -231,29 +232,57 @@ class RequestDetailsScreen extends ConsumerWidget {
                               scrollDirection: Axis.horizontal,
                               itemCount: request.attachmentUrls.length,
                               itemBuilder: (context, index) {
+                                final img = request.attachmentUrls[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    _showFullScreenImage(
+                                    AppImageViewerDialog.show(
                                       context,
-                                      request.attachmentUrls[index],
+                                      imageUrls: request.attachmentUrls,
+                                      initialIndex: index,
                                     );
                                   },
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    margin: const EdgeInsets.only(right: 12),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: AppColors.border,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          request.attachmentUrls[index],
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        margin: const EdgeInsets.only(right: 12),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: AppColors.border.withValues(alpha: 0.3),
+                                          border: Border.all(color: AppColors.border),
                                         ),
-                                        fit: BoxFit.cover,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.network(
+                                            img,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (c, e, s) => const Center(
+                                              child: Icon(
+                                                LucideIcons.image,
+                                                color: AppColors.secondaryText,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Positioned(
+                                        right: 16,
+                                        bottom: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: const Icon(
+                                            LucideIcons.maximize2,
+                                            color: Colors.white,
+                                            size: 11,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },
@@ -482,30 +511,6 @@ class RequestDetailsScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showFullScreenImage(BuildContext context, String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.zero,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            InteractiveViewer(child: Image.network(imageUrl)),
-            Positioned(
-              top: 40,
-              right: 20,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

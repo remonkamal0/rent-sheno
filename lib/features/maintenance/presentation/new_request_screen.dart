@@ -11,6 +11,7 @@ import '../../../core/services/providers.dart';
 import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/app_image_viewer_dialog.dart';
 
 class NewRequestScreen extends ConsumerStatefulWidget {
   const NewRequestScreen({super.key});
@@ -384,16 +385,27 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                             return Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                Container(
-                                  width: 72,
-                                  height: 72,
-                                  margin: const EdgeInsets.only(right: 12),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: AppColors.border),
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: FileImage(_attachedPhotos[index]),
-                                      fit: BoxFit.cover,
+                                GestureDetector(
+                                  onTap: () {
+                                    AppImageViewerDialog.show(
+                                      context,
+                                      imageUrls: _attachedPhotos
+                                          .map((f) => f.path)
+                                          .toList(),
+                                      initialIndex: index,
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 72,
+                                    height: 72,
+                                    margin: const EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: AppColors.border),
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: FileImage(_attachedPhotos[index]),
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
                                 ),

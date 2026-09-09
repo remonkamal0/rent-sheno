@@ -11,6 +11,7 @@ import '../../../core/utils/localizations.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../core/widgets/sms_back_button.dart';
 import '../../../core/widgets/app_buttons.dart';
+import '../../../core/widgets/app_image_viewer_dialog.dart';
 
 class ManagerDetailScreen extends ConsumerStatefulWidget {
   final String requestId;
@@ -326,26 +327,56 @@ class _ManagerDetailScreenState extends ConsumerState<ManagerDetailScreen> {
                       itemCount: req.attachmentUrls.length,
                       itemBuilder: (context, index) {
                         final img = req.attachmentUrls[index];
-                        return Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          width: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.border.withOpacity(0.3),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              img,
-                              fit: BoxFit.cover,
-                              errorBuilder: (c, e, s) => const Center(
-                                child: Icon(
-                                  LucideIcons.image,
-                                  color: AppColors.secondaryText,
+                        return GestureDetector(
+                          onTap: () {
+                            AppImageViewerDialog.show(
+                              context,
+                              imageUrls: req.attachmentUrls,
+                              initialIndex: index,
+                            );
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: AppColors.border.withValues(alpha: 0.3),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    img,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (c, e, s) => const Center(
+                                      child: Icon(
+                                        LucideIcons.image,
+                                        color: AppColors.secondaryText,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              Positioned(
+                                right: 18,
+                                bottom: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Icon(
+                                    LucideIcons.maximize2,
+                                    color: Colors.white,
+                                    size: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
